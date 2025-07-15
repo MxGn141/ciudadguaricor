@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home } from 'lucide-react';
 import { useContextoNoticias } from '../contexts/ContextoNoticias';
-import BarraLateral from '../components/comunes/BarraLateral';
 
 const secciones = [
   { nombre: 'Nacionales', color: 'bg-blue-500', limite: 3 },
@@ -34,7 +33,7 @@ export default function PaginaPrincipal() {
 
         {/* Layout principal */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-4">
             {/* Noticia principal + secundarias */}
             {noticiaPrincipal && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -137,11 +136,6 @@ export default function PaginaPrincipal() {
                 </section>
               );
             })}
-          </div>
-
-          {/* Sidebar derecho */}
-          <div className="lg:col-span-1">
-            <BarraLateral />
           </div>
         </div>
       </main>

@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home } from 'lucide-react';
+import { Home, ChevronDown, Search } from 'lucide-react';
+
+interface Props {
+  isSticky?: boolean;
+  onBuscar: (termino: string) => void;
+}
 
 const secciones = [
   { nombre: 'NACIONALES', ruta: '/seccion/Nacionales', color: 'bg-blue-500' },
@@ -12,45 +17,170 @@ const secciones = [
   { nombre: 'SUCESOS', ruta: '/seccion/Sucesos', color: 'bg-gray-600' },
 ];
 
-export default function BarraNavegacion() {
+export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
   const location = useLocation();
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const [terminoBusqueda, setTerminoBusqueda] = useState('');
+
+  const manejarSubmitBusqueda = (e: React.FormEvent) => {
+    e.preventDefault();
+    onBuscar(terminoBusqueda);
+  };
 
   return (
-    <nav className="bg-white border-b-2 border-gray-200 sticky top-0 z-40 shadow-sm hidden md:block">
+    <nav className={`border-b border-gray-200 transition-all duration-300 ${
+      isSticky ? 'bg-green-800 text-white' : 'bg-white'
+    }`}>
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center">
-          {/* Botón de inicio */}
-          <Link
-            to="/"
-            className={`flex items-center px-4 py-3 text-sm font-medium hover:bg-gray-100 transition-colors border-b-3 ${
-              location.pathname === '/'
-                ? 'border-red-500 bg-gray-50'
-                : 'border-transparent'
-            }`}
-          >
-            <Home size={16} className="mr-2" />
-            <span className="hidden sm:inline">MÁS NOTICIAS</span>
-          </Link>
-          
-          {/* Separador */}
-          <div className="h-8 w-px bg-gray-300 mx-2"></div>
-          
-          {/* Secciones */}
-          <div className="flex overflow-x-auto scrollbar-hide flex-1">
+        {/* Navegación Desktop */}
+        <div className="hidden lg:flex items-center justify-between h-12">
+          <div className="flex items-center space-x-1">
+            {isSticky && (
+              <img 
+                src="/logo.png" 
+                alt="Logo Ciudad Guárico" 
+                className="h-10 w-auto mr-2"
+              />
+            )}
+            <Link
+              to="/"
+              className={`flex items-center px-3 py-2 text-sm font-medium transition-colors ${
+                location.pathname === '/' 
+                  ? 'text-red-400 border-b-2 border-red-400' 
+                  : isSticky 
+                    ? 'text-white hover:bg-green-700' 
+                    : 'text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <Home size={16} className="mr-2" />
+              <span>INICIO</span>
+            </Link>
+            
             {secciones.map((seccion) => (
               <Link
                 key={seccion.nombre}
                 to={seccion.ruta}
-                className={`px-4 py-3 whitespace-nowrap text-sm font-medium hover:bg-gray-100 transition-colors border-b-3 ${
+                className={`px-3 py-2 text-sm font-medium transition-all duration-200 border-b-2 ${
                   location.pathname === seccion.ruta
-                    ? `${seccion.color} border-current text-white`
-                    : 'border-transparent text-gray-700'
+                    ? isSticky 
+                      ? 'text-red-400 border-red-400'
+                      : 'text-red-600 border-red-600'
+                    : isSticky
+                      ? 'text-white border-transparent hover:border-green-600 hover:bg-green-700'
+                      : 'text-gray-700 border-transparent hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
                 {seccion.nombre}
               </Link>
             ))}
           </div>
+
+          {isSticky && (
+            <div className="flex-shrink-0">
+              <form onSubmit={manejarSubmitBusqueda} className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar noticias..."
+                  value={terminoBusqueda}
+                  onChange={(e) => setTerminoBusqueda(e.target.value)}
+                  className="w-48 px-3 py-1 pl-8 text-sm rounded-lg border-2 border-green-600 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none bg-green-700 text-white placeholder-green-300"
+                />
+                <Search 
+                  size={14} 
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 text-green-300"
+                />
+              </form>
+            </div>
+          )}
+        </div>
+
+        {/* Navegación Mobile */}
+        <div className="lg:hidden">
+          <button
+            onClick={() => setMenuAbierto(!menuAbierto)}
+            className={`w-full px-4 py-3 flex items-center justify-between transition-colors ${
+              isSticky 
+                ? 'text-white hover:bg-green-700' 
+                : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <div className="flex items-center">
+              {isSticky && (
+                <img 
+                  src="/logo.png" 
+                  alt="Logo Ciudad Guárico" 
+                  className="h-8 w-auto mr-3"
+                />
+              )}
+              <span className="font-medium">Secciones</span>
+            </div>
+            <ChevronDown 
+              size={20} 
+              className={`transform transition-transform duration-200 ${
+                menuAbierto ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+
+          {menuAbierto && (
+            <div className={`border-t border-gray-200 py-2 ${
+              isSticky ? 'bg-green-800' : 'bg-white'
+            }`}>
+              <Link
+                to="/"
+                className={`flex items-center px-4 py-2 text-sm font-medium transition-colors ${
+                  location.pathname === '/' 
+                    ? isSticky
+                      ? 'text-red-400 bg-green-900'
+                      : 'text-red-600 bg-red-50'
+                    : isSticky
+                      ? 'text-white hover:bg-green-700'
+                      : 'text-gray-700 hover:bg-gray-50'
+                }`}
+                onClick={() => setMenuAbierto(false)}
+              >
+                <Home size={18} className="mr-2" />
+                <span>INICIO</span>
+              </Link>
+              
+              {secciones.map((seccion) => (
+                <Link
+                  key={seccion.nombre}
+                  to={seccion.ruta}
+                  className={`block px-4 py-2 text-sm font-medium transition-colors ${
+                    location.pathname === seccion.ruta
+                      ? isSticky
+                        ? 'text-red-400 bg-green-900'
+                        : 'text-red-600 bg-red-50'
+                      : isSticky
+                        ? 'text-white hover:bg-green-700'
+                        : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setMenuAbierto(false)}
+                >
+                  {seccion.nombre}
+                </Link>
+              ))}
+
+              {isSticky && (
+                <div className="px-4 py-2 border-t border-green-700 mt-2">
+                  <form onSubmit={manejarSubmitBusqueda} className="relative">
+                    <input
+                      type="text"
+                      placeholder="Buscar noticias..."
+                      value={terminoBusqueda}
+                      onChange={(e) => setTerminoBusqueda(e.target.value)}
+                      className="w-full px-3 py-2 pl-9 text-sm rounded-lg border-2 border-green-600 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none bg-green-700 text-white placeholder-green-300"
+                    />
+                    <Search 
+                      size={16} 
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-300"
+                    />
+                  </form>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </nav>
