@@ -31,16 +31,18 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
     <nav className={`border-b border-gray-200 transition-all duration-300 ${
       isSticky ? 'bg-green-800 text-white' : 'bg-white'
     }`}>
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4">
         {/* Navegación Desktop */}
         <div className="hidden lg:flex items-center justify-between h-12">
           <div className="flex items-center space-x-1">
             {isSticky && (
-              <img 
-                src="/logo.png" 
-                alt="Logo Ciudad Guárico" 
-                className="h-10 w-auto mr-2"
-              />
+              <Link to="/" className="flex-shrink-0">
+                <img 
+                  src="/logo.png" 
+                  alt="Logo Ciudad Guárico" 
+                  className="h-10 w-auto mr-2"
+                />
+              </Link>
             )}
             <Link
               to="/"
@@ -96,33 +98,41 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
 
         {/* Navegación Mobile */}
         <div className="lg:hidden">
-          <button
-            onClick={() => setMenuAbierto(!menuAbierto)}
-            className={`w-full px-4 py-3 flex items-center justify-between transition-colors ${
-              isSticky 
-                ? 'text-white hover:bg-green-700' 
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <div className="flex items-center">
-              {isSticky && (
+          <div className={`flex items-center justify-between h-14 ${
+            isSticky ? 'text-white' : 'text-gray-700'
+          }`}>
+            {isSticky && (
+              <Link to="/" className="flex-shrink-0">
                 <img 
                   src="/logo.png" 
                   alt="Logo Ciudad Guárico" 
-                  className="h-8 w-auto mr-3"
+                  className="h-8 w-auto"
                 />
-              )}
-              <span className="font-medium">Secciones</span>
-            </div>
-            <ChevronDown 
-              size={20} 
-              className={`transform transition-transform duration-200 ${
-                menuAbierto ? 'rotate-180' : ''
-              }`}
-            />
-          </button>
+              </Link>
+            )}
+            <button
+              onClick={() => setMenuAbierto(!menuAbierto)}
+              className="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500 transition-colors duration-200"
+            >
+              <span className="sr-only">Abrir menú principal</span>
+              <div className="flex items-center">
+                <span className="font-medium mr-2">Secciones</span>
+                <ChevronDown 
+                  size={20} 
+                  className={`transform transition-transform duration-200 ${
+                    menuAbierto ? 'rotate-180' : ''
+                  }`}
+                />
+              </div>
+            </button>
+          </div>
 
-          {menuAbierto && (
+          {/* Menú móvil desplegable */}
+          <div className={`transform transition-all duration-300 ease-in-out ${
+            menuAbierto 
+              ? 'max-h-screen opacity-100' 
+              : 'max-h-0 opacity-0 overflow-hidden'
+          }`}>
             <div className={`border-t border-gray-200 py-2 ${
               isSticky ? 'bg-green-800' : 'bg-white'
             }`}>
@@ -163,24 +173,24 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
               ))}
 
               {isSticky && (
-                <div className="px-4 py-2 border-t border-green-700 mt-2">
+                <div className="px-4 py-3 border-t border-green-700 mt-2">
                   <form onSubmit={manejarSubmitBusqueda} className="relative">
                     <input
                       type="text"
                       placeholder="Buscar noticias..."
                       value={terminoBusqueda}
                       onChange={(e) => setTerminoBusqueda(e.target.value)}
-                      className="w-full px-3 py-2 pl-9 text-sm rounded-lg border-2 border-green-600 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none bg-green-700 text-white placeholder-green-300"
+                      className="w-full px-4 py-2 pl-10 text-sm rounded-lg border-2 border-green-600 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none bg-green-700 text-white placeholder-green-300"
                     />
                     <Search 
                       size={16} 
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-300"
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-300"
                     />
                   </form>
                 </div>
               )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </nav>
