@@ -3,6 +3,9 @@ module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      screens: {
+        'xs': '475px',
+      },
       colors: {
         'guarico': {
           'blue': '#0088FF',      // Azul brillante principal
@@ -16,7 +19,18 @@ module.exports = {
           'dark-green': '#004000',  // Variante oscura del verde
           'white': '#FFFFFF',     // Blanco del texto y contornos
           'black': '#000000',     // Negro del fondo
+          // Nuevos colores para mejor armonía
+          'primary': '#0066CC',   // Azul principal más oscuro
+          'secondary': '#FFD700', // Dorado como secundario
+          'accent': '#006400',    // Verde como acento
         },
+      },
+      fontFamily: {
+        'serif': ['Merriweather', 'serif'],
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        'guarico': '0 4px 6px -1px rgba(0, 102, 204, 0.1), 0 2px 4px -1px rgba(0, 102, 204, 0.06)',
       },
     },
   },

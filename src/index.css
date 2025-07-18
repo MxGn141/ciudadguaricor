@@ -1,11 +1,34 @@
 /* Importar fuente adicional */
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Merriweather', serif;
+  }
+}
+
 @layer components {
+  /* Responsive utilities */
+  .responsive-banner {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  @media (max-width: 640px) {
+    .responsive-banner {
+      background-position: center top;
+    }
+  }
+
   /* Animaciones para carruseles */
   @keyframes scroll-left {
     0% {
@@ -50,15 +73,17 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-}
-
-@layer base {
-  /* Estilos adicionales para el diseño tipo El Universal */
-  .font-serif {
-    font-family: 'Merriweather', serif;
+  
+  /* Mejoras de accesibilidad y UX */
+  .focus-visible {
+    @apply outline-none ring-2 ring-guarico-gold ring-offset-2;
   }
-
-  .border-b-3 {
-    border-bottom-width: 3px;
+  
+  .btn-primary {
+    @apply bg-guarico-primary text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-guarico-dark-blue focus:ring-2 focus:ring-guarico-gold focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-guarico-secondary text-guarico-black px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-guarico-light-gold focus:ring-2 focus:ring-guarico-primary focus:ring-offset-2;
   }
 }

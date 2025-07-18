@@ -16,21 +16,21 @@ export default function App() {
     <ProveedorContextoAuth>
       <ProveedorContextoNoticias>
         <ProveedorContextoPublicidad>
-          <Router>
-            <Routes>
-              {/* Rutas públicas */}
-              <Route path="/" element={<LayoutPublico />}>
-                <Route index element={<PaginaPrincipal />} />
-                <Route path="seccion/:seccion" element={<PaginaSeccion />} />
+        <Router>
+          <Routes>
+            {/* Rutas públicas */}
+            <Route path="/" element={<LayoutPublico />}>
+              <Route index element={<PaginaPrincipal />} />
+              <Route path="seccion/:seccion" element={<PaginaSeccion />} />
                 <Route path="noticia/:id" element={<VistaNoticia />} />
-              </Route>
-              
-              {/* Rutas de administración */}
-              <Route path="/admin/login" element={<LoginAdmin />} />
-              <Route path="/admin/dashboard" element={<DashboardAdmin />} />
+            </Route>
+            
+            {/* Rutas de administración */}
+            <Route path="/admin/login" element={<LoginAdmin />} />
+            <Route path="/admin/dashboard" element={<DashboardAdmin />} />
               <Route path="/admin/publicidad" element={<GestionarPublicidad />} />
-            </Routes>
-          </Router>
+          </Routes>
+        </Router>
         </ProveedorContextoPublicidad>
       </ProveedorContextoNoticias>
     </ProveedorContextoAuth>

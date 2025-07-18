@@ -82,7 +82,7 @@ const noticiasIniciales: Noticia[] = [
     autorFoto: 'Pedro Martín',
     seccion: 'Nacionales',
     fechaPublicacion: new Date(),
-    destacada: false
+    destacada: true
   },
   {
     id: '5',
@@ -94,7 +94,7 @@ const noticiasIniciales: Noticia[] = [
     autorFoto: 'María Fernández',
     seccion: 'Cultura',
     fechaPublicacion: new Date(),
-    destacada: false
+    destacada: true
   },
   {
     id: '6',
@@ -118,6 +118,79 @@ const noticiasIniciales: Noticia[] = [
     autorFoto: 'Ana López',
     seccion: 'Sociales',
     fechaPublicacion: new Date(),
+    destacada: false
+  },
+  // Noticias de Sucesos
+  {
+    id: '37',
+    titulo: 'Bomberos controlan incendio en zona industrial',
+    contenido: 'Rápida acción de los cuerpos de seguridad evita daños mayores en incidente.',
+    resumen: 'Efectiva respuesta ante emergencia industrial.',
+    imagen: 'https://images.pexels.com/photos/6061750/pexels-photo-6061750.jpeg?auto=compress&cs=tinysrgb&w=800',
+    autorTexto: 'Roberto Méndez',
+    autorFoto: 'María Sánchez',
+    seccion: 'Sucesos',
+    fechaPublicacion: new Date(),
+    destacada: true
+  },
+  {
+    id: '38',
+    titulo: 'Protección Civil realiza simulacro de emergencia',
+    contenido: 'Ejercicio de preparación involucra a múltiples organismos de seguridad.',
+    resumen: 'Exitoso simulacro fortalece respuesta ante emergencias.',
+    imagen: 'https://images.pexels.com/photos/6062557/pexels-photo-6062557.jpeg?auto=compress&cs=tinysrgb&w=800',
+    autorTexto: 'Carlos López',
+    autorFoto: 'Ana Torres',
+    seccion: 'Sucesos',
+    fechaPublicacion: new Date(Date.now() - 86400000),
+    destacada: false
+  },
+  {
+    id: '39',
+    titulo: 'Rescatan excursionistas en Parque Nacional',
+    contenido: 'Grupos especializados logran exitoso rescate de grupo extraviado.',
+    resumen: 'Operativo de rescate culmina con éxito.',
+    imagen: 'https://images.pexels.com/photos/6062573/pexels-photo-6062573.jpeg?auto=compress&cs=tinysrgb&w=800',
+    autorTexto: 'Miguel Ángel',
+    autorFoto: 'Patricia Blanco',
+    seccion: 'Sucesos',
+    fechaPublicacion: new Date(Date.now() - 172800000),
+    destacada: false
+  },
+  {
+    id: '40',
+    titulo: 'Policía recupera vehículos robados',
+    contenido: 'Operativo especial permite la recuperación de varios vehículos sustraídos.',
+    resumen: 'Exitoso operativo policial contra el robo de vehículos.',
+    imagen: 'https://images.pexels.com/photos/6062574/pexels-photo-6062574.jpeg?auto=compress&cs=tinysrgb&w=800',
+    autorTexto: 'Pedro Ramírez',
+    autorFoto: 'Laura González',
+    seccion: 'Sucesos',
+    fechaPublicacion: new Date(Date.now() - 259200000),
+    destacada: false
+  },
+  {
+    id: '41',
+    titulo: 'Capacitan a comunidades en prevención de riesgos',
+    contenido: 'Programa especial forma a líderes comunitarios en gestión de emergencias.',
+    resumen: 'Comunidades mejor preparadas ante emergencias.',
+    imagen: 'https://images.pexels.com/photos/6062575/pexels-photo-6062575.jpeg?auto=compress&cs=tinysrgb&w=800',
+    autorTexto: 'Andrea Torres',
+    autorFoto: 'José Martínez',
+    seccion: 'Sucesos',
+    fechaPublicacion: new Date(Date.now() - 345600000),
+    destacada: false
+  },
+  {
+    id: '42',
+    titulo: 'Bomberos realizan jornada preventiva',
+    contenido: 'Cuerpo de bomberos inspecciona establecimientos comerciales.',
+    resumen: 'Importante labor preventiva de los bomberos.',
+    imagen: 'https://images.pexels.com/photos/6062576/pexels-photo-6062576.jpeg?auto=compress&cs=tinysrgb&w=800',
+    autorTexto: 'Luis García',
+    autorFoto: 'Carmen Díaz',
+    seccion: 'Sucesos',
+    fechaPublicacion: new Date(Date.now() - 432000000),
     destacada: false
   }
 ];

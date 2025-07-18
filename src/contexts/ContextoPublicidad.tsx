@@ -2,17 +2,19 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface Banner {
   id: string;
-  tipo: 'header' | 'sidebar' | 'inicio';
+  tipo: 'header' | 'sidebar' | 'inicio' | 'inicio-back';
   imagen: string;
   enlace?: string;
   activo: boolean;
+  posicion?: 'primera' | 'segunda';
 }
 
 interface ContextoPublicidadProps {
   banners: Banner[];
   bannerHeader: Banner | null;
-  bannerSidebar: Banner | null;
+  bannersSidebar: Banner[];
   bannerInicio: Banner | null;
+  bannerInicioBack: Banner | null;
   actualizarBanner: (banner: Banner) => void;
   eliminarBanner: (id: string) => void;
   agregarBanner: (banner: Banner) => void;
@@ -36,34 +38,60 @@ export function ProveedorContextoPublicidad({ children }: { children: React.Reac
     },
     {
       id: '3',
+      tipo: 'sidebar',
+      imagen: '/banner-publicidad/banner-sidebar-b.png',
+      activo: true
+    },
+    {
+      id: '4',
+      tipo: 'sidebar',
+      imagen: '/banner-publicidad/banner-sidebar.png',
+      activo: true
+    },
+    {
+      id: '5',
+      tipo: 'sidebar',
+      imagen: '/banner-publicidad/banner-sidebar-b.png',
+      activo: true
+    },
+    {
+      id: '6',
+      tipo: 'sidebar',
+      imagen: '/banner-publicidad/banner-sidebar.png',
+      activo: true
+    },
+    {
+      id: '7',
+      tipo: 'sidebar',
+      imagen: '/banner-publicidad/banner-sidebar-b.png',
+      activo: true
+    },
+    {
+      id: '8',
       tipo: 'inicio',
       imagen: '/banner-publicidad/banner-inicio.png',
+      activo: true,
+      posicion: 'primera'
+    },
+    {
+      id: '9',
+      tipo: 'inicio',
+      imagen: '/banner-publicidad/banner-inicio.png',
+      activo: true,
+      posicion: 'segunda'
+    },
+    {
+      id: '10',
+      tipo: 'inicio-back',
+      imagen: '/banner-publicidad/banner-inicio-back.png',
       activo: true
     }
   ]);
 
-  // Asegurarse de que las imágenes estén disponibles
-  useEffect(() => {
-    // Verificar si las imágenes existen y son accesibles
-    const verificarImagen = async (src: string) => {
-      try {
-        const response = await fetch(src);
-        if (!response.ok) {
-          console.error(`No se pudo cargar la imagen: ${src}`);
-        }
-      } catch (error) {
-        console.error(`Error al cargar la imagen: ${src}`, error);
-      }
-    };
-
-    banners.forEach(banner => {
-      verificarImagen(banner.imagen);
-    });
-  }, []);
-
   const bannerHeader = banners.find(b => b.tipo === 'header' && b.activo) || null;
-  const bannerSidebar = banners.find(b => b.tipo === 'sidebar' && b.activo) || null;
+  const bannersSidebar = banners.filter(b => b.tipo === 'sidebar' && b.activo).slice(0, 6);
   const bannerInicio = banners.find(b => b.tipo === 'inicio' && b.activo) || null;
+  const bannerInicioBack = banners.find(b => b.tipo === 'inicio-back' && b.activo) || null;
 
   const actualizarBanner = (bannerActualizado: Banner) => {
     setBanners(banners.map(banner => 
@@ -76,15 +104,16 @@ export function ProveedorContextoPublicidad({ children }: { children: React.Reac
   };
 
   const agregarBanner = (nuevoBanner: Banner) => {
-    setBanners([...banners, nuevoBanner]);
+    setBanners(prev => [...prev, nuevoBanner]);
   };
 
   return (
     <ContextoPublicidad.Provider value={{
       banners,
       bannerHeader,
-      bannerSidebar,
+      bannersSidebar,
       bannerInicio,
+      bannerInicioBack,
       actualizarBanner,
       eliminarBanner,
       agregarBanner
@@ -100,4 +129,4 @@ export function useContextoPublicidad() {
     throw new Error('useContextoPublicidad debe ser usado dentro de un ProveedorContextoPublicidad');
   }
   return context;
-} 
+}
