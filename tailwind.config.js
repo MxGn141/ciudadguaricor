@@ -4,6 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
+<<<<<<< HEAD
         'guarico': {
           'blue': '#0088FF',      // Azul brillante principal
           'light-blue': '#00B7FF', // Azul claro
@@ -17,6 +18,16 @@ export default {
           'white': '#FFFFFF',     // Blanco del texto y contornos
           'black': '#000000',     // Negro del fondo
         },
+=======
+        'guarico-blue': {
+          DEFAULT: '#0074D9', // Azul principal
+          dark: '#003366',   // Azul oscuro
+        },
+        'guarico-green': '#00843D', // Verde bandera
+        'guarico-yellow': '#FFD600', // Amarillo bandera
+        'guarico-black': '#000000',
+        'guarico-white': '#FFFFFF',
+>>>>>>> b280d1bf9bedb1668e1d35ea6ca2713a3f1352b4
       },
     },
   },
