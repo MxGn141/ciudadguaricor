@@ -9,18 +9,18 @@ export default function BarraLateral() {
   return (
     <aside className="w-full space-y-6">
       {/* Edición del Día */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-red-600 text-white px-4 py-2">
+      <div className="bg-guarico-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-guarico-blue text-guarico-white px-4 py-2">
           <h3 className="font-bold text-lg">EDICIÓN DEL DÍA</h3>
         </div>
         <div className="p-4">
-          <div className="relative bg-red-500 rounded-lg overflow-hidden">
+          <div className="relative bg-guarico-dark-blue rounded-lg overflow-hidden">
             <div className="aspect-[3/4] flex items-center justify-center">
               <div className="text-center">
-                <div className="text-6xl font-bold text-white mb-2">CIUDAD</div>
-                <div className="text-6xl font-bold text-white">GUÁRICO</div>
+                <div className="text-6xl font-bold text-guarico-gold mb-2">CIUDAD</div>
+                <div className="text-6xl font-bold text-guarico-gold">GUÁRICO</div>
                 <div className="absolute bottom-4 left-4 right-4">
-                  <div className="text-white font-semibold">
+                  <div className="text-guarico-white font-semibold">
                     {new Date().toLocaleDateString('es-ES', { 
                       day: '2-digit', 
                       month: '2-digit', 
@@ -30,13 +30,13 @@ export default function BarraLateral() {
                 </div>
               </div>
             </div>
-            <button className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all">
+            <button className="absolute top-2 right-2 bg-guarico-black bg-opacity-50 text-guarico-white p-2 rounded-full hover:bg-opacity-75 transition-all">
               <Eye size={16} />
             </button>
           </div>
           <button 
             onClick={() => window.open('/edicion-pdf', '_blank')}
-            className="w-full mt-4 bg-red-600 text-white px-4 py-2 rounded font-semibold hover:bg-red-700 transition-colors flex items-center justify-center"
+            className="w-full mt-4 bg-guarico-blue text-guarico-white px-4 py-2 rounded font-semibold hover:bg-guarico-light-blue transition-colors flex items-center justify-center"
           >
             <Download size={20} className="mr-2" />
             Descargar PDF
@@ -48,33 +48,33 @@ export default function BarraLateral() {
       <div className="flex justify-center space-x-3">
         <button 
           onClick={() => window.open('https://twitter.com/ciudadguarico', '_blank')}
-          className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors"
+          className="w-12 h-12 bg-guarico-blue rounded-full flex items-center justify-center hover:bg-guarico-light-blue transition-colors"
         >
-          <span className="text-white font-bold text-xl">★</span>
+          <span className="text-guarico-gold font-bold text-xl">★</span>
         </button>
         <button 
           onClick={() => document.getElementById('search-input')?.focus()}
-          className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+          className="w-12 h-12 bg-guarico-green rounded-full flex items-center justify-center hover:bg-guarico-light-green transition-colors"
         >
-          <span className="text-white font-bold text-xl">🔍</span>
+          <span className="text-guarico-white font-bold text-xl">🔍</span>
         </button>
         <button 
           onClick={() => window.location.reload()}
-          className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+          className="w-12 h-12 bg-guarico-gold rounded-full flex items-center justify-center hover:bg-guarico-light-gold transition-colors"
         >
-          <span className="text-white font-bold text-xl">⚡</span>
+          <span className="text-guarico-black font-bold text-xl">⚡</span>
         </button>
         <button 
           onClick={() => window.open('/', '_blank')}
-          className="w-12 h-12 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-800 transition-colors"
+          className="w-12 h-12 bg-guarico-blue rounded-full flex items-center justify-center hover:bg-guarico-light-blue transition-colors"
         >
-          <span className="text-white font-bold text-xl">CG</span>
+          <span className="text-guarico-gold font-bold text-xl">CG</span>
         </button>
       </div>
 
       {/* Publicidad */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-red-600 text-white px-4 py-2">
+      <div className="bg-guarico-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-guarico-blue text-guarico-white px-4 py-2">
           <h3 className="font-semibold">Publicidad</h3>
         </div>
         <div className="p-4 space-y-3">
@@ -108,7 +108,7 @@ export default function BarraLateral() {
             ))
           ) : (
             <div className="text-center py-6 text-gray-500">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+              <div className="border-2 border-dashed border-guarico-light-blue rounded-lg p-4">
                 <p className="text-sm">Espacio publicitario disponible</p>
                 <p className="text-xs mt-1">Hasta 6 anuncios</p>
               </div>
@@ -118,8 +118,8 @@ export default function BarraLateral() {
       </div>
 
       {/* Clima */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-blue-600 text-white px-4 py-2">
+      <div className="bg-guarico-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-guarico-green text-guarico-white px-4 py-2">
           <h3 className="font-semibold">Clima en Guárico</h3>
         </div>
         <div className="p-4 text-center">
@@ -135,33 +135,33 @@ export default function BarraLateral() {
       </div>
 
       {/* Redes Sociales */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-red-600 text-white px-4 py-2">
+      <div className="bg-guarico-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-guarico-blue text-guarico-white px-4 py-2">
           <h3 className="font-semibold">Síguenos</h3>
         </div>
         <div className="p-4">
           <div className="grid grid-cols-2 gap-3">
             <button 
               onClick={() => window.open('https://facebook.com/ciudadguarico', '_blank')}
-              className="bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
+              className="bg-guarico-blue text-guarico-white px-3 py-2 rounded text-sm hover:bg-guarico-light-blue transition-colors"
             >
               Facebook
             </button>
             <button 
               onClick={() => window.open('https://twitter.com/ciudadguarico', '_blank')}
-              className="bg-blue-400 text-white px-3 py-2 rounded text-sm hover:bg-blue-500 transition-colors"
+              className="bg-guarico-green text-guarico-white px-3 py-2 rounded text-sm hover:bg-guarico-light-green transition-colors"
             >
               Twitter
             </button>
             <button 
               onClick={() => window.open('https://instagram.com/ciudadguarico', '_blank')}
-              className="bg-pink-600 text-white px-3 py-2 rounded text-sm hover:bg-pink-700 transition-colors"
+              className="bg-guarico-gold text-guarico-black px-3 py-2 rounded text-sm hover:bg-guarico-light-gold transition-colors"
             >
               Instagram
             </button>
             <button 
               onClick={() => window.open('https://youtube.com/ciudadguarico', '_blank')}
-              className="bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition-colors"
+              className="bg-guarico-blue text-guarico-white px-3 py-2 rounded text-sm hover:bg-guarico-light-blue transition-colors"
             >
               YouTube
             </button>

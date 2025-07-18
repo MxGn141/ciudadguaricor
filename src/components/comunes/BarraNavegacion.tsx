@@ -8,13 +8,13 @@ interface Props {
 }
 
 const secciones = [
-  { nombre: 'NACIONALES', ruta: '/seccion/Nacionales', color: 'bg-blue-500' },
-  { nombre: 'MUNICIPALES', ruta: '/seccion/Municipales', color: 'bg-green-500' },
-  { nombre: 'DEPORTES', ruta: '/seccion/Deportes', color: 'bg-red-500' },
-  { nombre: 'CULTURA', ruta: '/seccion/Cultura', color: 'bg-purple-500' },
-  { nombre: 'ECONOMÍA', ruta: '/seccion/Economía', color: 'bg-yellow-500' },
-  { nombre: 'SOCIALES', ruta: '/seccion/Sociales', color: 'bg-pink-500' },
-  { nombre: 'SUCESOS', ruta: '/seccion/Sucesos', color: 'bg-gray-600' },
+  { nombre: 'NACIONALES', ruta: '/seccion/Nacionales', color: 'bg-guarico-blue' },
+  { nombre: 'MUNICIPALES', ruta: '/seccion/Municipales', color: 'bg-guarico-green' },
+  { nombre: 'DEPORTES', ruta: '/seccion/Deportes', color: 'bg-guarico-gold' },
+  { nombre: 'CULTURA', ruta: '/seccion/Cultura', color: 'bg-guarico-blue' },
+  { nombre: 'ECONOMÍA', ruta: '/seccion/Economía', color: 'bg-guarico-green' },
+  { nombre: 'SOCIALES', ruta: '/seccion/Sociales', color: 'bg-guarico-gold' },
+  { nombre: 'SUCESOS', ruta: '/seccion/Sucesos', color: 'bg-guarico-blue' },
 ];
 
 export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
@@ -28,8 +28,8 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
   };
 
   return (
-    <nav className={`border-b border-gray-200 transition-all duration-300 ${
-      isSticky ? 'bg-green-800 text-white' : 'bg-white'
+    <nav className={`border-b border-guarico-gold transition-all duration-300 ${
+      isSticky ? 'bg-guarico-blue text-guarico-white' : 'bg-guarico-white'
     }`}>
       <div className="max-w-7xl mx-auto px-2 sm:px-4">
         {/* Navegación Desktop */}
@@ -48,9 +48,9 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
               to="/"
               className={`flex items-center px-3 py-2 text-sm font-medium transition-colors ${
                 location.pathname === '/' 
-                  ? 'text-red-400 border-b-2 border-red-400' 
+                  ? 'text-guarico-gold border-b-2 border-guarico-gold' 
                   : isSticky 
-                    ? 'text-white hover:bg-green-700' 
+                    ? 'text-guarico-white hover:bg-guarico-light-blue' 
                     : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -65,10 +65,10 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
                 className={`px-3 py-2 text-sm font-medium transition-all duration-200 border-b-2 ${
                   location.pathname === seccion.ruta
                     ? isSticky 
-                      ? 'text-red-400 border-red-400'
-                      : 'text-red-600 border-red-600'
+                      ? 'text-guarico-gold border-guarico-gold'
+                      : 'text-guarico-blue border-guarico-blue'
                     : isSticky
-                      ? 'text-white border-transparent hover:border-green-600 hover:bg-green-700'
+                      ? 'text-guarico-white border-transparent hover:border-guarico-light-blue hover:bg-guarico-light-blue'
                       : 'text-gray-700 border-transparent hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -85,11 +85,11 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
                   placeholder="Buscar noticias..."
                   value={terminoBusqueda}
                   onChange={(e) => setTerminoBusqueda(e.target.value)}
-                  className="w-48 px-3 py-1 pl-8 text-sm rounded-lg border-2 border-green-600 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none bg-green-700 text-white placeholder-green-300"
+                  className="w-48 px-3 py-1 pl-8 text-sm rounded-lg border-2 border-guarico-light-blue focus:border-guarico-light-blue focus:ring-1 focus:ring-guarico-light-blue focus:outline-none bg-guarico-blue text-guarico-white placeholder-guarico-light-gold"
                 />
                 <Search 
                   size={14} 
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 text-green-300"
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 text-guarico-light-gold"
                 />
               </form>
             </div>
@@ -99,7 +99,7 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
         {/* Navegación Mobile */}
         <div className="lg:hidden">
           <div className={`flex items-center justify-between h-14 ${
-            isSticky ? 'text-white' : 'text-gray-700'
+            isSticky ? 'text-guarico-white' : 'text-gray-700'
           }`}>
             {isSticky && (
               <Link to="/" className="flex-shrink-0">
@@ -112,7 +112,7 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
             )}
             <button
               onClick={() => setMenuAbierto(!menuAbierto)}
-              className="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500 transition-colors duration-200"
+              className="inline-flex items-center justify-center p-2 rounded-md hover:bg-guarico-light-blue hover:text-guarico-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-guarico-light-blue transition-colors duration-200"
             >
               <span className="sr-only">Abrir menú principal</span>
               <div className="flex items-center">
@@ -133,18 +133,18 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
               ? 'max-h-screen opacity-100' 
               : 'max-h-0 opacity-0 overflow-hidden'
           }`}>
-            <div className={`border-t border-gray-200 py-2 ${
-              isSticky ? 'bg-green-800' : 'bg-white'
+            <div className={`border-t border-guarico-light-blue py-2 ${
+              isSticky ? 'bg-guarico-blue' : 'bg-guarico-white'
             }`}>
               <Link
                 to="/"
                 className={`flex items-center px-4 py-2 text-sm font-medium transition-colors ${
                   location.pathname === '/' 
                     ? isSticky
-                      ? 'text-red-400 bg-green-900'
-                      : 'text-red-600 bg-red-50'
+                      ? 'text-guarico-gold bg-guarico-dark-blue'
+                      : 'text-guarico-blue bg-gray-50'
                     : isSticky
-                      ? 'text-white hover:bg-green-700'
+                      ? 'text-guarico-white hover:bg-guarico-light-blue'
                       : 'text-gray-700 hover:bg-gray-50'
                 }`}
                 onClick={() => setMenuAbierto(false)}
@@ -160,10 +160,10 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
                   className={`block px-4 py-2 text-sm font-medium transition-colors ${
                     location.pathname === seccion.ruta
                       ? isSticky
-                        ? 'text-red-400 bg-green-900'
-                        : 'text-red-600 bg-red-50'
+                        ? 'text-guarico-gold bg-guarico-dark-blue'
+                        : 'text-guarico-blue bg-gray-50'
                       : isSticky
-                        ? 'text-white hover:bg-green-700'
+                        ? 'text-guarico-white hover:bg-guarico-light-blue'
                         : 'text-gray-700 hover:bg-gray-50'
                   }`}
                   onClick={() => setMenuAbierto(false)}
@@ -173,18 +173,18 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
               ))}
 
               {isSticky && (
-                <div className="px-4 py-3 border-t border-green-700 mt-2">
+                <div className="px-4 py-3 border-t border-guarico-light-blue mt-2">
                   <form onSubmit={manejarSubmitBusqueda} className="relative">
                     <input
                       type="text"
                       placeholder="Buscar noticias..."
                       value={terminoBusqueda}
                       onChange={(e) => setTerminoBusqueda(e.target.value)}
-                      className="w-full px-4 py-2 pl-10 text-sm rounded-lg border-2 border-green-600 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none bg-green-700 text-white placeholder-green-300"
+                      className="w-full px-4 py-2 pl-10 text-sm rounded-lg border-2 border-guarico-light-blue focus:border-guarico-light-blue focus:ring-1 focus:ring-guarico-light-blue focus:outline-none bg-guarico-blue text-guarico-white placeholder-guarico-light-gold"
                     />
                     <Search 
                       size={16} 
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-300"
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-guarico-light-gold"
                     />
                   </form>
                 </div>
