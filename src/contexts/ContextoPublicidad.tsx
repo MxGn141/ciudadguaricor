@@ -25,22 +25,41 @@ export function ProveedorContextoPublicidad({ children }: { children: React.Reac
     {
       id: '1',
       tipo: 'header',
-      imagen: '/src/banner-publicidad/banner-header.png',
+      imagen: '/banner-publicidad/banner-header.png',
       activo: true
     },
     {
       id: '2',
       tipo: 'sidebar',
-      imagen: '/src/banner-publicidad/banner-sidebar.png',
+      imagen: '/banner-publicidad/banner-sidebar.png',
       activo: true
     },
     {
       id: '3',
       tipo: 'inicio',
-      imagen: '/src/banner-publicidad/banner-inicio.png',
+      imagen: '/banner-publicidad/banner-inicio.png',
       activo: true
     }
   ]);
+
+  // Asegurarse de que las imágenes estén disponibles
+  useEffect(() => {
+    // Verificar si las imágenes existen y son accesibles
+    const verificarImagen = async (src: string) => {
+      try {
+        const response = await fetch(src);
+        if (!response.ok) {
+          console.error(`No se pudo cargar la imagen: ${src}`);
+        }
+      } catch (error) {
+        console.error(`Error al cargar la imagen: ${src}`, error);
+      }
+    };
+
+    banners.forEach(banner => {
+      verificarImagen(banner.imagen);
+    });
+  }, []);
 
   const bannerHeader = banners.find(b => b.tipo === 'header' && b.activo) || null;
   const bannerSidebar = banners.find(b => b.tipo === 'sidebar' && b.activo) || null;
@@ -59,11 +78,6 @@ export function ProveedorContextoPublicidad({ children }: { children: React.Reac
   const agregarBanner = (nuevoBanner: Banner) => {
     setBanners([...banners, nuevoBanner]);
   };
-
-  // En un caso real, aquí cargaríamos los banners desde una API o base de datos
-  useEffect(() => {
-    // Cargar banners desde el backend
-  }, []);
 
   return (
     <ContextoPublicidad.Provider value={{

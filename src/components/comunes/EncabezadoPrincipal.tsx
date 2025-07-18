@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Menu, X, Facebook, Twitter, Instagram } from 'lucide-react';
 import { useContextoPublicidad } from '../../contexts/ContextoPublicidad';
@@ -19,16 +19,14 @@ export default function EncabezadoPrincipal({ onBuscar }: Props) {
     setMostrarBusqueda(false);
   };
 
-  const estiloHeader = bannerHeader ? {
-    backgroundImage: `url(${bannerHeader.imagen})`,
-    backgroundSize: '100% 100%',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    width: '100%',
-    height: '100%'
-  } : {
-    backgroundColor: '#0088FF'
-  };
+  // Verificar que el banner se está cargando
+  useEffect(() => {
+    if (bannerHeader) {
+      console.log('Banner cargado:', bannerHeader);
+    } else {
+      console.log('No hay banner disponible');
+    }
+  }, [bannerHeader]);
 
   return (
     <header className="shadow-md relative z-50">
@@ -70,70 +68,72 @@ export default function EncabezadoPrincipal({ onBuscar }: Props) {
       </div>
 
       {/* Encabezado principal con banner */}
-      <div className="w-full relative banner-container">
-        {bannerHeader && (
-          <div className="absolute inset-0">
-            <img 
-              src={bannerHeader.imagen}
-              alt="Banner header"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+      <div className="relative">
+        {/* Banner de fondo */}
+        <div 
+          className="absolute inset-0 w-full h-full"
+          style={{
+            backgroundColor: '#0088FF',
+            ...(bannerHeader && {
+              backgroundImage: `url(${bannerHeader.imagen})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            })
+          }}
+        />
         
         {/* Contenido del encabezado */}
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between">
-              {/* Menú móvil y búsqueda */}
-              <div className="flex items-center lg:hidden">
-                <button
-                  onClick={() => setMenuAbierto(!menuAbierto)}
-                  className="p-2 hover:bg-black/20 rounded-lg text-guarico-white transition-colors"
-                  aria-label="Menú principal"
-                >
-                  {menuAbierto ? <X size={24} /> : <Menu size={24} />}
-                </button>
-              </div>
+        <div className="relative max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            {/* Menú móvil y búsqueda */}
+            <div className="flex items-center lg:hidden">
+              <button
+                onClick={() => setMenuAbierto(!menuAbierto)}
+                className="p-2 hover:bg-black/20 rounded-lg text-guarico-white transition-colors"
+                aria-label="Menú principal"
+              >
+                {menuAbierto ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
 
-              {/* Logo centrado */}
-              <div className="flex-1 flex justify-center items-center">
-                <Link to="/" className="block">
-                  <img 
-                    src="/logo.png" 
-                    alt="Logo Ciudad Guárico" 
-                    className="h-16 w-auto object-contain transition-transform duration-300 hover:scale-105 sm:h-20 md:h-24 lg:h-28"
-                  />
-                </Link>
-              </div>
+            {/* Logo centrado */}
+            <div className="flex-1 flex justify-center items-center">
+              <Link to="/" className="block">
+                <img 
+                  src="/logo.png" 
+                  alt="Logo Ciudad Guárico" 
+                  className="h-20 w-auto object-contain transition-transform duration-300 hover:scale-105 sm:h-24 md:h-28 lg:h-32"
+                />
+              </Link>
+            </div>
 
-              {/* Búsqueda desktop */}
-              <div className="hidden lg:flex items-center space-x-4">
-                <form onSubmit={manejarBusqueda} className="relative">
-                  <input
-                    type="text"
-                    placeholder="Buscar noticias..."
-                    value={terminoBusqueda}
-                    onChange={(e) => setTerminoBusqueda(e.target.value)}
-                    className="w-64 px-4 py-2 pl-10 rounded-lg border-2 border-white/30 focus:border-guarico-gold focus:ring-2 focus:ring-guarico-gold focus:outline-none bg-black/20 text-white placeholder-white/70"
-                  />
-                  <Search 
-                    size={20} 
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
-                  />
-                </form>
-              </div>
+            {/* Búsqueda desktop */}
+            <div className="hidden lg:flex items-center space-x-4">
+              <form onSubmit={manejarBusqueda} className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar noticias..."
+                  value={terminoBusqueda}
+                  onChange={(e) => setTerminoBusqueda(e.target.value)}
+                  className="w-64 px-4 py-2 pl-10 rounded-lg border-2 border-white/30 focus:border-guarico-gold focus:ring-2 focus:ring-guarico-gold focus:outline-none bg-black/20 text-white placeholder-white/70"
+                />
+                <Search 
+                  size={20} 
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
+                />
+              </form>
+            </div>
 
-              {/* Botón de búsqueda móvil */}
-              <div className="lg:hidden">
-                <button
-                  onClick={() => setMostrarBusqueda(!mostrarBusqueda)}
-                  className="p-2 hover:bg-black/20 rounded-lg text-guarico-white transition-colors"
-                  aria-label="Buscar"
-                >
-                  <Search size={24} />
-                </button>
-              </div>
+            {/* Botón de búsqueda móvil */}
+            <div className="lg:hidden">
+              <button
+                onClick={() => setMostrarBusqueda(!mostrarBusqueda)}
+                className="p-2 hover:bg-black/20 rounded-lg text-guarico-white transition-colors"
+                aria-label="Buscar"
+              >
+                <Search size={24} />
+              </button>
             </div>
           </div>
         </div>
