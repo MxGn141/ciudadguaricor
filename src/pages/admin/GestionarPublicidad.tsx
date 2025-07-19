@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { useContextoPublicidad } from '../../contexts/ContextoPublicidad';
-import { Upload, X, Edit2, Check, Eye, EyeOff, Plus, Image as ImageIcon } from 'lucide-react';
+import { useContextoContenido } from '../../contexts/ContextoContenido';
+import { Upload, X, Eye, EyeOff, Plus, Image as ImageIcon } from 'lucide-react';
 
 export default function GestionarPublicidad() {
-  const { banners, actualizarBanner, eliminarBanner, agregarBanner } = useContextoPublicidad();
+  const { contenidos, actualizarContenido, eliminarContenido, agregarContenido } = useContextoContenido();
   const [bannerEditando, setBannerEditando] = useState<string | null>(null);
   const [mostrarFormulario, setMostrarFormulario] = useState<'header' | 'sidebar' | 'inicio' | 'inicio-back' | 'inicio-2' | null>(null);
   const [nuevoBanner, setNuevoBanner] = useState({
@@ -22,14 +22,14 @@ export default function GestionarPublicidad() {
       
       const reader = new FileReader();
       reader.onloadend = () => {
-        const banner = {
+        const contenido = {
           id: Date.now().toString(),
           tipo,
           imagen: reader.result as string,
           enlace: nuevoBanner.enlace,
           activo: true
         };
-        agregarBanner(banner);
+        agregarContenido(contenido);
         setNuevoBanner({ imagen: '', enlace: '' });
         setMostrarFormulario(null);
       };
@@ -37,16 +37,16 @@ export default function GestionarPublicidad() {
     }
   };
 
-  const handleToggleActivo = (banner: any) => {
-    actualizarBanner({
-      ...banner,
-      activo: !banner.activo
+  const handleToggleActivo = (contenido: any) => {
+    actualizarContenido({
+      ...contenido,
+      activo: !contenido.activo
     });
   };
 
   const handleEliminar = (id: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este banner?')) {
-      eliminarBanner(id);
+    if (window.confirm('¿Estás seguro de que quieres eliminar este contenido?')) {
+      eliminarContenido(id);
     }
   };
 
@@ -56,7 +56,7 @@ export default function GestionarPublicidad() {
       return;
     }
 
-    const banner = {
+    const contenido = {
       id: Date.now().toString(),
       tipo,
       imagen: nuevoBanner.imagen,
@@ -64,7 +64,7 @@ export default function GestionarPublicidad() {
       activo: true
     };
     
-    agregarBanner(banner);
+    agregarContenido(contenido);
     setNuevoBanner({ imagen: '', enlace: '' });
     setMostrarFormulario(null);
   };
@@ -74,7 +74,7 @@ export default function GestionarPublicidad() {
     titulo: string, 
     descripcion: string 
   }) => {
-    const bannersDelTipo = banners.filter(b => b.tipo === tipo);
+    const contenidosDelTipo = contenidos.filter(b => b.tipo === tipo);
     
     return (
       <div className="mb-8 bg-white rounded-lg shadow-md p-6">
@@ -88,14 +88,14 @@ export default function GestionarPublicidad() {
             className="flex items-center px-4 py-2 bg-guarico-blue text-white rounded-lg hover:bg-guarico-light-blue transition-colors"
           >
             <Plus size={16} className="mr-2" />
-            Agregar Banner
+            Agregar Contenido
           </button>
         </div>
 
-        {/* Formulario para agregar banner */}
+        {/* Formulario para agregar contenido */}
         {mostrarFormulario === tipo && (
           <div className="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-            <h3 className="font-medium mb-4">Agregar Nuevo Banner</h3>
+            <h3 className="font-medium mb-4">Agregar Nuevo Contenido</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -126,7 +126,7 @@ export default function GestionarPublicidad() {
                   onClick={() => handleSubmitURL(tipo)}
                   className="px-4 py-2 bg-guarico-green text-white rounded-lg hover:bg-guarico-light-green transition-colors"
                 >
-                  Agregar Banner
+                  Agregar Contenido
                 </button>
                 <span className="text-gray-500">o</span>
                 <input
@@ -157,21 +157,21 @@ export default function GestionarPublicidad() {
           </div>
         )}
 
-        {/* Lista de banners */}
+        {/* Lista de contenidos */}
         <div className="space-y-4">
-          {bannersDelTipo.length > 0 ? (
-            bannersDelTipo.map(banner => (
-              <div key={banner.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+          {contenidosDelTipo.length > 0 ? (
+            contenidosDelTipo.map(contenido => (
+              <div key={contenido.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-4">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      banner.activo 
+                      contenido.activo 
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-red-100 text-red-800'
                     }`}>
-                      {banner.activo ? 'Activo' : 'Inactivo'}
+                      {contenido.activo ? 'Activo' : 'Inactivo'}
                     </span>
-                    {banner.enlace && (
+                    {contenido.enlace && (
                       <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
                         Con enlace
                       </span>
@@ -179,18 +179,18 @@ export default function GestionarPublicidad() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => handleToggleActivo(banner)}
+                      onClick={() => handleToggleActivo(contenido)}
                       className={`p-2 rounded-lg transition-colors ${
-                        banner.activo 
+                        contenido.activo 
                           ? 'text-red-600 hover:bg-red-50' 
                           : 'text-green-600 hover:bg-green-50'
                       }`}
-                      title={banner.activo ? 'Desactivar' : 'Activar'}
+                      title={contenido.activo ? 'Desactivar' : 'Activar'}
                     >
-                      {banner.activo ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {contenido.activo ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                     <button
-                      onClick={() => handleEliminar(banner.id)}
+                      onClick={() => handleEliminar(contenido.id)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Eliminar"
                     >
@@ -201,21 +201,14 @@ export default function GestionarPublicidad() {
                 
                 <div className="relative group">
                   <img
-                    src={banner.imagen}
-                    alt="Banner preview"
-                    className={`w-full rounded-lg transition-opacity ${
-                      tipo === 'header' ? 'h-32 object-cover' :
-                      tipo === 'sidebar' ? 'h-48 object-cover' :
-                      'h-40 object-cover'
-                    }`}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x200/0088FF/FFFFFF?text=Error+al+cargar+imagen';
-                    }}
+                    src={contenido.imagen}
+                    alt="Vista previa"
+                    className="w-full h-40 object-cover rounded-lg"
                   />
-                  {banner.enlace && (
+                  {contenido.enlace && (
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-lg flex items-center justify-center">
                       <a
-                        href={banner.enlace}
+                        href={contenido.enlace}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="opacity-0 group-hover:opacity-100 bg-white text-guarico-blue px-4 py-2 rounded-lg font-medium transition-opacity duration-300"
@@ -226,16 +219,16 @@ export default function GestionarPublicidad() {
                   )}
                 </div>
                 
-                {banner.enlace && (
+                {contenido.enlace && (
                   <div className="mt-2 text-sm text-gray-600">
                     <strong>Enlace:</strong> 
                     <a 
-                      href={banner.enlace} 
+                      href={contenido.enlace} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-guarico-blue hover:text-guarico-light-blue ml-1"
                     >
-                      {banner.enlace}
+                      {contenido.enlace}
                     </a>
                   </div>
                 )}
@@ -244,8 +237,7 @@ export default function GestionarPublicidad() {
           ) : (
             <div className="text-center py-8 text-gray-500">
               <ImageIcon size={48} className="mx-auto mb-4 text-gray-300" />
-              <p className="text-lg font-medium">No hay banners configurados</p>
-              <p className="text-sm">Agrega tu primer banner para esta sección</p>
+              <p className="text-lg font-medium">No hay contenido configurado</p>
             </div>
           )}
         </div>
@@ -255,7 +247,7 @@ export default function GestionarPublicidad() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Gestionar Publicidad</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Gestionar Contenido</h1>
       
       <BannerSection
         tipo="header"

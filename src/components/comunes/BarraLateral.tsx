@@ -1,10 +1,9 @@
 import React from 'react';
 import { Download, Eye } from 'lucide-react';
-import { useContextoPublicidad } from '../../contexts/ContextoPublicidad';
-import ContenidoDestacado from './ContenidoDestacado';
+import { useContextoContenido } from '../../contexts/ContextoContenido';
 
 export default function BarraLateral() {
-  const { bannersSidebar } = useContextoPublicidad();
+  const { contenidosLaterales } = useContextoContenido();
 
   return (
     <aside className="w-full space-y-6">
@@ -58,10 +57,10 @@ export default function BarraLateral() {
             rel="noopener noreferrer"
             className="block hover:opacity-90 transition-opacity"
           >
-            {/* ContenidoPersonalizado */}
-            <ContenidoDestacado
+            <img
               src="/gob.png"
-              className="w-full h-32"
+              alt="Gobernación de Guárico"
+              className="w-full h-auto object-contain"
             />
           </a>
 
@@ -73,9 +72,10 @@ export default function BarraLateral() {
               rel="noopener noreferrer"
               className="block hover:opacity-90 transition-opacity"
             >
-              <ContenidoDestacado
+              <img
                 src="/cantaguarico.jpg"
-                className="w-full h-32"
+                alt="Canta Guárico"
+                className="w-full h-auto object-contain"
               />
             </a>
             {/* Reproductor de Radio */}
@@ -94,26 +94,41 @@ export default function BarraLateral() {
         </div>
       </div>
 
-      {/* Contenido Destacado */}
-      <section className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-md overflow-hidden">
-        <div className="bg-gradient-to-r from-guarico-blue to-guarico-dark-blue text-white px-4 py-3">
-          <h3 className="font-bold">DESTACADOS</h3>
+      {/* Contenido Relacionado */}
+      <section className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-guarico-blue text-white px-4 py-3">
+          <h3 className="font-bold">CONTENIDO RELACIONADO</h3>
         </div>
         <div className="p-4 space-y-4">
-          {bannersSidebar.length > 0 ? (
-            bannersSidebar.map((banner) => (
-              <div key={banner.id} className="transform transition-all duration-500 hover:scale-[1.02]">
-                <ContenidoDestacado
-                  src={banner.imagen}
-                  href={banner.enlace}
-                  className="w-full aspect-[4/3]"
-                />
-              </div>
+          {contenidosLaterales.length > 0 ? (
+            contenidosLaterales.map((contenido) => (
+              <article key={contenido.id} className="overflow-hidden rounded-lg">
+                {contenido.enlace ? (
+                  <a 
+                    href={contenido.enlace} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block hover:opacity-90 transition-opacity"
+                  >
+                    <img
+                      src={contenido.imagen}
+                      alt="Contenido relacionado"
+                      className="w-full h-auto object-contain"
+                    />
+                  </a>
+                ) : (
+                  <img
+                    src={contenido.imagen}
+                    alt="Contenido relacionado"
+                    className="w-full h-auto object-contain"
+                  />
+                )}
+              </article>
             ))
           ) : (
             <div className="text-center py-6 text-gray-500">
               <div className="border-2 border-dashed border-guarico-light-blue rounded-lg p-4">
-                <p className="text-sm">Espacio disponible</p>
+                <p className="text-sm">Próximamente más contenido</p>
               </div>
             </div>
           )}
@@ -121,9 +136,9 @@ export default function BarraLateral() {
       </section>
 
       {/* Espacio adicional */}
-      <section className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4 text-center min-h-[600px] flex items-center justify-center">
+      <section className="bg-gray-100 rounded-lg p-4 text-center min-h-[600px] flex items-center justify-center">
         <div className="text-gray-400">
-          <p className="text-sm">Espacio disponible</p>
+          <p className="text-sm">Próximamente más contenido</p>
         </div>
       </section>
     </aside>

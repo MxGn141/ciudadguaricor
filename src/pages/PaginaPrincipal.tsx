@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Home, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useContextoNoticias } from '../contexts/ContextoNoticias';
-import { useContextoPublicidad } from '../contexts/ContextoPublicidad';
-import ContenidoDestacado from '../components/comunes/ContenidoDestacado';
+import { useContextoContenido } from '../contexts/ContextoContenido';
 
 const secciones = [
   { nombre: 'Nacionales', color: 'bg-blue-600', limite: 3 },
@@ -17,7 +16,7 @@ const secciones = [
 
 export default function PaginaPrincipal() {
   const { noticias, obtenerNoticiasPorSeccion } = useContextoNoticias();
-  const { bannerInicio, bannerInicioBack, bannerInicio2 } = useContextoPublicidad();
+  const { contenidoInicio, contenidoInicioBack, contenidoInicio2 } = useContextoContenido();
   const [noticiaActual, setNoticiaActual] = useState(0);
 
   // Obtener las 3 noticias principales
@@ -219,32 +218,52 @@ export default function PaginaPrincipal() {
             </div>
           </div>
 
-          {/* Contenido Superior */}
-          {bannerInicio && (
-            <section className="w-full mb-8 overflow-hidden rounded-lg transform transition-all duration-500 hover:scale-[1.01]">
-              <ContenidoDestacado
-                src={bannerInicio.imagen}
-                href={bannerInicio.enlace}
-                className="w-full aspect-[21/9]"
-              />
-            </section>
+          {/* Contenido Destacado */}
+          {contenidoInicio && (
+            <article className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              {contenidoInicio.enlace ? (
+                <a href={contenidoInicio.enlace} target="_blank" rel="noopener noreferrer">
+                  <img 
+                    src={contenidoInicio.imagen}
+                    alt="Contenido destacado"
+                    className="w-full h-auto object-contain"
+                  />
+                </a>
+              ) : (
+                <img 
+                  src={contenidoInicio.imagen}
+                  alt="Contenido destacado"
+                  className="w-full h-auto object-contain"
+                />
+              )}
+            </article>
           )}
 
-          {/* Secciones con contenido personalizado */}
+          {/* Secciones con contenido adicional */}
           {secciones.map((seccion, index) => {
             // Después de la sección de Cultura
             if (index > 0 && secciones[index - 1].nombre === 'Cultura') {
               return (
                 <React.Fragment key={seccion.nombre}>
-                  {/* Contenido Entre Secciones */}
-                  {bannerInicio2 && (
-                    <section className="w-full mb-8 overflow-hidden rounded-lg transform transition-all duration-500 hover:scale-[1.01]">
-                      <ContenidoDestacado
-                        src={bannerInicio2.imagen}
-                        href={bannerInicio2.enlace}
-                        className="w-full aspect-[21/9]"
-                      />
-                    </section>
+                  {/* Contenido Relacionado */}
+                  {contenidoInicio2 && (
+                    <article className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                      {contenidoInicio2.enlace ? (
+                        <a href={contenidoInicio2.enlace} target="_blank" rel="noopener noreferrer">
+                          <img 
+                            src={contenidoInicio2.imagen}
+                            alt="Contenido relacionado"
+                            className="w-full h-auto object-contain"
+                          />
+                        </a>
+                      ) : (
+                        <img 
+                          src={contenidoInicio2.imagen}
+                          alt="Contenido relacionado"
+                          className="w-full h-auto object-contain"
+                        />
+                      )}
+                    </article>
                   )}
                   {renderSeccion(seccion, index)}
                 </React.Fragment>
@@ -254,19 +273,19 @@ export default function PaginaPrincipal() {
           })}
 
           {/* Banner publicitario final */}
-          {bannerInicioBack && (
+          {contenidoInicioBack && (
             <div className="w-full mt-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              {bannerInicioBack.enlace ? (
-                <a href={bannerInicioBack.enlace} target="_blank" rel="noopener noreferrer">
+              {contenidoInicioBack.enlace ? (
+                <a href={contenidoInicioBack.enlace} target="_blank" rel="noopener noreferrer">
                   <img 
-                    src={bannerInicioBack.imagen}
+                    src={contenidoInicioBack.imagen}
                     alt="Publicidad"
                     className="w-full h-auto object-contain"
                   />
                 </a>
               ) : (
                 <img 
-                  src={bannerInicioBack.imagen}
+                  src={contenidoInicioBack.imagen}
                   alt="Publicidad"
                   className="w-full h-auto object-contain"
                 />

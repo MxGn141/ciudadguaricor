@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ProveedorContextoNoticias } from './contexts/ContextoNoticias';
 import { ProveedorContextoAuth } from './contexts/ContextoAuth';
-import { ProveedorContextoPublicidad } from './contexts/ContextoPublicidad';
+import { ProveedorContextoContenido } from './contexts/ContextoContenido';
 import LayoutPublico from './components/layout/LayoutPublico';
 import PaginaPrincipal from './pages/PaginaPrincipal';
 import VistaNoticia from './pages/VistaNoticia';
@@ -15,23 +15,23 @@ export default function App() {
   return (
     <ProveedorContextoAuth>
       <ProveedorContextoNoticias>
-        <ProveedorContextoPublicidad>
-        <Router>
-          <Routes>
-            {/* Rutas públicas */}
-            <Route path="/" element={<LayoutPublico />}>
-              <Route index element={<PaginaPrincipal />} />
-              <Route path="seccion/:seccion" element={<PaginaSeccion />} />
+        <ProveedorContextoContenido>
+          <Router>
+            <Routes>
+              {/* Rutas públicas */}
+              <Route path="/" element={<LayoutPublico />}>
+                <Route index element={<PaginaPrincipal />} />
+                <Route path="seccion/:seccion" element={<PaginaSeccion />} />
                 <Route path="noticia/:id" element={<VistaNoticia />} />
-            </Route>
-            
-            {/* Rutas de administración */}
-            <Route path="/admin/login" element={<LoginAdmin />} />
-            <Route path="/admin/dashboard" element={<DashboardAdmin />} />
+              </Route>
+              
+              {/* Rutas de administración */}
+              <Route path="/admin/login" element={<LoginAdmin />} />
+              <Route path="/admin/dashboard" element={<DashboardAdmin />} />
               <Route path="/admin/publicidad" element={<GestionarPublicidad />} />
-          </Routes>
-        </Router>
-        </ProveedorContextoPublicidad>
+            </Routes>
+          </Router>
+        </ProveedorContextoContenido>
       </ProveedorContextoNoticias>
     </ProveedorContextoAuth>
   );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Facebook, Twitter, Instagram } from 'lucide-react';
-import { useContextoPublicidad } from '../../contexts/ContextoPublicidad';
+import { useContextoContenido } from '../../contexts/ContextoContenido';
 
 interface Props {
   onBuscar: (termino: string) => void;
@@ -10,7 +10,7 @@ interface Props {
 export default function EncabezadoPrincipal({ onBuscar }: Props) {
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
   const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
-  const { bannerHeader } = useContextoPublicidad();
+  const { contenidoHeader } = useContextoContenido();
 
   const manejarBusqueda = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,28 +57,28 @@ export default function EncabezadoPrincipal({ onBuscar }: Props) {
         </div>
       </div>
 
-      {/* Encabezado principal con banner */}
+      {/* Encabezado principal con imagen de fondo */}
       <div className="w-full relative">
-        {/* Banner principal */}
-        <div className="relative w-full h-32 sm:h-40 md:h-48 lg:h-56 xl:h-64">
-          {/* Banner de fondo */}
-          <div 
-            className="absolute inset-0 w-full h-full bg-no-repeat bg-center"
-            style={{
-              backgroundImage: `url(${bannerHeader?.imagen || '/banner-publicidad/banner-header.png'})`,
-              backgroundSize: '100% 100%'
-            }}
-          >
-            {bannerHeader?.enlace && (
-              <a 
-                href={bannerHeader.enlace} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="absolute inset-0 z-10 w-full h-full"
-                aria-label="Enlace publicitario"
-              />
-            )}
-          </div>
+        {/* Imagen de fondo */}
+        <div 
+          className="relative w-full"
+          style={{
+            height: 'clamp(120px, 25vw, 256px)',
+            backgroundImage: `url(${contenidoHeader?.imagen || '/banner-publicidad/banner-header.png'})`,
+            backgroundSize: '100% 100%',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          {contenidoHeader?.enlace && (
+            <a 
+              href={contenidoHeader.enlace} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="absolute inset-0 z-10 w-full h-full"
+              aria-label="Enlace de contenido"
+            />
+          )}
           
           {/* Contenido del encabezado */}
           <div className="relative z-20 max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
@@ -88,8 +88,9 @@ export default function EncabezadoPrincipal({ onBuscar }: Props) {
                 <img 
                   src="/logo.png"
                   alt="Logo Ciudad Guárico" 
-                  className="h-24 sm:h-32 md:h-40 lg:h-48 xl:h-56 w-auto object-contain transition-transform duration-300 hover:scale-105"
+                  className="w-auto transition-transform duration-300 hover:scale-105"
                   style={{
+                    height: 'clamp(80px, 20vw, 200px)',
                     filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))'
                   }}
                 />
