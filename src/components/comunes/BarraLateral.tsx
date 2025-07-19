@@ -1,7 +1,7 @@
 import React from 'react';
 import { Download, Eye } from 'lucide-react';
 import { useContextoPublicidad } from '../../contexts/ContextoPublicidad';
-import ImagenFallback from './ImagenFallback';
+import ContenidoPersonalizado from './ContenidoPersonalizado';
 
 export default function BarraLateral() {
   const { bannersSidebar } = useContextoPublicidad();
@@ -58,10 +58,9 @@ export default function BarraLateral() {
             rel="noopener noreferrer"
             className="block hover:opacity-90 transition-opacity"
           >
-            <ImagenFallback
+            <ContenidoPersonalizado
               src="/gob.png"
-              alt="Gobernación de Guárico"
-              className="w-full h-auto object-contain"
+              className="w-full h-32"
             />
           </a>
 
@@ -73,10 +72,9 @@ export default function BarraLateral() {
               rel="noopener noreferrer"
               className="block hover:opacity-90 transition-opacity"
             >
-              <ImagenFallback
+              <ContenidoPersonalizado
                 src="/cantaguarico.jpg"
-                alt="Canta Guárico"
-                className="w-full h-auto object-contain"
+                className="w-full h-32"
               />
             </a>
             {/* Reproductor de Radio */}
@@ -95,35 +93,20 @@ export default function BarraLateral() {
         </div>
       </div>
 
-      {/* Publicidad */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {/* Contenido Destacado */}
+      <section className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="bg-guarico-blue text-white px-4 py-3">
-          <h3 className="font-bold">CONTENIDO PATROCINADO</h3>
+          <h3 className="font-bold">DESTACADOS</h3>
         </div>
         <div className="p-4 space-y-4">
           {bannersSidebar.length > 0 ? (
             bannersSidebar.map((banner) => (
               <div key={banner.id} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-                {banner.enlace ? (
-                  <a 
-                    href={banner.enlace} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="block hover:opacity-90 transition-opacity"
-                  >
-                    <ImagenFallback
-                      src={banner.imagen}
-                      alt="Contenido patrocinado"
-                      className="w-full object-contain"
-                    />
-                  </a>
-                ) : (
-                  <ImagenFallback
-                    src={banner.imagen}
-                    alt="Contenido patrocinado"
-                    className="w-full object-contain"
-                  />
-                )}
+                <ContenidoPersonalizado
+                  src={banner.imagen}
+                  href={banner.enlace}
+                  className="w-full h-64"
+                />
               </div>
             ))
           ) : (
@@ -134,14 +117,14 @@ export default function BarraLateral() {
             </div>
           )}
         </div>
-      </div>
+      </section>
 
-      {/* Espacio próximo */}
-      <div className="bg-gray-100 rounded-lg p-4 text-center min-h-[600px] flex items-center justify-center">
+      {/* Espacio adicional */}
+      <section className="bg-gray-100 rounded-lg p-4 text-center min-h-[600px] flex items-center justify-center">
         <div className="text-gray-400">
           <p className="text-sm">Espacio disponible</p>
         </div>
-      </div>
+      </section>
     </aside>
   );
 }

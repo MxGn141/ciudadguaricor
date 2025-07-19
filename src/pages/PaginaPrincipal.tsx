@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Home, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useContextoNoticias } from '../contexts/ContextoNoticias';
 import { useContextoPublicidad } from '../contexts/ContextoPublicidad';
-import ImagenFallback from '../components/comunes/ImagenFallback';
+import ContenidoPersonalizado from '../components/comunes/ContenidoPersonalizado';
 
 const secciones = [
   { nombre: 'Nacionales', color: 'bg-blue-600', limite: 3 },
@@ -219,52 +219,32 @@ export default function PaginaPrincipal() {
             </div>
           </div>
 
-          {/* Banner publicitario superior */}
+          {/* Contenido Superior */}
           {bannerInicio && (
-            <div className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              {bannerInicio.enlace ? (
-                <a href={bannerInicio.enlace} target="_blank" rel="noopener noreferrer">
-                  <ImagenFallback 
-                    src={bannerInicio.imagen}
-                    alt="Contenido patrocinado"
-                    className="w-full h-auto object-contain"
-                  />
-                </a>
-              ) : (
-                <ImagenFallback 
-                  src={bannerInicio.imagen}
-                  alt="Contenido patrocinado"
-                  className="w-full h-auto object-contain"
-                />
-              )}
-            </div>
+            <section className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <ContenidoPersonalizado
+                src={bannerInicio.imagen}
+                href={bannerInicio.enlace}
+                className="w-full h-48"
+              />
+            </section>
           )}
 
-          {/* Secciones con banners */}
+          {/* Secciones con contenido personalizado */}
           {secciones.map((seccion, index) => {
             // Después de la sección de Cultura
             if (index > 0 && secciones[index - 1].nombre === 'Cultura') {
               return (
                 <React.Fragment key={seccion.nombre}>
-                  {/* Banner inicio-2 */}
+                  {/* Contenido Entre Secciones */}
                   {bannerInicio2 && (
-                    <div className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                      {bannerInicio2.enlace ? (
-                        <a href={bannerInicio2.enlace} target="_blank" rel="noopener noreferrer">
-                          <ImagenFallback 
-                            src={bannerInicio2.imagen}
-                            alt="Contenido patrocinado"
-                            className="w-full h-auto object-contain"
-                          />
-                        </a>
-                      ) : (
-                        <ImagenFallback 
-                          src={bannerInicio2.imagen}
-                          alt="Contenido patrocinado"
-                          className="w-full h-auto object-contain"
-                        />
-                      )}
-                    </div>
+                    <section className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                      <ContenidoPersonalizado
+                        src={bannerInicio2.imagen}
+                        href={bannerInicio2.enlace}
+                        className="w-full h-48"
+                      />
+                    </section>
                   )}
                   {renderSeccion(seccion, index)}
                 </React.Fragment>
