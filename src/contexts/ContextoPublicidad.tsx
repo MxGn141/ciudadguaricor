@@ -2,11 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface Banner {
   id: string;
-  tipo: 'header' | 'sidebar' | 'inicio' | 'inicio-back';
+  tipo: 'header' | 'sidebar' | 'inicio' | 'inicio-back' | 'inicio-2';
   imagen: string;
   enlace?: string;
   activo: boolean;
-  posicion?: 'primera' | 'segunda';
 }
 
 interface ContextoPublicidadProps {
@@ -15,6 +14,7 @@ interface ContextoPublicidadProps {
   bannersSidebar: Banner[];
   bannerInicio: Banner | null;
   bannerInicioBack: Banner | null;
+  bannerInicio2: Banner | null;
   actualizarBanner: (banner: Banner) => void;
   eliminarBanner: (id: string) => void;
   agregarBanner: (banner: Banner) => void;
@@ -84,20 +84,18 @@ export function ProveedorContextoPublicidad({ children }: { children: React.Reac
           id: '8',
           tipo: 'inicio' as const,
           imagen: '/banner-publicidad/banner-inicio.png',
-          activo: true,
-          posicion: 'primera' as const
+          activo: true
         },
         {
           id: '9',
-          tipo: 'inicio' as const,
-          imagen: '/banner-publicidad/banner-inicio.png',
-          activo: true,
-          posicion: 'segunda' as const
+          tipo: 'inicio-back' as const,
+          imagen: '/banner-publicidad/banner-inicio-back.png',
+          activo: true
         },
         {
           id: '10',
-          tipo: 'inicio-back' as const,
-          imagen: '/banner-publicidad/banner-inicio-back.png',
+          tipo: 'inicio-2' as const,
+          imagen: '/banner-publicidad/banner-inicio-2.png',
           activo: true
         }
       ];
@@ -123,6 +121,7 @@ export function ProveedorContextoPublicidad({ children }: { children: React.Reac
   const bannersSidebar = banners.filter(b => b.tipo === 'sidebar' && b.activo).slice(0, 6);
   const bannerInicio = banners.find(b => b.tipo === 'inicio' && b.activo) || null;
   const bannerInicioBack = banners.find(b => b.tipo === 'inicio-back' && b.activo) || null;
+  const bannerInicio2 = banners.find(b => b.tipo === 'inicio-2' && b.activo) || null;
 
   const actualizarBanner = (bannerActualizado: Banner) => {
     setBanners(banners.map(banner => 
@@ -148,6 +147,7 @@ export function ProveedorContextoPublicidad({ children }: { children: React.Reac
       bannersSidebar,
       bannerInicio,
       bannerInicioBack,
+      bannerInicio2,
       actualizarBanner,
       eliminarBanner,
       agregarBanner

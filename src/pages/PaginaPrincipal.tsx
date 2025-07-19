@@ -16,7 +16,7 @@ const secciones = [
 
 export default function PaginaPrincipal() {
   const { noticias, obtenerNoticiasPorSeccion } = useContextoNoticias();
-  const { bannerInicio, bannerInicioBack } = useContextoPublicidad();
+  const { bannerInicio, bannerInicioBack, bannerInicio2 } = useContextoPublicidad();
   const [noticiaActual, setNoticiaActual] = useState(0);
 
   // Obtener las 3 noticias principales
@@ -219,7 +219,7 @@ export default function PaginaPrincipal() {
           </div>
 
           {/* Banner publicitario superior */}
-          {bannerInicio && bannerInicio.posicion === 'primera' && (
+          {bannerInicio && (
             <div className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
               {bannerInicio.enlace ? (
                 <a href={bannerInicio.enlace} target="_blank" rel="noopener noreferrer">
@@ -239,24 +239,26 @@ export default function PaginaPrincipal() {
             </div>
           )}
 
-          {/* Secciones con banner intermedio */}
+          {/* Secciones con banners */}
           {secciones.map((seccion, index) => {
+            // Después de la sección de Cultura
             if (index > 0 && secciones[index - 1].nombre === 'Cultura') {
               return (
                 <React.Fragment key={seccion.nombre}>
-                  {bannerInicio && bannerInicio.posicion === 'segunda' && (
+                  {/* Banner inicio-2 */}
+                  {bannerInicio2 && (
                     <div className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                      {bannerInicio.enlace ? (
-                        <a href={bannerInicio.enlace} target="_blank" rel="noopener noreferrer">
+                      {bannerInicio2.enlace ? (
+                        <a href={bannerInicio2.enlace} target="_blank" rel="noopener noreferrer">
                           <img 
-                            src={bannerInicio.imagen}
+                            src={bannerInicio2.imagen}
                             alt="Publicidad"
                             className="w-full h-auto object-contain"
                           />
                         </a>
                       ) : (
                         <img 
-                          src={bannerInicio.imagen}
+                          src={bannerInicio2.imagen}
                           alt="Publicidad"
                           className="w-full h-auto object-contain"
                         />
