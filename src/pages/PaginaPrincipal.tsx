@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Home, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useContextoNoticias } from '../contexts/ContextoNoticias';
 import { useContextoPublicidad } from '../contexts/ContextoPublicidad';
+import ImagenFallback from '../components/comunes/ImagenFallback';
 
 const secciones = [
   { nombre: 'Nacionales', color: 'bg-blue-600', limite: 3 },
@@ -223,16 +224,16 @@ export default function PaginaPrincipal() {
             <div className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
               {bannerInicio.enlace ? (
                 <a href={bannerInicio.enlace} target="_blank" rel="noopener noreferrer">
-                  <img 
+                  <ImagenFallback 
                     src={bannerInicio.imagen}
-                    alt="Publicidad"
+                    alt="Contenido patrocinado"
                     className="w-full h-auto object-contain"
                   />
                 </a>
               ) : (
-                <img 
+                <ImagenFallback 
                   src={bannerInicio.imagen}
-                  alt="Publicidad"
+                  alt="Contenido patrocinado"
                   className="w-full h-auto object-contain"
                 />
               )}
@@ -250,16 +251,16 @@ export default function PaginaPrincipal() {
                     <div className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
                       {bannerInicio2.enlace ? (
                         <a href={bannerInicio2.enlace} target="_blank" rel="noopener noreferrer">
-                          <img 
+                          <ImagenFallback 
                             src={bannerInicio2.imagen}
-                            alt="Publicidad"
+                            alt="Contenido patrocinado"
                             className="w-full h-auto object-contain"
                           />
                         </a>
                       ) : (
-                        <img 
+                        <ImagenFallback 
                           src={bannerInicio2.imagen}
-                          alt="Publicidad"
+                          alt="Contenido patrocinado"
                           className="w-full h-auto object-contain"
                         />
                       )}

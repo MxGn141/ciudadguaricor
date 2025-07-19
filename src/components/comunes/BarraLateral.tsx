@@ -98,7 +98,7 @@ export default function BarraLateral() {
       {/* Publicidad */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="bg-guarico-blue text-white px-4 py-3">
-          <h3 className="font-bold">PUBLICIDAD</h3>
+          <h3 className="font-bold">CONTENIDO PATROCINADO</h3>
         </div>
         <div className="p-4 space-y-4">
           {bannersSidebar.length > 0 ? (
@@ -113,14 +113,14 @@ export default function BarraLateral() {
                   >
                     <ImagenFallback
                       src={banner.imagen}
-                      alt="Publicidad"
+                      alt="Contenido patrocinado"
                       className="w-full object-contain"
                     />
                   </a>
                 ) : (
                   <ImagenFallback
                     src={banner.imagen}
-                    alt="Publicidad"
+                    alt="Contenido patrocinado"
                     className="w-full object-contain"
                   />
                 )}
@@ -129,7 +129,7 @@ export default function BarraLateral() {
           ) : (
             <div className="text-center py-6 text-gray-500">
               <div className="border-2 border-dashed border-guarico-light-blue rounded-lg p-4">
-                <p className="text-sm">Espacio próximo</p>
+                <p className="text-sm">Espacio disponible</p>
               </div>
             </div>
           )}
@@ -139,7 +139,7 @@ export default function BarraLateral() {
       {/* Espacio próximo */}
       <div className="bg-gray-100 rounded-lg p-4 text-center min-h-[600px] flex items-center justify-center">
         <div className="text-gray-400">
-          <p className="text-sm">Espacio próximo</p>
+          <p className="text-sm">Espacio disponible</p>
         </div>
       </div>
     </aside>

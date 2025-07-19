@@ -259,32 +259,32 @@ export default function GestionarPublicidad() {
       
       <BannerSection
         tipo="header"
-        titulo="Banner Principal"
-        descripcion="Banner que aparece en el encabezado de todas las páginas"
+        titulo="Encabezado Principal"
+        descripcion="Imagen que aparece en el encabezado de todas las páginas"
       />
       
       <BannerSection
         tipo="sidebar"
-        titulo="Banners Laterales"
-        descripcion="Banners que aparecen en la barra lateral"
+        titulo="Contenido Lateral"
+        descripcion="Imágenes que aparecen en la barra lateral"
       />
       
       <BannerSection
         tipo="inicio"
-        titulo="Banner de Inicio"
-        descripcion="Banner que aparece después de la sección Más Noticias"
+        titulo="Contenido Superior"
+        descripcion="Imagen que aparece después de la sección Más Noticias"
       />
       
       <BannerSection
         tipo="inicio-back"
-        titulo="Banner de Fondo"
-        descripcion="Banner que aparece como fondo en la página principal"
+        titulo="Imagen de Fondo"
+        descripcion="Imagen que aparece como fondo en la página principal"
       />
 
       <BannerSection
         tipo="inicio-2"
-        titulo="Banner Entre Secciones"
-        descripcion="Banner que aparece entre las secciones de Cultura y Sociales"
+        titulo="Contenido Entre Secciones"
+        descripcion="Imagen que aparece entre las secciones de Cultura y Sociales"
       />
     </div>
   );
