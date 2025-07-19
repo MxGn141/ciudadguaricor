@@ -27,61 +27,61 @@ export function ProveedorContextoContenido({ children }: { children: React.React
     {
       id: '1',
       tipo: 'header' as const,
-      imagen: '/banner-publicidad/banner-header.png',
+      imagen: '/media/contenido/header-bg.png',
       activo: true
     },
     {
       id: '2',
       tipo: 'sidebar' as const,
-      imagen: '/banner-publicidad/banner-sidebar.png',
+      imagen: '/media/contenido/side-1.png',
       activo: true
     },
     {
       id: '3',
       tipo: 'sidebar' as const,
-      imagen: '/banner-publicidad/banner-sidebar-b.png',
+      imagen: '/media/contenido/side-2.png',
       activo: true
     },
     {
       id: '4',
       tipo: 'sidebar' as const,
-      imagen: '/banner-publicidad/banner-sidebar.png',
+      imagen: '/media/contenido/side-1.png',
       activo: true
     },
     {
       id: '5',
       tipo: 'sidebar' as const,
-      imagen: '/banner-publicidad/banner-sidebar-b.png',
+      imagen: '/media/contenido/side-2.png',
       activo: true
     },
     {
       id: '6',
       tipo: 'sidebar' as const,
-      imagen: '/banner-publicidad/banner-sidebar.png',
+      imagen: '/media/contenido/side-1.png',
       activo: true
     },
     {
       id: '7',
       tipo: 'sidebar' as const,
-      imagen: '/banner-publicidad/banner-sidebar-b.png',
+      imagen: '/media/contenido/side-2.png',
       activo: true
     },
     {
       id: '8',
       tipo: 'inicio' as const,
-      imagen: '/banner-publicidad/banner-inicio.png',
+      imagen: '/media/contenido/main-1.png',
       activo: true
     },
     {
       id: '9',
       tipo: 'inicio-back' as const,
-      imagen: '/banner-publicidad/banner-inicio-back.png',
+      imagen: '/media/contenido/main-bg.png',
       activo: true
     },
     {
       id: '10',
       tipo: 'inicio-2' as const,
-      imagen: '/banner-publicidad/banner-inicio-2.png',
+      imagen: '/media/contenido/main-2.png',
       activo: true
     }
   ]);

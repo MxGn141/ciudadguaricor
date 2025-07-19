@@ -64,7 +64,7 @@ export default function EncabezadoPrincipal({ onBuscar }: Props) {
           className="relative w-full"
           style={{
             height: 'clamp(120px, 25vw, 256px)',
-            backgroundImage: `url(${contenidoHeader?.imagen || '/banner-publicidad/banner-header.png'})`,
+            backgroundImage: `url(${contenidoHeader?.imagen || '/media/contenido/header-bg.png'})`,
             backgroundSize: '100% 100%',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
