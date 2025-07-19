@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Home, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useContextoNoticias } from '../contexts/ContextoNoticias';
 import { useContextoPublicidad } from '../contexts/ContextoPublicidad';
-import ContenidoPersonalizado from '../components/comunes/ContenidoPersonalizado';
+import ContenidoDestacado from '../components/comunes/ContenidoDestacado';
 
 const secciones = [
   { nombre: 'Nacionales', color: 'bg-blue-600', limite: 3 },
@@ -221,11 +221,11 @@ export default function PaginaPrincipal() {
 
           {/* Contenido Superior */}
           {bannerInicio && (
-            <section className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              <ContenidoPersonalizado
+            <section className="w-full mb-8 overflow-hidden rounded-lg transform transition-all duration-500 hover:scale-[1.01]">
+              <ContenidoDestacado
                 src={bannerInicio.imagen}
                 href={bannerInicio.enlace}
-                className="w-full h-48"
+                className="w-full aspect-[21/9]"
               />
             </section>
           )}
@@ -238,11 +238,11 @@ export default function PaginaPrincipal() {
                 <React.Fragment key={seccion.nombre}>
                   {/* Contenido Entre Secciones */}
                   {bannerInicio2 && (
-                    <section className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                      <ContenidoPersonalizado
+                    <section className="w-full mb-8 overflow-hidden rounded-lg transform transition-all duration-500 hover:scale-[1.01]">
+                      <ContenidoDestacado
                         src={bannerInicio2.imagen}
                         href={bannerInicio2.enlace}
-                        className="w-full h-48"
+                        className="w-full aspect-[21/9]"
                       />
                     </section>
                   )}
