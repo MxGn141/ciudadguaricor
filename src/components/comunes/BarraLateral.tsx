@@ -1,6 +1,7 @@
 import React from 'react';
 import { Download, Eye } from 'lucide-react';
 import { useContextoPublicidad } from '../../contexts/ContextoPublicidad';
+import ImagenFallback from './ImagenFallback';
 
 export default function BarraLateral() {
   const { bannersSidebar } = useContextoPublicidad();
@@ -57,7 +58,7 @@ export default function BarraLateral() {
             rel="noopener noreferrer"
             className="block hover:opacity-90 transition-opacity"
           >
-            <img
+            <ImagenFallback
               src="/gob.png"
               alt="Gobernación de Guárico"
               className="w-full h-auto object-contain"
@@ -72,7 +73,7 @@ export default function BarraLateral() {
               rel="noopener noreferrer"
               className="block hover:opacity-90 transition-opacity"
             >
-              <img
+              <ImagenFallback
                 src="/cantaguarico.jpg"
                 alt="Canta Guárico"
                 className="w-full h-auto object-contain"
@@ -110,14 +111,14 @@ export default function BarraLateral() {
                     rel="noopener noreferrer"
                     className="block hover:opacity-90 transition-opacity"
                   >
-                    <img
+                    <ImagenFallback
                       src={banner.imagen}
                       alt="Publicidad"
                       className="w-full object-contain"
                     />
                   </a>
                 ) : (
-                  <img
+                  <ImagenFallback
                     src={banner.imagen}
                     alt="Publicidad"
                     className="w-full object-contain"
