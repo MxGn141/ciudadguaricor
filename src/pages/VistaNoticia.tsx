@@ -21,9 +21,16 @@ export default function VistaNoticia() {
     return new Date(fecha);
   };
 
+  // Obtener la imagen principal desde media
+  const imagenPrincipal = noticia.media?.find(m => m.tipo === 'imagen')?.url || '';
+  // Obtener autores como string
+  const autores = noticia.autores?.join(', ');
+  // Obtener nombre de la sección
+  const nombreSeccion = noticia.seccion?.nombre || '';
+
   // Obtener noticias relacionadas de la misma sección
   const noticiasRelacionadas = noticias
-    .filter(n => n.seccion === noticia.seccion && n.id !== noticia.id)
+    .filter(n => n.seccion?.id === noticia.seccion?.id && n.id !== noticia.id)
     .slice(0, 3);
 
   const compartirEnRedes = (red: string) => {
@@ -48,13 +55,13 @@ export default function VistaNoticia() {
       {/* Imagen principal */}
       <div className="relative mb-6">
         <img
-          src={noticia.imagen}
+          src={imagenPrincipal}
           alt={noticia.titulo}
           className="w-full h-64 md:h-96 object-cover rounded-lg"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-lg" />
         <span className="absolute top-4 left-4 bg-guarico-blue text-guarico-white px-3 py-1 text-sm rounded-lg shadow-lg">
-          {noticia.seccion}
+          {nombreSeccion}
         </span>
       </div>
 
@@ -68,15 +75,11 @@ export default function VistaNoticia() {
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center">
             <User size={16} className="mr-2 text-guarico-blue" />
-            <span>Por <strong>{noticia.autorTexto}</strong></span>
-          </div>
-          <div className="flex items-center">
-            <Camera size={16} className="mr-2 text-guarico-blue" />
-            <span>Foto: <strong>{noticia.autorFoto}</strong></span>
+            <span>Por <strong>{autores}</strong></span>
           </div>
           <div className="flex items-center">
             <Calendar size={16} className="mr-2 text-guarico-blue" />
-            <span>{convertirFecha(noticia.fechaPublicacion).toLocaleDateString('es-ES', {
+            <span>{convertirFecha(noticia.fecha_publicacion).toLocaleDateString('es-ES', {
               weekday: 'long',
               year: 'numeric',
               month: 'long',
@@ -131,28 +134,31 @@ export default function VistaNoticia() {
       {noticiasRelacionadas.length > 0 && (
         <div className="mt-8 bg-gray-50 p-6 rounded-lg border-t border-gray-200">
           <h3 className="text-xl font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">
-            Más noticias de {noticia.seccion}
+            Más noticias de {nombreSeccion}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {noticiasRelacionadas.map((noticiaRel) => (
-              <Link
-                key={noticiaRel.id}
-                to={`/noticia/${noticiaRel.id}`}
-                className="block hover:bg-white p-3 rounded-lg transition-colors"
-              >
-                <img
-                  src={noticiaRel.imagen}
-                  alt={noticiaRel.titulo}
-                  className="w-full h-32 object-cover rounded-lg mb-2"
-                />
-                <h4 className="font-semibold text-sm text-gray-900 line-clamp-2 hover:text-guarico-blue transition-colors">
-                  {noticiaRel.titulo}
-                </h4>
-                <p className="text-xs text-gray-500 mt-1">
-                  {convertirFecha(noticiaRel.fechaPublicacion).toLocaleDateString('es-ES')}
-                </p>
-              </Link>
-            ))}
+            {noticiasRelacionadas.map((noticiaRel) => {
+              const imagenRel = noticiaRel.media?.find(m => m.tipo === 'imagen')?.url || '';
+              return (
+                <Link
+                  key={noticiaRel.id}
+                  to={`/noticia/${noticiaRel.id}`}
+                  className="block hover:bg-white p-3 rounded-lg transition-colors"
+                >
+                  <img
+                    src={imagenRel}
+                    alt={noticiaRel.titulo}
+                    className="w-full h-32 object-cover rounded-lg mb-2"
+                  />
+                  <h4 className="font-semibold text-sm text-gray-900 line-clamp-2 hover:text-guarico-blue transition-colors">
+                    {noticiaRel.titulo}
+                  </h4>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {convertirFecha(noticiaRel.fecha_publicacion).toLocaleDateString('es-ES')}
+                  </p>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

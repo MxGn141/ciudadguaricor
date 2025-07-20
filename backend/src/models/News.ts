@@ -1,4 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Section } from './Section';
+import { NewsAuthor } from './NewsAuthor';
+import { NewsMedia } from './NewsMedia';
 
 @Entity('noticias')
 export class News {
@@ -14,33 +17,25 @@ export class News {
   @Column({ length: 300 })
   resumen!: string;
 
-  @Column({ nullable: true })
-  imagen!: string;
-
-  @Column({ nullable: true })
-  imagen_filename!: string;
-
-  @Column({ length: 100, name: 'autor_texto' })
-  autorTexto!: string;
-
-  @Column({ nullable: true, name: 'autor_foto' })
-  autorFoto!: string;
-
-  @Column({
-    type: 'enum',
-    enum: ['Nacionales', 'Municipales', 'Deportes', 'Cultura', 'Economía', 'Sociales', 'Sucesos']
-  })
-  seccion!: string;
+  @ManyToOne(() => Section, { eager: true })
+  @JoinColumn({ name: 'seccion_id' })
+  seccion!: Section;
 
   @Column({ default: false })
   destacada!: boolean;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', name: 'fecha_publicacion' })
-  fechaPublicacion!: Date;
+  fecha_publicacion!: Date;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt!: Date;
+  created_at!: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt!: Date;
+  updated_at!: Date;
+
+  @OneToMany(() => NewsAuthor, newsAuthor => newsAuthor.noticia)
+  newsAuthors!: NewsAuthor[];
+
+  @OneToMany(() => NewsMedia, newsMedia => newsMedia.noticia)
+  newsMedia!: NewsMedia[];
 } 

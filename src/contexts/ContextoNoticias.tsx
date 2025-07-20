@@ -7,12 +7,17 @@ export interface Noticia {
   titulo: string;
   contenido: string;
   resumen: string;
-  imagen: string;
-  autorTexto: string;
-  autorFoto: string;
-  seccion: string;
-  fechaPublicacion: Date | string;
+  seccion: {
+    id: number;
+    nombre: string;
+    color?: string;
+  } | null;
+  autores: string[];
+  media: { url: string; tipo: string; descripcion?: string }[];
+  fecha_publicacion: Date | string;
   destacada?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Publicidad {
@@ -232,15 +237,21 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
       console.log('Cargando noticias desde:', `${API_URL}/news`);
       const response = await axios.get(`${API_URL}/news`);
       console.log('Respuesta del backend:', response.data);
-      
-      // Procesar las imágenes para que tengan la URL completa del backend
-      const noticiasConImagenes = response.data.map((noticia: any) => ({
-        ...noticia,
-        imagen: noticia.imagen ? `http://localhost:3000${noticia.imagen}` : noticia.imagen
+      // Mapear la nueva estructura
+      const noticiasMapeadas = response.data.map((noticia: any) => ({
+        id: noticia.id,
+        titulo: noticia.titulo,
+        contenido: noticia.contenido,
+        resumen: noticia.resumen,
+        seccion: noticia.seccion,
+        autores: noticia.autores || [],
+        media: noticia.media || [],
+        fecha_publicacion: noticia.fecha_publicacion,
+        destacada: noticia.destacada,
+        created_at: noticia.created_at,
+        updated_at: noticia.updated_at
       }));
-      
-      console.log('Noticias procesadas:', noticiasConImagenes.map((n: any) => ({ id: n.id, titulo: n.titulo, seccion: n.seccion })));
-      setNoticias(noticiasConImagenes || []);
+      setNoticias(noticiasMapeadas || []);
     } catch (error) {
       console.error('Error al cargar noticias:', error);
       setNoticias([]);
@@ -306,35 +317,26 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
   const obtenerNoticiasPorSeccion = async (seccion: string): Promise<Noticia[]> => {
     try {
       const response = await axios.get(`${API_URL}/news/section/${seccion}`);
-      // Procesar las imágenes para que tengan la URL completa del backend
-      const noticiasConImagenes = response.data.map((noticia: any) => ({
-        ...noticia,
-        imagen: noticia.imagen ? `http://localhost:3000${noticia.imagen}` : noticia.imagen
+      return response.data.map((noticia: any) => ({
+        id: noticia.id,
+        titulo: noticia.titulo,
+        contenido: noticia.contenido,
+        resumen: noticia.resumen,
+        seccion: noticia.seccion,
+        autores: noticia.autores || [],
+        media: noticia.media || [],
+        fecha_publicacion: noticia.fecha_publicacion,
+        destacada: noticia.destacada,
+        created_at: noticia.created_at,
+        updated_at: noticia.updated_at
       }));
-      return noticiasConImagenes || [];
     } catch (error) {
-      console.error('Error al obtener noticias por sección:', error);
       return [];
     }
   };
 
   const obtenerNoticiaPorId = (id: string) => {
-    console.log('Buscando noticia con ID:', id);
-    console.log('Noticias disponibles:', noticias.map(n => ({ id: n.id, titulo: n.titulo })));
-    
-    // Buscar por ID exacto primero
-    let noticiaEncontrada = noticias.find(noticia => noticia.id.toString() === id);
-    
-    // Si no se encuentra, intentar con conversión numérica
-    if (!noticiaEncontrada) {
-      const idNumerico = parseInt(id, 10);
-      if (!isNaN(idNumerico)) {
-        noticiaEncontrada = noticias.find(noticia => noticia.id === idNumerico);
-      }
-    }
-    
-    console.log('Noticia encontrada:', noticiaEncontrada?.titulo);
-    return noticiaEncontrada;
+    return noticias.find(n => n.id === id || n.id === Number(id));
   };
 
   return (

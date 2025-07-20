@@ -15,6 +15,13 @@ export default function TarjetaNoticia({ noticia }: Props) {
     return new Date(fecha);
   };
 
+  // Obtener la imagen principal desde media
+  const imagenPrincipal = noticia.media?.find(m => m.tipo === 'imagen')?.url || '';
+  // Obtener autores como string
+  const autores = noticia.autores?.join(', ');
+  // Obtener nombre de la sección
+  const nombreSeccion = noticia.seccion?.nombre || '';
+
   return (
     <Link 
       to={`/noticia/${noticia.id}`} 
@@ -22,7 +29,7 @@ export default function TarjetaNoticia({ noticia }: Props) {
     >
       <div className="relative h-48 md:h-56 lg:h-64 overflow-hidden">
           <img
-            src={noticia.imagen}
+            src={imagenPrincipal}
             alt={noticia.titulo}
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -30,10 +37,10 @@ export default function TarjetaNoticia({ noticia }: Props) {
       <div className="p-6">
         <div className="flex items-center gap-2 mb-3">
           <span className="bg-blue-600 text-white text-xs px-3 py-1 rounded-full">
-            {noticia.seccion}
+            {nombreSeccion}
           </span>
           <time className="text-gray-500 text-xs">
-            {convertirFecha(noticia.fechaPublicacion).toLocaleDateString('es-ES')}
+            {convertirFecha(noticia.fecha_publicacion).toLocaleDateString('es-ES')}
           </time>
         </div>
         <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600">
@@ -43,9 +50,9 @@ export default function TarjetaNoticia({ noticia }: Props) {
             {noticia.resumen}
         </p>
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <span className="text-sm text-gray-600">{noticia.autorTexto}</span>
+          <span className="text-sm text-gray-600">{autores}</span>
           <time className="text-xs text-gray-500">
-            {convertirFecha(noticia.fechaPublicacion).toLocaleTimeString('es-ES', { 
+            {convertirFecha(noticia.fecha_publicacion).toLocaleTimeString('es-ES', { 
               hour: '2-digit', 
               minute: '2-digit' 
             })}

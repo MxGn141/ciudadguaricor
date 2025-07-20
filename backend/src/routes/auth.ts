@@ -29,7 +29,7 @@ router.post('/login', [
 
   // Genera el token
   const token = jwt.sign(
-    { id: user.id, username: user.username, role: user.role },
+    { id: user.id, username: user.username },
     process.env.JWT_SECRET || 'secret',
     { expiresIn: '24h' }
   );

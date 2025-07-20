@@ -1,9 +1,20 @@
-import React, { useState } from 'react';
-import { Save, Image as ImageIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Save } from 'lucide-react';
 import { useContextoNoticias } from '../../contexts/ContextoNoticias';
+import axios from 'axios';
 
 interface Props {
   onCreada: () => void;
+}
+
+interface Seccion {
+  id: number;
+  nombre: string;
+}
+
+interface Autor {
+  id: number;
+  nombre: string;
 }
 
 export default function CrearNoticia({ onCreada }: Props) {
@@ -12,21 +23,32 @@ export default function CrearNoticia({ onCreada }: Props) {
     titulo: '',
     contenido: '',
     resumen: '',
-    autorTexto: '',
-    autorFoto: '',
-    seccion: 'Nacionales',
+    seccion_id: '',
+    autores: [] as string[],
     destacada: false
   });
   const [imagen, setImagen] = useState<File | null>(null);
+  const [secciones, setSecciones] = useState<Seccion[]>([]);
+  const [autores, setAutores] = useState<Autor[]>([]);
 
-  const secciones = ['Nacionales', 'Municipales', 'Deportes', 'Cultura', 'Economía', 'Sociales', 'Sucesos'];
+  useEffect(() => {
+    // Cargar secciones y autores desde el backend
+    axios.get('/api/sections').then(res => setSecciones(res.data));
+    axios.get('/api/authors').then(res => setAutores(res.data));
+  }, []);
 
   const manejarCambio = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormulario(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    }));
+    if (name === 'autores') {
+      const options = (e.target as HTMLSelectElement).options;
+      const values = Array.from(options).filter(o => o.selected).map(o => o.value);
+      setFormulario(prev => ({ ...prev, autores: values }));
+    } else {
+      setFormulario(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      }));
+    }
   };
 
   const manejarImagen = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,25 +59,37 @@ export default function CrearNoticia({ onCreada }: Props) {
 
   const manejarSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formulario.titulo || !formulario.contenido || !formulario.resumen || !imagen) {
+    if (!formulario.titulo || !formulario.contenido || !formulario.resumen || !formulario.seccion_id || !imagen) {
       alert('Por favor completa todos los campos obligatorios y selecciona una imagen');
       return;
     }
-    const formData = new FormData();
-    Object.entries(formulario).forEach(([key, value]) => {
-      formData.append(key, value as string);
-    });
-    formData.append('imagen', imagen);
+    // Subir la imagen primero (puedes adaptar esto a tu endpoint de media)
+    let mediaIds: number[] = [];
+    if (imagen) {
+      const formDataImg = new FormData();
+      formDataImg.append('file', imagen);
+      const res = await axios.post('/api/media', formDataImg, { headers: { 'Content-Type': 'multipart/form-data' } });
+      mediaIds = [res.data.id];
+    }
+    // Armar el objeto para el backend
+    const noticiaPayload = {
+      titulo: formulario.titulo,
+      contenido: formulario.contenido,
+      resumen: formulario.resumen,
+      seccion_id: Number(formulario.seccion_id),
+      autores: formulario.autores.map(Number),
+      media: mediaIds,
+      destacada: formulario.destacada
+    };
     try {
-      await agregarNoticia(formData);
+      await agregarNoticia(noticiaPayload);
       alert('Noticia creada exitosamente');
       setFormulario({
         titulo: '',
         contenido: '',
         resumen: '',
-        autorTexto: '',
-        autorFoto: '',
-        seccion: 'Nacionales',
+        seccion_id: '',
+        autores: [],
         destacada: false
       });
       setImagen(null);
@@ -89,19 +123,20 @@ export default function CrearNoticia({ onCreada }: Props) {
           </div>
 
           <div>
-            <label htmlFor="seccion" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="seccion_id" className="block text-sm font-medium text-gray-700 mb-2">
               Sección *
             </label>
             <select
-              id="seccion"
-              name="seccion"
-              value={formulario.seccion}
+              id="seccion_id"
+              name="seccion_id"
+              value={formulario.seccion_id}
               onChange={manejarCambio}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
               required
             >
+              <option value="">Seleccione una sección</option>
               {secciones.map(seccion => (
-                <option key={seccion} value={seccion}>{seccion}</option>
+                <option key={seccion.id} value={seccion.id}>{seccion.nombre}</option>
               ))}
             </select>
           </div>
@@ -122,36 +157,24 @@ export default function CrearNoticia({ onCreada }: Props) {
             {imagen && <p className="text-xs text-gray-500 mt-1">{imagen.name}</p>}
           </div>
 
-          <div>
-            <label htmlFor="autorTexto" className="block text-sm font-medium text-gray-700 mb-2">
-              Autor del Texto
+          <div className="md:col-span-2">
+            <label htmlFor="autores" className="block text-sm font-medium text-gray-700 mb-2">
+              Autores *
             </label>
-            <input
-              type="text"
-              id="autorTexto"
-              name="autorTexto"
-              value={formulario.autorTexto}
+            <select
+              id="autores"
+              name="autores"
+              multiple
+              value={formulario.autores}
               onChange={manejarCambio}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              placeholder="Nombre del periodista"
-              maxLength={50}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="autorFoto" className="block text-sm font-medium text-gray-700 mb-2">
-              Autor de la Foto
-            </label>
-            <input
-              type="text"
-              id="autorFoto"
-              name="autorFoto"
-              value={formulario.autorFoto}
-              onChange={manejarCambio}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              placeholder="Nombre del fotógrafo"
-              maxLength={50}
-            />
+              required
+            >
+              {autores.map(autor => (
+                <option key={autor.id} value={autor.id}>{autor.nombre}</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">Puede seleccionar uno o varios autores (Ctrl+Click)</p>
           </div>
         </div>
 
@@ -213,9 +236,8 @@ export default function CrearNoticia({ onCreada }: Props) {
                 titulo: '',
                 contenido: '',
                 resumen: '',
-                autorTexto: '',
-                autorFoto: '',
-                seccion: 'Nacionales',
+                seccion_id: '',
+                autores: [],
                 destacada: false
               });
               setImagen(null);
@@ -226,7 +248,7 @@ export default function CrearNoticia({ onCreada }: Props) {
           </button>
           <button
             type="submit"
-            disabled={!formulario.titulo || !formulario.contenido || !formulario.resumen || !imagen}
+            disabled={!formulario.titulo || !formulario.contenido || !formulario.resumen || !formulario.seccion_id || !imagen}
             className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save size={20} className="mr-2" />

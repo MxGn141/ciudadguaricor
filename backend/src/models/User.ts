@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { UserRole } from './UserRole';
 
 @Entity('usuarios')
 export class User {
@@ -11,9 +12,9 @@ export class User {
   @Column()
   password!: string;
 
-  @Column()
-  role!: string;
-
   @CreateDateColumn()
   created_at!: Date;
+
+  @OneToMany(() => UserRole, userRole => userRole.usuario)
+  userRoles!: UserRole[];
 }
