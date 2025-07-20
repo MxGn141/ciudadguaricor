@@ -1,281 +1,283 @@
-import React, { useState } from 'react';
-import { Plus, Trash2, Image as ImageIcon, Search, X } from 'lucide-react';
-import { useContextoNoticias } from '../../contexts/ContextoNoticias';
+import React, { useState, useRef } from 'react';
+import { useContextoContenido } from '../../contexts/ContextoContenido';
+import { Upload, X, Eye, EyeOff, Plus, Image as ImageIcon } from 'lucide-react';
 
 export default function GestionarPublicidad() {
-  const { publicidades, agregarPublicidad, eliminarPublicidad } = useContextoNoticias();
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [formulario, setFormulario] = useState({
-    titulo: '',
+  const { contenidos, actualizarContenido, eliminarContenido, agregarContenido } = useContextoContenido();
+  const [bannerEditando, setBannerEditando] = useState<string | null>(null);
+  const [mostrarFormulario, setMostrarFormulario] = useState<'header' | 'sidebar' | 'inicio' | 'inicio-back' | 'inicio-2' | null>(null);
+  const [nuevoBanner, setNuevoBanner] = useState({
     imagen: '',
-    enlace: '',
-    tipo: 'sidebar' as 'carrusel' | 'sidebar'
+    enlace: ''
   });
-  const [tipoFiltro, setTipoFiltro] = useState('');
-  const [busqueda, setBusqueda] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const manejarCambio = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormulario(prev => ({ ...prev, [name]: value }));
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, tipo: 'header' | 'sidebar' | 'inicio' | 'inicio-back' | 'inicio-2') => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB límite
+        alert('El archivo es demasiado grande. Máximo 5MB.');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const contenido = {
+          id: Date.now().toString(),
+          tipo,
+          imagen: reader.result as string,
+          enlace: nuevoBanner.enlace,
+          activo: true
+        };
+        agregarContenido(contenido);
+        setNuevoBanner({ imagen: '', enlace: '' });
+        setMostrarFormulario(null);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  const manejarSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formulario.titulo || !formulario.imagen) {
-      alert('Por favor complete todos los campos obligatorios');
+  const handleToggleActivo = (contenido: any) => {
+    actualizarContenido({
+      ...contenido,
+      activo: !contenido.activo
+    });
+  };
+
+  const handleEliminar = (id: string) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este contenido?')) {
+      eliminarContenido(id);
+    }
+  };
+
+  const handleSubmitURL = (tipo: 'header' | 'sidebar' | 'inicio' | 'inicio-back' | 'inicio-2') => {
+    if (!nuevoBanner.imagen) {
+      alert('Por favor ingresa una URL de imagen válida.');
       return;
     }
 
-    agregarPublicidad(formulario);
+    const contenido = {
+      id: Date.now().toString(),
+      tipo,
+      imagen: nuevoBanner.imagen,
+      enlace: nuevoBanner.enlace,
+      activo: true
+    };
     
-    setFormulario({
-      titulo: '',
-      imagen: '',
-      enlace: '',
-      tipo: 'sidebar'
-    });
-    
-    setMostrarFormulario(false);
+    agregarContenido(contenido);
+    setNuevoBanner({ imagen: '', enlace: '' });
+    setMostrarFormulario(null);
   };
 
-  const confirmarEliminacion = (id: string, titulo: string) => {
-    if (window.confirm(`¿Está seguro de eliminar la publicidad "${titulo}"?`)) {
-      eliminarPublicidad(id);
-    }
-  };
-
-  const publicidadesFiltradas = tipoFiltro
-    ? publicidades.filter(pub => pub.tipo === tipoFiltro)
-    : publicidades;
-  const publicidadesBuscadas = publicidadesFiltradas.filter(pub =>
-    pub.titulo.toLowerCase().includes(busqueda.toLowerCase())
-  );
-
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-2xl font-bold text-gray-900">Gestionar Publicidad</h2>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none">
-            <input
-              type="text"
-              value={busqueda}
-              onChange={e => setBusqueda(e.target.value)}
-              placeholder="Buscar por título..."
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+  const BannerSection = ({ tipo, titulo, descripcion }: { 
+    tipo: 'header' | 'sidebar' | 'inicio' | 'inicio-back' | 'inicio-2', 
+    titulo: string, 
+    descripcion: string 
+  }) => {
+    const contenidosDelTipo = contenidos.filter(b => b.tipo === tipo);
+    
+    return (
+      <div className="mb-8 bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">{titulo}</h2>
+            <p className="text-sm text-gray-600 mt-1">{descripcion}</p>
           </div>
-          <select
-            value={tipoFiltro}
-            onChange={e => setTipoFiltro(e.target.value)}
-            className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white"
-          >
-            <option value="">Todos los tipos</option>
-            <option value="sidebar">Sidebar</option>
-            <option value="carrusel">Carrusel Superior</option>
-          </select>
           <button
-            onClick={() => setMostrarFormulario(true)}
-            className="flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            onClick={() => setMostrarFormulario(tipo)}
+            className="flex items-center px-4 py-2 bg-guarico-blue text-white rounded-lg hover:bg-guarico-light-blue transition-colors"
           >
-            <Plus size={20} className="mr-2" />
-            Nueva Publicidad
+            <Plus size={16} className="mr-2" />
+            Agregar Contenido
           </button>
         </div>
-      </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Publicidad</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enlace</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {publicidadesBuscadas.map((publicidad) => (
-                <tr key={publicidad.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <img 
-                        src={publicidad.imagen} 
-                        alt={publicidad.titulo} 
-                        className="h-10 w-10 rounded-lg object-cover mr-3"
-                      />
-                      <div className="text-sm font-medium text-gray-900 max-w-md truncate">
-                        {publicidad.titulo}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      publicidad.tipo === 'carrusel' 
-                        ? 'bg-purple-100 text-purple-800'
-                        : 'bg-blue-100 text-blue-800'
-                    }`}>
-                      {publicidad.tipo === 'carrusel' ? 'Carrusel Superior' : 'Sidebar'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {publicidad.enlace ? (
-                      <a 
-                        href={publicidad.enlace} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 hover:underline"
-                      >
-                        {publicidad.enlace}
-                      </a>
-                    ) : (
-                      <span className="text-gray-400">Sin enlace</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => confirmarEliminacion(publicidad.id, publicidad.titulo)}
-                      className="p-1 hover:bg-red-100 rounded-full transition-colors"
-                      title="Eliminar publicidad"
-                    >
-                      <Trash2 className="h-5 w-5 text-red-500" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {publicidadesBuscadas.length === 0 && (
-          <div className="text-center py-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-              <ImageIcon className="h-8 w-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron publicidades</h3>
-            <p className="text-gray-500">
-              {busqueda || tipoFiltro 
-                ? "Intenta ajustar los filtros de búsqueda"
-                : "Comienza creando una nueva publicidad"}
-            </p>
-          </div>
-        )}
-      </div>
-
-      <div className="flex justify-end">
-        <p className="text-sm text-gray-600">
-          Total: {publicidadesBuscadas.length} {publicidadesBuscadas.length === 1 ? 'publicidad' : 'publicidades'}
-        </p>
-      </div>
-
-      {/* Modal de nueva publicidad */}
-      {mostrarFormulario && (
-        <>
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300"
-            onClick={() => setMostrarFormulario(false)}
-          />
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-              <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                <form onSubmit={manejarSubmit} className="bg-white px-4 pb-4 pt-5 sm:p-6">
-                  <div className="flex justify-between items-center mb-4 border-b pb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Nueva Publicidad</h3>
-                    <button
-                      type="button"
-                      onClick={() => setMostrarFormulario(false)}
-                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                    >
-                      <X size={20} className="text-gray-500" />
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 mb-1">
-                        Título *
-                      </label>
-                      <input
-                        type="text"
-                        id="titulo"
-                        name="titulo"
-                        value={formulario.titulo}
-                        onChange={manejarCambio}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="imagen" className="block text-sm font-medium text-gray-700 mb-1">
-                        URL de la imagen *
-                      </label>
-                      <input
-                        type="url"
-                        id="imagen"
-                        name="imagen"
-                        value={formulario.imagen}
-                        onChange={manejarCambio}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="enlace" className="block text-sm font-medium text-gray-700 mb-1">
-                        Enlace
-                      </label>
-                      <input
-                        type="url"
-                        id="enlace"
-                        name="enlace"
-                        value={formulario.enlace}
-                        onChange={manejarCambio}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="tipo" className="block text-sm font-medium text-gray-700 mb-1">
-                        Tipo *
-                      </label>
-                      <select
-                        id="tipo"
-                        name="tipo"
-                        value={formulario.tipo}
-                        onChange={manejarCambio}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        required
-                      >
-                        <option value="sidebar">Sidebar</option>
-                        <option value="carrusel">Carrusel Superior</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex justify-end gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setMostrarFormulario(false)}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
-                    >
-                      Guardar
-                    </button>
-                  </div>
-                </form>
+        {/* Formulario para agregar contenido */}
+        {mostrarFormulario === tipo && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <h3 className="font-medium mb-4">Agregar Nuevo Contenido</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  URL de la Imagen
+                </label>
+                <input
+                  type="url"
+                  value={nuevoBanner.imagen}
+                  onChange={(e) => setNuevoBanner(prev => ({ ...prev, imagen: e.target.value }))}
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-guarico-blue focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Enlace (opcional)
+                </label>
+                <input
+                  type="url"
+                  value={nuevoBanner.enlace}
+                  onChange={(e) => setNuevoBanner(prev => ({ ...prev, enlace: e.target.value }))}
+                  placeholder="https://ejemplo.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-guarico-blue focus:border-transparent"
+                />
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => handleSubmitURL(tipo)}
+                  className="px-4 py-2 bg-guarico-green text-white rounded-lg hover:bg-guarico-light-green transition-colors"
+                >
+                  Agregar Contenido
+                </button>
+                <span className="text-gray-500">o</span>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) => handleFileChange(e, tipo)}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-4 py-2 bg-guarico-blue text-white rounded-lg hover:bg-guarico-light-blue transition-colors flex items-center"
+                >
+                  <Upload size={16} className="mr-2" />
+                  Subir Archivo
+                </button>
+                <button
+                  onClick={() => {
+                    setMostrarFormulario(null);
+                    setNuevoBanner({ imagen: '', enlace: '' });
+                  }}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
               </div>
             </div>
           </div>
-        </>
-      )}
+        )}
+
+        {/* Lista de contenidos */}
+        <div className="space-y-4">
+          {contenidosDelTipo.length > 0 ? (
+            contenidosDelTipo.map(contenido => (
+              <div key={contenido.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-4">
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      contenido.activo 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {contenido.activo ? 'Activo' : 'Inactivo'}
+                    </span>
+                    {contenido.enlace && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                        Con enlace
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleToggleActivo(contenido)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        contenido.activo 
+                          ? 'text-red-600 hover:bg-red-50' 
+                          : 'text-green-600 hover:bg-green-50'
+                      }`}
+                      title={contenido.activo ? 'Desactivar' : 'Activar'}
+                    >
+                      {contenido.activo ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                    <button
+                      onClick={() => handleEliminar(contenido.id)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Eliminar"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="relative group">
+                  <img
+                    src={contenido.imagen}
+                    alt="Vista previa"
+                    className="w-full h-40 object-cover rounded-lg"
+                  />
+                  {contenido.enlace && (
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-lg flex items-center justify-center">
+                      <a
+                        href={contenido.enlace}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="opacity-0 group-hover:opacity-100 bg-white text-guarico-blue px-4 py-2 rounded-lg font-medium transition-opacity duration-300"
+                      >
+                        Ver enlace
+                      </a>
+                    </div>
+                  )}
+                </div>
+                
+                {contenido.enlace && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    <strong>Enlace:</strong> 
+                    <a 
+                      href={contenido.enlace} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-guarico-blue hover:text-guarico-light-blue ml-1"
+                    >
+                      {contenido.enlace}
+                    </a>
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <ImageIcon size={48} className="mx-auto mb-4 text-gray-300" />
+              <p className="text-lg font-medium">No hay contenido configurado</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Gestionar Contenido</h1>
+      
+      <BannerSection
+        tipo="header"
+        titulo="Encabezado Principal"
+        descripcion="Imagen que aparece en el encabezado de todas las páginas"
+      />
+      
+      <BannerSection
+        tipo="sidebar"
+        titulo="Contenido Lateral"
+        descripcion="Imágenes que aparecen en la barra lateral"
+      />
+      
+      <BannerSection
+        tipo="inicio"
+        titulo="Contenido Superior"
+        descripcion="Imagen que aparece después de la sección Más Noticias"
+      />
+      
+      <BannerSection
+        tipo="inicio-back"
+        titulo="Imagen de Fondo"
+        descripcion="Imagen que aparece como fondo en la página principal"
+      />
+
+      <BannerSection
+        tipo="inicio-2"
+        titulo="Contenido Entre Secciones"
+        descripcion="Imagen que aparece entre las secciones de Cultura y Sociales"
+      />
     </div>
   );
 }

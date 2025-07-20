@@ -55,8 +55,8 @@ export default function DashboardAdmin() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-200">
                 <div className="flex items-center">
-                  <div className="p-3 bg-red-100 rounded-full">
-                    <FileText className="h-6 w-6 text-red-600" />
+                  <div className="p-3 bg-green-100 rounded-full">
+                    <FileText className="h-6 w-6 text-[#4CAF50]" />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Total Noticias</p>
@@ -66,8 +66,8 @@ export default function DashboardAdmin() {
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-200">
                 <div className="flex items-center">
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <Image className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 bg-green-100 rounded-full">
+                    <Image className="h-6 w-6 text-[#4CAF50]" />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Publicidades</p>
@@ -77,8 +77,8 @@ export default function DashboardAdmin() {
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-200">
                 <div className="flex items-center">
-                  <div className="p-3 bg-yellow-100 rounded-full">
-                    <Plus className="h-6 w-6 text-yellow-600" />
+                  <div className="p-3 bg-green-100 rounded-full">
+                    <Plus className="h-6 w-6 text-[#4CAF50]" />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Noticias Destacadas</p>
@@ -89,7 +89,7 @@ export default function DashboardAdmin() {
               <div className="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-200">
                 <div className="flex items-center">
                   <div className="p-3 bg-green-100 rounded-full">
-                    <Users className="h-6 w-6 text-green-600" />
+                    <Users className="h-6 w-6 text-[#4CAF50]" />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Secciones Activas</p>
@@ -109,7 +109,7 @@ export default function DashboardAdmin() {
                     <div className="flex-1 mx-4">
                       <div className="w-full bg-gray-200 rounded-full h-2.5">
                         <div 
-                          className="bg-red-600 h-2.5 rounded-full transition-all duration-500 ease-out" 
+                          className="bg-[#4CAF50] h-2.5 rounded-full transition-all duration-500 ease-out" 
                           style={{ width: `${(cantidad / Math.max(...Object.values(noticiasPorSeccion))) * 100}%` }}
                         ></div>
                       </div>
@@ -154,7 +154,7 @@ export default function DashboardAdmin() {
               }}
               className={`w-full flex items-center px-4 py-3 mb-2 rounded-lg text-left transition-all duration-200 ${
                 vistaActiva === item.id 
-                  ? 'bg-red-50 text-red-600 shadow-sm' 
+                  ? 'bg-green-50 text-[#4CAF50] shadow-sm' 
                   : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -177,21 +177,21 @@ export default function DashboardAdmin() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Header Móvil */}
       <div className="lg:hidden flex items-center justify-between bg-white shadow-sm px-4 py-2 sticky top-0 z-50">
         <button 
           onClick={() => setSidebarAbierto(true)} 
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <Menu size={24} />
+          <Menu size={24} className="text-[#4CAF50]" />
         </button>
         <img src="/logo-admin.png" alt="Logo Admin" className="h-8 w-auto" />
         <button 
           onClick={cerrarSesion} 
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <LogOut size={24} />
+          <LogOut size={24} className="text-[#4CAF50]" />
         </button>
       </div>
 
@@ -213,7 +213,7 @@ export default function DashboardAdmin() {
                 onClick={() => setSidebarAbierto(false)}
                 className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <X size={20} />
+                <X size={20} className="text-[#4CAF50]" />
               </button>
               <SidebarContent />
             </aside>

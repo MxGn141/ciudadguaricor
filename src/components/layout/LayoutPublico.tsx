@@ -51,7 +51,7 @@ export default function LayoutPublico() {
       {/* Contenido Principal */}
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex flex-col md:flex-row gap-6">
             {/* Contenido */}
             <div className="flex-1 min-w-0">
               <div className="bg-white rounded-lg shadow">
@@ -60,7 +60,7 @@ export default function LayoutPublico() {
             </div>
 
             {/* Barra Lateral */}
-            <aside className="w-full lg:w-80 shrink-0">
+            <aside className="w-full md:w-80 shrink-0 order-2 md:order-none">
               <div className="sticky top-[calc(var(--header-height)+1rem)] space-y-6">
                 <BarraLateral />
               </div>
@@ -77,7 +77,7 @@ export default function LayoutPublico() {
         :root {
           --header-height: 120px;
         }
-        @media (max-width: 1024px) {
+        @media (max-width: 768px) {
           :root {
             --header-height: 100px;
           }

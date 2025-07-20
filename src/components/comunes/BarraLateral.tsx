@@ -1,173 +1,146 @@
 import React from 'react';
-import { Download, FileText, Calendar, Eye } from 'lucide-react';
-import { useContextoNoticias } from '../../contexts/ContextoNoticias';
+import { Download, Eye } from 'lucide-react';
+import { useContextoContenido } from '../../contexts/ContextoContenido';
 
 export default function BarraLateral() {
-  const { publicidades } = useContextoNoticias();
-  const publicidadesSidebar = publicidades.filter(pub => pub.tipo === 'sidebar').slice(0, 6);
+  const { contenidosLaterales } = useContextoContenido();
 
   return (
     <aside className="w-full space-y-6">
-      {/* Edición del Día */}
+      {/* Edición Digital */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-red-600 text-white px-4 py-2">
-          <h3 className="font-bold text-lg">EDICIÓN DEL DÍA</h3>
+        <div className="bg-guarico-blue text-white px-4 py-3">
+          <h3 className="font-bold text-lg">EDICIÓN DIGITAL</h3>
         </div>
         <div className="p-4">
-          <div className="relative bg-red-500 rounded-lg overflow-hidden">
+          <div className="relative bg-guarico-dark-blue rounded-lg overflow-hidden">
             <div className="aspect-[3/4] flex items-center justify-center">
               <div className="text-center">
-                <div className="text-6xl font-bold text-white mb-2">CIUDAD</div>
-                <div className="text-6xl font-bold text-white">GUÁRICO</div>
+                <div className="text-6xl font-bold text-guarico-gold mb-2">CIUDAD</div>
+                <div className="text-6xl font-bold text-guarico-gold">GUÁRICO</div>
                 <div className="absolute bottom-4 left-4 right-4">
                   <div className="text-white font-semibold">
                     {new Date().toLocaleDateString('es-ES', { 
+                      weekday: 'long',
                       day: '2-digit', 
-                      month: '2-digit', 
+                      month: 'long', 
                       year: 'numeric' 
                     })}
                   </div>
                 </div>
               </div>
             </div>
-            <button className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all">
+            <button className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
               <Eye size={16} />
             </button>
           </div>
           <button 
             onClick={() => window.open('/edicion-pdf', '_blank')}
-            className="w-full mt-4 bg-red-600 text-white px-4 py-2 rounded font-semibold hover:bg-red-700 transition-colors flex items-center justify-center"
+            className="w-full mt-4 bg-guarico-blue text-white px-4 py-3 rounded font-semibold hover:bg-guarico-blue/90 transition-colors flex items-center justify-center"
           >
             <Download size={20} className="mr-2" />
-            Descargar PDF
+            Descargar Edición Digital
           </button>
         </div>
       </div>
 
-      {/* Iconos circulares */}
-      <div className="flex justify-center space-x-3">
-        <button 
-          onClick={() => window.open('https://twitter.com/ciudadguarico', '_blank')}
-          className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors"
-        >
-          <span className="text-white font-bold text-xl">★</span>
-        </button>
-        <button 
-          onClick={() => document.getElementById('search-input')?.focus()}
-          className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
-        >
-          <span className="text-white font-bold text-xl">🔍</span>
-        </button>
-        <button 
-          onClick={() => window.location.reload()}
-          className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
-        >
-          <span className="text-white font-bold text-xl">⚡</span>
-        </button>
-        <button 
-          onClick={() => window.open('/', '_blank')}
-          className="w-12 h-12 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-800 transition-colors"
-        >
-          <span className="text-white font-bold text-xl">CG</span>
-        </button>
+      {/* Enlaces Institucionales */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-guarico-blue text-white px-4 py-3">
+          <h3 className="font-bold">ENLACES</h3>
+        </div>
+        <div className="p-4 space-y-4">
+          {/* Gobernación de Guárico */}
+          <a 
+            href="https://guarico.gob.ve/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block hover:opacity-90 transition-opacity"
+          >
+            <img
+              src="/gob.png"
+              alt="Gobernación de Guárico"
+              className="w-full h-auto object-contain"
+            />
+          </a>
+
+          {/* Canta Guárico */}
+          <div className="space-y-2">
+            <a 
+              href="https://zeno.fm/radio/cantaguarico-91-3fm/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block hover:opacity-90 transition-opacity"
+            >
+              <img
+                src="/cantaguarico.jpg"
+                alt="Canta Guárico"
+                className="w-full h-auto object-contain"
+              />
+            </a>
+            {/* Reproductor de Radio */}
+            <div className="w-full bg-gray-100 rounded-lg p-2">
+              <iframe
+                title="Canta Guárico Radio"
+                src="https://zeno.fm/player/cantaguarico-91-3fm"
+                width="100%"
+                height="100"
+                frameBorder="0"
+                scrolling="no"
+                className="w-full"
+              ></iframe>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Publicidad */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-red-600 text-white px-4 py-2">
-          <h3 className="font-semibold">Publicidad</h3>
+      {/* Contenido Relacionado */}
+      <section className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-guarico-blue text-white px-4 py-3">
+          <h3 className="font-bold">CONTENIDO RELACIONADO</h3>
         </div>
-        <div className="p-4 space-y-3">
-          {publicidadesSidebar.length > 0 ? (
-            publicidadesSidebar.map((pub) => (
-              <div key={pub.id} className="border rounded-lg overflow-hidden hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer">
-                {pub.enlace ? (
-                  <a href={pub.enlace} target="_blank" rel="noopener noreferrer">
+        <div className="p-4 space-y-4">
+          {contenidosLaterales.length > 0 ? (
+            contenidosLaterales.map((contenido) => (
+              <article key={contenido.id} className="overflow-hidden rounded-lg">
+                {contenido.enlace ? (
+                  <a 
+                    href={contenido.enlace} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block hover:opacity-90 transition-opacity"
+                  >
                     <img
-                      src={pub.imagen}
-                      alt={pub.titulo}
-                      className="w-full h-24 object-cover hover:opacity-90 transition-opacity"
+                      src={contenido.imagen}
+                      alt="Contenido relacionado"
+                      className="w-full h-auto object-contain"
                     />
-                    <div className="p-2">
-                      <p className="text-xs font-medium text-gray-800 line-clamp-2">{pub.titulo}</p>
-                    </div>
                   </a>
                 ) : (
-                  <>
-                    <img
-                      src={pub.imagen}
-                      alt={pub.titulo}
-                      className="w-full h-24 object-cover"
-                    />
-                    <div className="p-2">
-                      <p className="text-xs font-medium text-gray-800 line-clamp-2">{pub.titulo}</p>
-                    </div>
-                  </>
+                  <img
+                    src={contenido.imagen}
+                    alt="Contenido relacionado"
+                    className="w-full h-auto object-contain"
+                  />
                 )}
-              </div>
+              </article>
             ))
           ) : (
             <div className="text-center py-6 text-gray-500">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                <p className="text-sm">Espacio publicitario disponible</p>
-                <p className="text-xs mt-1">Hasta 6 anuncios</p>
+              <div className="border-2 border-dashed border-guarico-light-blue rounded-lg p-4">
+                <p className="text-sm">Próximamente más contenido</p>
               </div>
             </div>
           )}
         </div>
-      </div>
+      </section>
 
-      {/* Clima */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-blue-600 text-white px-4 py-2">
-          <h3 className="font-semibold">Clima en Guárico</h3>
+      {/* Espacio adicional */}
+      <section className="bg-gray-100 rounded-lg p-4 text-center min-h-[600px] flex items-center justify-center">
+        <div className="text-gray-400">
+          <p className="text-sm">Próximamente más contenido</p>
         </div>
-        <div className="p-4 text-center">
-          <div className="text-3xl font-bold text-gray-800 mb-2">28°C</div>
-          <p className="text-gray-600 text-sm mb-2">Parcialmente nublado</p>
-          <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
-            <div>Máx: 32°C</div>
-            <div>Mín: 24°C</div>
-            <div>Humedad: 65%</div>
-            <div>Viento: 12 km/h</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Redes Sociales */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-red-600 text-white px-4 py-2">
-          <h3 className="font-semibold">Síguenos</h3>
-        </div>
-        <div className="p-4">
-          <div className="grid grid-cols-2 gap-3">
-            <button 
-              onClick={() => window.open('https://facebook.com/ciudadguarico', '_blank')}
-              className="bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
-            >
-              Facebook
-            </button>
-            <button 
-              onClick={() => window.open('https://twitter.com/ciudadguarico', '_blank')}
-              className="bg-blue-400 text-white px-3 py-2 rounded text-sm hover:bg-blue-500 transition-colors"
-            >
-              Twitter
-            </button>
-            <button 
-              onClick={() => window.open('https://instagram.com/ciudadguarico', '_blank')}
-              className="bg-pink-600 text-white px-3 py-2 rounded text-sm hover:bg-pink-700 transition-colors"
-            >
-              Instagram
-            </button>
-            <button 
-              onClick={() => window.open('https://youtube.com/ciudadguarico', '_blank')}
-              className="bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition-colors"
-            >
-              YouTube
-            </button>
-          </div>
-        </div>
-      </div>
+      </section>
     </aside>
   );
 }

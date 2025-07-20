@@ -3,11 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 
-// Este componente ya no se usa en el nuevo diseño
 export default function CarruselNoticias() {
-<<<<<<< Updated upstream
-  return null;
-=======
   const { noticias } = useContextoNoticias();
   const [indiceActual, setIndiceActual] = useState(0);
 
@@ -125,5 +121,4 @@ export default function CarruselNoticias() {
       )}
     </div>
   );
->>>>>>> Stashed changes
 }

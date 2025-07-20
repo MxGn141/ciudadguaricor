@@ -1,16 +1,19 @@
-<<<<<<< Updated upstream
-import React from 'react';
-import { useParams, Navigate } from 'react-router-dom';
-import { useContextoNoticias } from '../contexts/ContextoNoticias';
-import TarjetaNoticia from '../components/noticias/TarjetaNoticia';
-=======
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { useContextoNoticias, Noticia } from '../contexts/ContextoNoticias';
 import { Calendar, Clock } from 'lucide-react';
->>>>>>> Stashed changes
 
 const seccionesValidas = ['Nacionales', 'Municipales', 'Deportes', 'Cultura', 'Economía', 'Sociales', 'Sucesos'];
+
+const coloresSeccion = {
+  'Nacionales': 'from-blue-600 to-blue-800',
+  'Municipales': 'from-green-600 to-green-800',
+  'Deportes': 'from-yellow-600 to-yellow-800',
+  'Cultura': 'from-purple-600 to-purple-800',
+  'Economía': 'from-emerald-600 to-emerald-800',
+  'Sociales': 'from-pink-600 to-pink-800',
+  'Sucesos': 'from-red-600 to-red-800'
+};
 
 export default function PaginaSeccion() {
   const { seccion } = useParams<{ seccion: string }>();
@@ -47,38 +50,21 @@ export default function PaginaSeccion() {
     cargarNoticias();
   }, [seccion, obtenerNoticiasPorSeccion]);
   
-<<<<<<< Updated upstream
-  const noticias = obtenerNoticiasPorSeccion(seccion);
-=======
   const gradienteSeccion = coloresSeccion[seccion as keyof typeof coloresSeccion] || 'from-blue-600 to-blue-800';
->>>>>>> Stashed changes
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            {seccion}
-          </h1>
-          <div className="h-1 w-20 bg-red-600"></div>
-        </div>
-        
-        {noticias.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {noticias.map((noticia) => (
-              <TarjetaNoticia key={noticia.id} noticia={noticia} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">
-              No hay noticias disponibles en la sección {seccion}
+      {/* Encabezado de la sección */}
+      <div className={`w-full bg-gradient-to-r ${gradienteSeccion} text-white`}>
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="flex flex-col items-center text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              {seccion}
+            </h1>
+            <p className="text-lg text-white/80">
+              Las últimas noticias de {seccion.toLowerCase()}
             </p>
           </div>
-<<<<<<< Updated upstream
-        )}
-      </main>
-=======
         </div>
       </div>
 
@@ -160,7 +146,6 @@ export default function PaginaSeccion() {
           </div>
         </aside>
       </div>
->>>>>>> Stashed changes
     </div>
   );
 }
