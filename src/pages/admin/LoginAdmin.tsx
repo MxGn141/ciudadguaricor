@@ -23,7 +23,7 @@ export default function LoginAdmin() {
     setCargando(true);
 
     try {
-      const exito = iniciarSesion(usuario, contrasena);
+      const exito = await iniciarSesion(usuario, contrasena);
       if (!exito) {
         setError('Credenciales incorrectas');
         setAnimateError(true);

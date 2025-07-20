@@ -13,6 +13,14 @@ export default function VistaNoticia() {
   
   if (!noticia) return <Navigate to="/" replace />;
 
+  // Función para convertir fecha a Date si es string
+  const convertirFecha = (fecha: Date | string): Date => {
+    if (fecha instanceof Date) {
+      return fecha;
+    }
+    return new Date(fecha);
+  };
+
   // Obtener noticias relacionadas de la misma sección
   const noticiasRelacionadas = noticias
     .filter(n => n.seccion === noticia.seccion && n.id !== noticia.id)
@@ -45,6 +53,7 @@ export default function VistaNoticia() {
         Volver al inicio
       </Link>
       
+<<<<<<< Updated upstream
       <article className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="relative">
           <img
@@ -56,6 +65,28 @@ export default function VistaNoticia() {
           <span className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 text-sm rounded shadow-lg">
             {noticia.seccion}
           </span>
+=======
+      {/* Metadatos y compartir */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 text-sm text-gray-600 border-b border-gray-200 pb-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center">
+            <User size={16} className="mr-2 text-guarico-blue" />
+            <span>Por <strong>{noticia.autorTexto}</strong></span>
+          </div>
+          <div className="flex items-center">
+            <Camera size={16} className="mr-2 text-guarico-blue" />
+            <span>Foto: <strong>{noticia.autorFoto}</strong></span>
+          </div>
+          <div className="flex items-center">
+            <Calendar size={16} className="mr-2 text-guarico-blue" />
+            <span>{convertirFecha(noticia.fechaPublicacion).toLocaleDateString('es-ES', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}</span>
+          </div>
+>>>>>>> Stashed changes
         </div>
         
         <div className="p-6 md:p-8">
@@ -149,7 +180,7 @@ export default function VistaNoticia() {
                   {noticiaRel.titulo}
                 </h4>
                 <p className="text-xs text-gray-500 mt-1">
-                  {noticiaRel.fechaPublicacion.toLocaleDateString('es-ES')}
+                  {convertirFecha(noticiaRel.fechaPublicacion).toLocaleDateString('es-ES')}
                 </p>
               </Link>
             ))}

@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import axios from 'axios';
+import { useContextoAuth } from './ContextoAuth';
 
 export interface Noticia {
-  id: string;
+  id: string | number;
   titulo: string;
   contenido: string;
   resumen: string;
@@ -9,7 +11,7 @@ export interface Noticia {
   autorTexto: string;
   autorFoto: string;
   seccion: string;
-  fechaPublicacion: Date;
+  fechaPublicacion: Date | string;
   destacada?: boolean;
 }
 
@@ -24,12 +26,12 @@ export interface Publicidad {
 interface ContextoNoticiasType {
   noticias: Noticia[];
   publicidades: Publicidad[];
-  agregarNoticia: (noticia: Omit<Noticia, 'id'>) => void;
-  editarNoticia: (id: string, noticia: Partial<Noticia>) => void;
-  eliminarNoticia: (id: string) => void;
+  agregarNoticia: (formData: FormData) => Promise<void>;
+  editarNoticia: (id: string, noticia: Partial<Noticia>) => Promise<void>;
+  eliminarNoticia: (id: string) => Promise<void>;
   agregarPublicidad: (publicidad: Omit<Publicidad, 'id'>) => void;
   eliminarPublicidad: (id: string) => void;
-  obtenerNoticiasPorSeccion: (seccion: string, limite?: number) => Noticia[];
+  obtenerNoticiasPorSeccion: (seccion: string) => Promise<Noticia[]>;
   obtenerNoticiaPorId: (id: string) => Noticia | undefined;
 }
 
@@ -137,26 +139,83 @@ const publicidadesIniciales: Publicidad[] = [
   }
 ];
 
+const API_URL = 'http://localhost:3000/api'; // Backend en puerto 3000
+
 export function ProveedorContextoNoticias({ children }: { children: ReactNode }) {
-  const [noticias, setNoticias] = useState<Noticia[]>(noticiasIniciales);
+  const [noticias, setNoticias] = useState<Noticia[]>([]);
   const [publicidades, setPublicidades] = useState<Publicidad[]>(publicidadesIniciales);
+  const { token } = useContextoAuth();
 
-  const agregarNoticia = (nuevaNoticia: Omit<Noticia, 'id'>) => {
-    const noticia: Noticia = {
-      ...nuevaNoticia,
-      id: Date.now().toString(),
-    };
-    setNoticias(prev => [noticia, ...prev]);
+  const config = {
+    headers: { Authorization: `Bearer ${token}` }
   };
 
-  const editarNoticia = (id: string, cambios: Partial<Noticia>) => {
+  useEffect(() => {
+    cargarNoticias();
+  }, []);
+
+  const cargarNoticias = async () => {
+    try {
+      console.log('Cargando noticias desde:', `${API_URL}/news`);
+      const response = await axios.get(`${API_URL}/news`);
+      console.log('Respuesta del backend:', response.data);
+      
+      // Procesar las imágenes para que tengan la URL completa del backend
+      const noticiasConImagenes = response.data.map((noticia: any) => ({
+        ...noticia,
+        imagen: noticia.imagen ? `http://localhost:3000${noticia.imagen}` : noticia.imagen
+      }));
+      
+      console.log('Noticias procesadas:', noticiasConImagenes.map((n: any) => ({ id: n.id, titulo: n.titulo, seccion: n.seccion })));
+      setNoticias(noticiasConImagenes || []);
+    } catch (error) {
+      console.error('Error al cargar noticias:', error);
+      setNoticias([]);
+    }
+  };
+
+  // Cambiado para aceptar FormData
+  const agregarNoticia = async (formData: FormData) => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      };
+      const response = await axios.post(`${API_URL}/news`, formData, config);
+      // Procesar la imagen de la noticia recién creada
+      const noticiaConImagen = {
+        ...response.data,
+        imagen: response.data.imagen ? `http://localhost:3000${response.data.imagen}` : response.data.imagen
+      };
+      setNoticias(prev => [noticiaConImagen, ...prev]);
+    } catch (error) {
+      console.error('Error al agregar noticia:', error);
+      throw error;
+    }
+  };
+
+  const editarNoticia = async (id: string, cambios: Partial<Noticia>) => {
+    try {
+      const response = await axios.put(`${API_URL}/news/${id}`, cambios, config);
     setNoticias(prev => prev.map(noticia => 
-      noticia.id === id ? { ...noticia, ...cambios } : noticia
+        noticia.id === id ? response.data : noticia
     ));
+    } catch (error) {
+      console.error('Error al editar noticia:', error);
+      throw error;
+    }
   };
 
-  const eliminarNoticia = (id: string) => {
+  const eliminarNoticia = async (id: string) => {
+    try {
+      await axios.delete(`${API_URL}/news/${id}`, config);
     setNoticias(prev => prev.filter(noticia => noticia.id !== id));
+    } catch (error) {
+      console.error('Error al eliminar noticia:', error);
+      throw error;
+    }
   };
 
   const agregarPublicidad = (nuevaPublicidad: Omit<Publicidad, 'id'>) => {
@@ -171,13 +230,38 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
     setPublicidades(prev => prev.filter(pub => pub.id !== id));
   };
 
-  const obtenerNoticiasPorSeccion = (seccion: string, limite?: number) => {
-    const noticiasFiltradas = noticias.filter(noticia => noticia.seccion === seccion);
-    return limite ? noticiasFiltradas.slice(0, limite) : noticiasFiltradas;
+  const obtenerNoticiasPorSeccion = async (seccion: string): Promise<Noticia[]> => {
+    try {
+      const response = await axios.get(`${API_URL}/news/section/${seccion}`);
+      // Procesar las imágenes para que tengan la URL completa del backend
+      const noticiasConImagenes = response.data.map((noticia: any) => ({
+        ...noticia,
+        imagen: noticia.imagen ? `http://localhost:3000${noticia.imagen}` : noticia.imagen
+      }));
+      return noticiasConImagenes || [];
+    } catch (error) {
+      console.error('Error al obtener noticias por sección:', error);
+      return [];
+    }
   };
 
   const obtenerNoticiaPorId = (id: string) => {
-    return noticias.find(noticia => noticia.id === id);
+    console.log('Buscando noticia con ID:', id);
+    console.log('Noticias disponibles:', noticias.map(n => ({ id: n.id, titulo: n.titulo })));
+    
+    // Buscar por ID exacto primero
+    let noticiaEncontrada = noticias.find(noticia => noticia.id.toString() === id);
+    
+    // Si no se encuentra, intentar con conversión numérica
+    if (!noticiaEncontrada) {
+      const idNumerico = parseInt(id, 10);
+      if (!isNaN(idNumerico)) {
+        noticiaEncontrada = noticias.find(noticia => noticia.id === idNumerico);
+      }
+    }
+    
+    console.log('Noticia encontrada:', noticiaEncontrada?.titulo);
+    return noticiaEncontrada;
   };
 
   return (

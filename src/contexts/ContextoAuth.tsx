@@ -1,32 +1,50 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import axios from 'axios';
 
 interface ContextoAuthType {
   estaAutenticado: boolean;
-  iniciarSesion: (usuario: string, contrasena: string) => boolean;
+  token: string | null;
+  iniciarSesion: (usuario: string, contrasena: string) => Promise<boolean>;
   cerrarSesion: () => void;
 }
 
 const ContextoAuth = createContext<ContextoAuthType | undefined>(undefined);
 
 export function ProveedorContextoAuth({ children }: { children: ReactNode }) {
-  const [estaAutenticado, setEstaAutenticado] = useState(false);
+  const [estaAutenticado, setEstaAutenticado] = useState(!!localStorage.getItem('token'));
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
 
-  const iniciarSesion = (usuario: string, contrasena: string): boolean => {
-    // Credenciales simples para demo
-    if (usuario === 'admin' && contrasena === 'ciudad2025') {
-      setEstaAutenticado(true);
-      return true;
+  const iniciarSesion = async (usuario: string, contrasena: string): Promise<boolean> => {
+    try {
+      const response = await axios.post('http://localhost:3000/api/auth/login', {
+        username: usuario,
+        password: contrasena
+      });
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        setToken(response.data.token);
+        setEstaAutenticado(true);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      setEstaAutenticado(false);
+      setToken(null);
+      localStorage.removeItem('token');
+      return false;
     }
-    return false;
   };
 
   const cerrarSesion = () => {
     setEstaAutenticado(false);
+    setToken(null);
+    localStorage.removeItem('token');
   };
 
   return (
     <ContextoAuth.Provider value={{
       estaAutenticado,
+      token,
       iniciarSesion,
       cerrarSesion
     }}>

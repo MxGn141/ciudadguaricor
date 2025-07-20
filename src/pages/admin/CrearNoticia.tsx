@@ -12,12 +12,12 @@ export default function CrearNoticia({ onCreada }: Props) {
     titulo: '',
     contenido: '',
     resumen: '',
-    imagen: '',
     autorTexto: '',
     autorFoto: '',
     seccion: 'Nacionales',
     destacada: false
   });
+  const [imagen, setImagen] = useState<File | null>(null);
 
   const secciones = ['Nacionales', 'Municipales', 'Deportes', 'Cultura', 'Economía', 'Sociales', 'Sucesos'];
 
@@ -29,46 +29,46 @@ export default function CrearNoticia({ onCreada }: Props) {
     }));
   };
 
-  const manejarSubmit = (e: React.FormEvent) => {
+  const manejarImagen = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImagen(e.target.files[0]);
+    }
+  };
+
+  const manejarSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formulario.titulo || !formulario.contenido || !formulario.resumen) {
-      alert('Por favor complete todos los campos obligatorios');
+    if (!formulario.titulo || !formulario.contenido || !formulario.resumen || !imagen) {
+      alert('Por favor completa todos los campos obligatorios y selecciona una imagen');
       return;
     }
-
-    // Validar URL de imagen si se proporciona
-    if (formulario.imagen && !formulario.imagen.startsWith('http')) {
-      alert('La URL de la imagen debe comenzar con http:// o https://');
-      return;
+    const formData = new FormData();
+    Object.entries(formulario).forEach(([key, value]) => {
+      formData.append(key, value as string);
+    });
+    formData.append('imagen', imagen);
+    try {
+      await agregarNoticia(formData);
+      alert('Noticia creada exitosamente');
+      setFormulario({
+        titulo: '',
+        contenido: '',
+        resumen: '',
+        autorTexto: '',
+        autorFoto: '',
+        seccion: 'Nacionales',
+        destacada: false
+      });
+      setImagen(null);
+      onCreada();
+    } catch (error) {
+      alert('Error al crear la noticia');
     }
-    agregarNoticia({
-      ...formulario,
-      imagen: formulario.imagen || 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=800',
-      fechaPublicacion: new Date()
-    });
-
-    // Resetear formulario
-    setFormulario({
-      titulo: '',
-      contenido: '',
-      resumen: '',
-      imagen: '',
-      autorTexto: '',
-      autorFoto: '',
-      seccion: 'Nacionales',
-      destacada: false
-    });
-
-    alert('Noticia creada exitosamente');
-    onCreada();
   };
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-900">Crear Nueva Noticia</h2>
-      
-      <form onSubmit={manejarSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
+      <form onSubmit={manejarSubmit} encType="multipart/form-data" className="bg-white rounded-lg shadow-md p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
             <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 mb-2">
@@ -108,18 +108,18 @@ export default function CrearNoticia({ onCreada }: Props) {
 
           <div>
             <label htmlFor="imagen" className="block text-sm font-medium text-gray-700 mb-2">
-              URL de la Imagen (opcional)
+              Imagen de la Noticia *
             </label>
             <input
-              type="url"
+              type="file"
               id="imagen"
               name="imagen"
-              value={formulario.imagen}
-              onChange={manejarCambio}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              placeholder="https://ejemplo.com/imagen.jpg"
+              accept="image/*"
+              onChange={manejarImagen}
+              className="w-full"
+              required
             />
-            <p className="text-xs text-gray-500 mt-1">Si no se proporciona, se usará una imagen por defecto</p>
+            {imagen && <p className="text-xs text-gray-500 mt-1">{imagen.name}</p>}
           </div>
 
           <div>
@@ -205,55 +205,28 @@ export default function CrearNoticia({ onCreada }: Props) {
           </label>
         </div>
 
-        {/* Vista previa */}
-        {formulario.titulo && (
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold mb-4">Vista Previa</h3>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-start space-x-4">
-                {formulario.imagen && (
-                  <img
-                    src={formulario.imagen}
-                    alt="Vista previa"
-                    className="w-24 h-16 object-cover rounded"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=800';
-                    }}
-                  />
-                )}
-                <div className="flex-1">
-                  <span className="inline-block bg-red-600 text-white px-2 py-1 text-xs rounded mb-2">
-                    {formulario.seccion}
-                  </span>
-                  <h4 className="font-bold text-gray-900 mb-1">{formulario.titulo}</h4>
-                  {formulario.resumen && (
-                    <p className="text-sm text-gray-600 line-clamp-2">{formulario.resumen}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
         <div className="flex justify-end space-x-4">
           <button
             type="button"
-            onClick={() => setFormulario({
-              titulo: '',
-              contenido: '',
-              resumen: '',
-              imagen: '',
-              autorTexto: '',
-              autorFoto: '',
-              seccion: 'Nacionales',
-              destacada: false
-            })}
+            onClick={() => {
+              setFormulario({
+                titulo: '',
+                contenido: '',
+                resumen: '',
+                autorTexto: '',
+                autorFoto: '',
+                seccion: 'Nacionales',
+                destacada: false
+              });
+              setImagen(null);
+            }}
             className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             Limpiar
           </button>
           <button
             type="submit"
-            disabled={!formulario.titulo || !formulario.contenido || !formulario.resumen}
+            disabled={!formulario.titulo || !formulario.contenido || !formulario.resumen || !imagen}
             className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save size={20} className="mr-2" />
