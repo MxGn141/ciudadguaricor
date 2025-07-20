@@ -83,53 +83,55 @@ export default function PaginaSeccion() {
               <p className="mt-4 text-gray-600">Cargando noticias...</p>
             </div>
           ) : noticias.length > 0 ? (
-            noticias.map((noticia) => (
-              <Link 
-                key={noticia.id}
-                to={`/noticia/${noticia.id}`}
-                className="block bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group"
-              >
-                {/* Imagen */}
-                <div className="relative h-48 overflow-hidden rounded-t-lg">
-                  <img 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    src={noticia.imagen} 
-                    alt={noticia.titulo}
-                  />
-                </div>
-                
-                {/* Contenido */}
-                <div className="p-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                    <Calendar size={16} className="text-gray-400" />
-                    <time>{convertirFecha(noticia.fechaPublicacion).toLocaleDateString()}</time>
+            noticias.map((noticia) => {
+              // Obtener la imagen principal desde media
+              const imagenPrincipal = noticia.media?.find(m => m.tipo === 'imagen')?.url || '';
+              // Obtener nombre de la sección
+              const nombreSeccion = typeof noticia.seccion === 'object' && noticia.seccion !== null ? noticia.seccion.nombre : String(noticia.seccion);
+              return (
+                <Link 
+                  key={noticia.id}
+                  to={`/noticia/${noticia.id}`}
+                  className="block bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group"
+                >
+                  {/* Imagen */}
+                  <div className="relative h-48 overflow-hidden rounded-t-lg">
+                    <img 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      src={imagenPrincipal}
+                      alt={noticia.titulo}
+                    />
                   </div>
-                  
-                  <h2 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {noticia.titulo}
-                  </h2>
-                  
-                  <p className="text-gray-600 text-sm line-clamp-2 mb-4">
-                    {noticia.resumen}
-                  </p>
-
-                  <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <Clock size={16} className="text-gray-400" />
-                      <time className="text-gray-500">
-                        {convertirFecha(noticia.fechaPublicacion).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </time>
+                  {/* Contenido */}
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                      <Calendar size={16} className="text-gray-400" />
+                      <time>{convertirFecha(noticia.fecha_publicacion).toLocaleDateString()}</time>
                     </div>
-                    <span className="text-gray-600">
-                      {noticia.autorTexto}
-                    </span>
+                    <h2 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
+                      {noticia.titulo}
+                    </h2>
+                    <p className="text-gray-600 text-sm line-clamp-2 mb-4">
+                      {noticia.resumen}
+                    </p>
+                    <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <Clock size={16} className="text-gray-400" />
+                        <time className="text-gray-500">
+                          {convertirFecha(noticia.fecha_publicacion).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </time>
+                      </div>
+                      <span className="text-gray-600">
+                        {noticia.autorTexto}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))
+                </Link>
+              );
+            })
           ) : (
             <div className="col-span-full text-center py-12 bg-white rounded-xl shadow-md">
               <p className="text-gray-600 text-lg">

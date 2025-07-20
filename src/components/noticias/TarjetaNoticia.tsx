@@ -18,7 +18,7 @@ export default function TarjetaNoticia({ noticia }: Props) {
   // Obtener la imagen principal desde media
   const imagenPrincipal = noticia.media?.find(m => m.tipo === 'imagen')?.url || '';
   // Obtener autores como string
-  const autores = noticia.autores?.join(', ');
+  const autores = [noticia.autorTexto, noticia.autorFoto].filter(Boolean).join(' / ');
   // Obtener nombre de la sección
   const nombreSeccion = noticia.seccion?.nombre || '';
 

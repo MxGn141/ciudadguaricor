@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Section } from './Section';
-import { NewsAuthor } from './NewsAuthor';
 import { NewsMedia } from './NewsMedia';
 
 @Entity('noticias')
@@ -17,6 +16,12 @@ export class News {
   @Column({ length: 300 })
   resumen!: string;
 
+  @Column({ length: 100 })
+  autorTexto!: string;
+
+  @Column({ length: 100 })
+  autorFoto!: string;
+
   @ManyToOne(() => Section, { eager: true })
   @JoinColumn({ name: 'seccion_id' })
   seccion!: Section;
@@ -32,9 +37,6 @@ export class News {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at!: Date;
-
-  @OneToMany(() => NewsAuthor, newsAuthor => newsAuthor.noticia)
-  newsAuthors!: NewsAuthor[];
 
   @OneToMany(() => NewsMedia, newsMedia => newsMedia.noticia)
   newsMedia!: NewsMedia[];

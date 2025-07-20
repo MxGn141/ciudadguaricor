@@ -3,6 +3,19 @@ import { Save } from 'lucide-react';
 import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 import axios from 'axios';
 
+// Notificación flotante
+function Notificacion({ mensaje, tipo, onClose }: { mensaje: string, tipo: 'exito' | 'error', onClose: () => void }) {
+  return (
+    <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-lg shadow-lg text-white transition-all animate-fade-in-down ${tipo === 'exito' ? 'bg-green-600' : 'bg-red-600'}`}
+      style={{ minWidth: 220 }}>
+      <div className="flex items-center justify-between gap-4">
+        <span>{mensaje}</span>
+        <button onClick={onClose} className="ml-4 text-white hover:text-gray-200 font-bold">×</button>
+      </div>
+    </div>
+  );
+}
+
 interface Props {
   onCreada: () => void;
 }
@@ -24,31 +37,32 @@ export default function CrearNoticia({ onCreada }: Props) {
     contenido: '',
     resumen: '',
     seccion_id: '',
-    autores: [] as string[],
+    autorTexto: '',
+    autorFoto: '',
     destacada: false
   });
   const [imagen, setImagen] = useState<File | null>(null);
   const [secciones, setSecciones] = useState<Seccion[]>([]);
   const [autores, setAutores] = useState<Autor[]>([]);
+  const [notificacion, setNotificacion] = useState<{ mensaje: string, tipo: 'exito' | 'error' } | null>(null);
 
   useEffect(() => {
-    // Cargar secciones y autores desde el backend
-    axios.get('/api/sections').then(res => setSecciones(res.data));
-    axios.get('/api/authors').then(res => setAutores(res.data));
+    axios.get('http://localhost:3000/api/sections').then(res => {
+      setSecciones(Array.isArray(res.data) ? res.data : []);
+    });
   }, []);
+
+  const mostrarNotificacion = (mensaje: string, tipo: 'exito' | 'error') => {
+    setNotificacion({ mensaje, tipo });
+    setTimeout(() => setNotificacion(null), 3500);
+  };
 
   const manejarCambio = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    if (name === 'autores') {
-      const options = (e.target as HTMLSelectElement).options;
-      const values = Array.from(options).filter(o => o.selected).map(o => o.value);
-      setFormulario(prev => ({ ...prev, autores: values }));
-    } else {
-      setFormulario(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-      }));
-    }
+    setFormulario(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : (type === 'select-one' ? String(value) : value)
+    }));
   };
 
   const manejarImagen = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,47 +74,51 @@ export default function CrearNoticia({ onCreada }: Props) {
   const manejarSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formulario.titulo || !formulario.contenido || !formulario.resumen || !formulario.seccion_id || !imagen) {
-      alert('Por favor completa todos los campos obligatorios y selecciona una imagen');
+      mostrarNotificacion('Por favor completa todos los campos obligatorios y selecciona una imagen', 'error');
       return;
     }
-    // Subir la imagen primero (puedes adaptar esto a tu endpoint de media)
     let mediaIds: number[] = [];
-    if (imagen) {
+    try {
+      // Usa la URL absoluta para el backend
       const formDataImg = new FormData();
       formDataImg.append('file', imagen);
-      const res = await axios.post('/api/media', formDataImg, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const res = await axios.post('http://localhost:3000/api/media', formDataImg, { headers: { 'Content-Type': 'multipart/form-data' } });
       mediaIds = [res.data.id];
+    } catch (err) {
+      mostrarNotificacion('Error al subir la imagen', 'error');
+      return;
     }
-    // Armar el objeto para el backend
-    const noticiaPayload = {
-      titulo: formulario.titulo,
-      contenido: formulario.contenido,
-      resumen: formulario.resumen,
-      seccion_id: Number(formulario.seccion_id),
-      autores: formulario.autores.map(Number),
-      media: mediaIds,
-      destacada: formulario.destacada
-    };
+    const noticiaForm = new FormData();
+    noticiaForm.append('titulo', formulario.titulo);
+    noticiaForm.append('contenido', formulario.contenido);
+    noticiaForm.append('resumen', formulario.resumen);
+    noticiaForm.append('seccion_id', formulario.seccion_id);
+    noticiaForm.append('autorTexto', formulario.autorTexto);
+    noticiaForm.append('autorFoto', formulario.autorFoto);
+    noticiaForm.append('destacada', String(formulario.destacada));
+    mediaIds.forEach(id => noticiaForm.append('media', String(id)));
     try {
-      await agregarNoticia(noticiaPayload);
-      alert('Noticia creada exitosamente');
+      await agregarNoticia(noticiaForm);
+      mostrarNotificacion('Noticia creada exitosamente', 'exito');
       setFormulario({
         titulo: '',
         contenido: '',
         resumen: '',
         seccion_id: '',
-        autores: [],
+        autorTexto: '',
+        autorFoto: '',
         destacada: false
       });
       setImagen(null);
       onCreada();
     } catch (error) {
-      alert('Error al crear la noticia');
+      mostrarNotificacion('Error al crear la noticia', 'error');
     }
   };
 
   return (
     <div className="space-y-6">
+      {notificacion && <Notificacion mensaje={notificacion.mensaje} tipo={notificacion.tipo} onClose={() => setNotificacion(null)} />}
       <h2 className="text-2xl font-bold text-gray-900">Crear Nueva Noticia</h2>
       <form onSubmit={manejarSubmit} encType="multipart/form-data" className="bg-white rounded-lg shadow-md p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -135,7 +153,7 @@ export default function CrearNoticia({ onCreada }: Props) {
               required
             >
               <option value="">Seleccione una sección</option>
-              {secciones.map(seccion => (
+              {(Array.isArray(secciones) ? secciones : []).map(seccion => (
                 <option key={seccion.id} value={seccion.id}>{seccion.nombre}</option>
               ))}
             </select>
@@ -158,23 +176,34 @@ export default function CrearNoticia({ onCreada }: Props) {
           </div>
 
           <div className="md:col-span-2">
-            <label htmlFor="autores" className="block text-sm font-medium text-gray-700 mb-2">
-              Autores *
+            <label htmlFor="autorTexto" className="block text-sm font-medium text-gray-700 mb-2">
+              Autor de Texto *
             </label>
-            <select
-              id="autores"
-              name="autores"
-              multiple
-              value={formulario.autores}
+            <input
+              type="text"
+              id="autorTexto"
+              name="autorTexto"
+              value={formulario.autorTexto}
               onChange={manejarCambio}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              placeholder="Nombre del autor de texto"
               required
-            >
-              {autores.map(autor => (
-                <option key={autor.id} value={autor.id}>{autor.nombre}</option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-1">Puede seleccionar uno o varios autores (Ctrl+Click)</p>
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="autorFoto" className="block text-sm font-medium text-gray-700 mb-2">
+              Autor de Foto *
+            </label>
+            <input
+              type="text"
+              id="autorFoto"
+              name="autorFoto"
+              value={formulario.autorFoto}
+              onChange={manejarCambio}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              placeholder="Nombre del autor de foto"
+              required
+            />
           </div>
         </div>
 
@@ -237,7 +266,8 @@ export default function CrearNoticia({ onCreada }: Props) {
                 contenido: '',
                 resumen: '',
                 seccion_id: '',
-                autores: [],
+                autorTexto: '',
+                autorFoto: '',
                 destacada: false
               });
               setImagen(null);

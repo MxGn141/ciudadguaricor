@@ -4,7 +4,10 @@ import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 export default function CarruselTitulares() {
   const { noticias } = useContextoNoticias();
   
-  const titulares = noticias.slice(0, 8).map(noticia => `${noticia.seccion}: ${noticia.titulo}`);
+  const titulares = noticias.slice(0, 8).map(noticia => {
+    const nombreSeccion = typeof noticia.seccion === 'object' && noticia.seccion !== null ? noticia.seccion.nombre : String(noticia.seccion);
+    return `${nombreSeccion}: ${noticia.titulo}`;
+  });
 
   if (titulares.length === 0) return null;
 

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import axios from 'axios';
 import { useContextoAuth } from './ContextoAuth';
+import { debounce } from 'lodash';
 
 export interface Noticia {
   id: string | number;
@@ -10,9 +11,9 @@ export interface Noticia {
   seccion: {
     id: number;
     nombre: string;
-    color?: string;
   } | null;
-  autores: string[];
+  autorTexto: string;
+  autorFoto: string;
   media: { url: string; tipo: string; descripcion?: string }[];
   fecha_publicacion: Date | string;
   destacada?: boolean;
@@ -38,169 +39,13 @@ interface ContextoNoticiasType {
   eliminarPublicidad: (id: string) => void;
   obtenerNoticiasPorSeccion: (seccion: string) => Promise<Noticia[]>;
   obtenerNoticiaPorId: (id: string) => Noticia | undefined;
+  setTerminoBusqueda: (termino: string) => void;
+  cargandoBusqueda: boolean;
 }
 
 const ContextoNoticias = createContext<ContextoNoticiasType | undefined>(undefined);
 
-const noticiasIniciales: Noticia[] = [
-  {
-    id: '1',
-    titulo: 'Ministro Ñáñez acusa a El País de España de impulsar una campaña sucia contra Venezuela',
-    contenido: 'El medio español reseña las declaraciones del fiscal chileno Héctor Barros quien afirmó que "el asesinato del exteniente, Ronald Ojeda, habría sido planificado en Caracas por motivos políticos"',
-    resumen: 'El medio español reseña las declaraciones del fiscal chileno Héctor Barros quien afirmó que el asesinato habría sido planificado en Caracas.',
-    imagen: 'https://images.pexels.com/photos/416405/pexels-photo-416405.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'María González',
-    autorFoto: 'Carlos Rodríguez',
-    seccion: 'Nacionales',
-    fechaPublicacion: new Date(),
-    destacada: true
-  },
-  {
-    id: '2',
-    titulo: 'Presidente Maduro y Yulimar Rojas: Atletas irán a París inspirados con tu ejemplo',
-    contenido: 'La atleta fue sometida a una operación por lo que no participará en los Juegos Olímpicos que se realizarán entre julio y agosto',
-    resumen: 'La atleta fue sometida a una operación por lo que no participará en los Juegos Olímpicos.',
-    imagen: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Luis Pérez',
-    autorFoto: 'Ana Martínez',
-    seccion: 'Deportes',
-    fechaPublicacion: new Date(),
-    destacada: true
-  },
-  {
-    id: '3',
-    titulo: 'Diosdado Cabello recordó a los jóvenes que sin la Revolución, Venezuela era un país de excluidos',
-    contenido: 'Desde el Parque Alí Primera, Cabello encabezó el acto para conmemorar junto a los jóvenes los 22 años del Golpe Fascista',
-    resumen: 'Desde el Parque Alí Primera, Cabello encabezó el acto para conmemorar los 22 años del Golpe Fascista.',
-    imagen: 'https://images.pexels.com/photos/274422/pexels-photo-274422.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Roberto Silva',
-    autorFoto: 'Carmen López',
-    seccion: 'Nacionales',
-    fechaPublicacion: new Date(),
-    destacada: true
-  },
-  {
-    id: '4',
-    titulo: 'Misión exploratoria de la Unión Europea sostiene reunión con autoridades del TSJ',
-    contenido: 'También estuvo presente representante la viceministra para Europa del Ministerio de Relaciones Exteriores, Coromoto Godoy',
-    resumen: 'También estuvo presente representante la viceministra para Europa del Ministerio de Relaciones Exteriores.',
-    imagen: 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Ana Rodríguez',
-    autorFoto: 'Pedro Martín',
-    seccion: 'Nacionales',
-    fechaPublicacion: new Date(),
-    destacada: true
-  },
-  {
-    id: '5',
-    titulo: 'Pobreza, escapar del círculo vicioso',
-    contenido: 'Análisis sobre las políticas públicas necesarias para combatir la pobreza estructural en Venezuela',
-    resumen: 'Análisis sobre las políticas públicas necesarias para combatir la pobreza estructural.',
-    imagen: 'https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'David Uzcátegui',
-    autorFoto: 'María Fernández',
-    seccion: 'Cultura',
-    fechaPublicacion: new Date(),
-    destacada: true
-  },
-  {
-    id: '6',
-    titulo: 'El pueblo',
-    contenido: 'Reflexiones sobre la participación ciudadana en los procesos democráticos venezolanos',
-    resumen: 'Reflexiones sobre la participación ciudadana en los procesos democráticos.',
-    imagen: 'https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Jean Maninat',
-    autorFoto: 'Carlos Vega',
-    seccion: 'Cultura',
-    fechaPublicacion: new Date(),
-    destacada: false
-  },
-  {
-    id: '7',
-    titulo: 'Misericordia',
-    contenido: 'Columna de opinión sobre los valores humanos en tiempos de crisis',
-    resumen: 'Columna de opinión sobre los valores humanos en tiempos de crisis.',
-    imagen: 'https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Soledad Morillo Belloso',
-    autorFoto: 'Ana López',
-    seccion: 'Sociales',
-    fechaPublicacion: new Date(),
-    destacada: false
-  },
-  // Noticias de Sucesos
-  {
-    id: '37',
-    titulo: 'Bomberos controlan incendio en zona industrial',
-    contenido: 'Rápida acción de los cuerpos de seguridad evita daños mayores en incidente.',
-    resumen: 'Efectiva respuesta ante emergencia industrial.',
-    imagen: 'https://images.pexels.com/photos/6061750/pexels-photo-6061750.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Roberto Méndez',
-    autorFoto: 'María Sánchez',
-    seccion: 'Sucesos',
-    fechaPublicacion: new Date(),
-    destacada: true
-  },
-  {
-    id: '38',
-    titulo: 'Protección Civil realiza simulacro de emergencia',
-    contenido: 'Ejercicio de preparación involucra a múltiples organismos de seguridad.',
-    resumen: 'Exitoso simulacro fortalece respuesta ante emergencias.',
-    imagen: 'https://images.pexels.com/photos/6062557/pexels-photo-6062557.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Carlos López',
-    autorFoto: 'Ana Torres',
-    seccion: 'Sucesos',
-    fechaPublicacion: new Date(Date.now() - 86400000),
-    destacada: false
-  },
-  {
-    id: '39',
-    titulo: 'Rescatan excursionistas en Parque Nacional',
-    contenido: 'Grupos especializados logran exitoso rescate de grupo extraviado.',
-    resumen: 'Operativo de rescate culmina con éxito.',
-    imagen: 'https://images.pexels.com/photos/6062573/pexels-photo-6062573.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Miguel Ángel',
-    autorFoto: 'Patricia Blanco',
-    seccion: 'Sucesos',
-    fechaPublicacion: new Date(Date.now() - 172800000),
-    destacada: false
-  },
-  {
-    id: '40',
-    titulo: 'Policía recupera vehículos robados',
-    contenido: 'Operativo especial permite la recuperación de varios vehículos sustraídos.',
-    resumen: 'Exitoso operativo policial contra el robo de vehículos.',
-    imagen: 'https://images.pexels.com/photos/6062574/pexels-photo-6062574.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Pedro Ramírez',
-    autorFoto: 'Laura González',
-    seccion: 'Sucesos',
-    fechaPublicacion: new Date(Date.now() - 259200000),
-    destacada: false
-  },
-  {
-    id: '41',
-    titulo: 'Capacitan a comunidades en prevención de riesgos',
-    contenido: 'Programa especial forma a líderes comunitarios en gestión de emergencias.',
-    resumen: 'Comunidades mejor preparadas ante emergencias.',
-    imagen: 'https://images.pexels.com/photos/6062575/pexels-photo-6062575.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Andrea Torres',
-    autorFoto: 'José Martínez',
-    seccion: 'Sucesos',
-    fechaPublicacion: new Date(Date.now() - 345600000),
-    destacada: false
-  },
-  {
-    id: '42',
-    titulo: 'Bomberos realizan jornada preventiva',
-    contenido: 'Cuerpo de bomberos inspecciona establecimientos comerciales.',
-    resumen: 'Importante labor preventiva de los bomberos.',
-    imagen: 'https://images.pexels.com/photos/6062576/pexels-photo-6062576.jpeg?auto=compress&cs=tinysrgb&w=800',
-    autorTexto: 'Luis García',
-    autorFoto: 'Carmen Díaz',
-    seccion: 'Sucesos',
-    fechaPublicacion: new Date(Date.now() - 432000000),
-    destacada: false
-  }
-];
+// Elimina el array noticiasIniciales y cualquier referencia a él
 
 const publicidadesIniciales: Publicidad[] = [
   {
@@ -222,11 +67,59 @@ const API_URL = 'http://localhost:3000/api'; // Backend en puerto 3000
 export function ProveedorContextoNoticias({ children }: { children: ReactNode }) {
   const [noticias, setNoticias] = useState<Noticia[]>([]);
   const [publicidades, setPublicidades] = useState<Publicidad[]>(publicidadesIniciales);
+  const [terminoBusqueda, setTerminoBusqueda] = useState('');
+  const [cargandoBusqueda, setCargandoBusqueda] = useState(false);
   const { token } = useContextoAuth();
 
   const config = {
     headers: { Authorization: `Bearer ${token}` }
   };
+
+  // Búsqueda global en el backend en tiempo real (autosuggest)
+  React.useEffect(() => {
+    let cancelado = false;
+    const buscarNoticias = async () => {
+      if (terminoBusqueda.trim().length === 0) {
+        setCargandoBusqueda(true);
+        await cargarNoticias();
+        setCargandoBusqueda(false);
+        return;
+      }
+      setCargandoBusqueda(true);
+      try {
+        const response = await axios.get(`${API_URL}/news?search=${encodeURIComponent(terminoBusqueda)}`);
+        if (!cancelado) {
+          const noticiasMapeadas = response.data.map((noticia: any) => ({
+            id: noticia.id,
+            titulo: noticia.titulo,
+            contenido: noticia.contenido,
+            resumen: noticia.resumen,
+            seccion: noticia.seccion,
+            autorTexto: noticia.autorTexto,
+            autorFoto: noticia.autorFoto,
+            media: (noticia.media || []).map((m: any) => ({
+              ...m,
+              url: m.url && m.url.startsWith('/uploads') ? `http://localhost:3000${m.url}` : m.url
+            })),
+            fecha_publicacion: noticia.fecha_publicacion,
+            destacada: noticia.destacada,
+            created_at: noticia.created_at,
+            updated_at: noticia.updated_at
+          }));
+          setNoticias(noticiasMapeadas || []);
+        }
+      } catch (error) {
+        if (!cancelado) setNoticias([]);
+      } finally {
+        if (!cancelado) setCargandoBusqueda(false);
+      }
+    };
+    const timeout = setTimeout(buscarNoticias, 250);
+    return () => {
+      cancelado = true;
+      clearTimeout(timeout);
+    };
+  }, [terminoBusqueda]);
 
   useEffect(() => {
     cargarNoticias();
@@ -244,8 +137,12 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
         contenido: noticia.contenido,
         resumen: noticia.resumen,
         seccion: noticia.seccion,
-        autores: noticia.autores || [],
-        media: noticia.media || [],
+        autorTexto: noticia.autorTexto,
+        autorFoto: noticia.autorFoto,
+        media: (noticia.media || []).map((m: any) => ({
+          ...m,
+          url: m.url && m.url.startsWith('/uploads') ? `http://localhost:3000${m.url}` : m.url
+        })),
         fecha_publicacion: noticia.fecha_publicacion,
         destacada: noticia.destacada,
         created_at: noticia.created_at,
@@ -323,8 +220,12 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
         contenido: noticia.contenido,
         resumen: noticia.resumen,
         seccion: noticia.seccion,
-        autores: noticia.autores || [],
-        media: noticia.media || [],
+        autorTexto: noticia.autorTexto,
+        autorFoto: noticia.autorFoto,
+        media: (noticia.media || []).map((m: any) => ({
+          ...m,
+          url: m.url && m.url.startsWith('/uploads') ? `http://localhost:3000${m.url}` : m.url
+        })),
         fecha_publicacion: noticia.fecha_publicacion,
         destacada: noticia.destacada,
         created_at: noticia.created_at,
@@ -339,6 +240,15 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
     return noticias.find(n => n.id === id || n.id === Number(id));
   };
 
+  // Filtrar noticias por término de búsqueda global
+  const noticiasFiltradas = terminoBusqueda.trim().length > 0
+    ? noticias.filter(noticia =>
+        noticia.titulo.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+        noticia.resumen.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+        noticia.autorTexto.toLowerCase().includes(terminoBusqueda.toLowerCase())
+      )
+    : noticias;
+
   return (
     <ContextoNoticias.Provider value={{
       noticias,
@@ -349,7 +259,9 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
       agregarPublicidad,
       eliminarPublicidad,
       obtenerNoticiasPorSeccion,
-      obtenerNoticiaPorId
+      obtenerNoticiaPorId,
+      setTerminoBusqueda,
+      cargandoBusqueda
     }}>
       {children}
     </ContextoNoticias.Provider>

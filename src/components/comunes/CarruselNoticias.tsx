@@ -50,38 +50,44 @@ export default function CarruselNoticias() {
   return (
     <div className="relative group">
       <div className="relative h-[400px] md:h-[500px] overflow-hidden rounded-xl">
-        {noticiasParaMostrar.map((noticia, index) => (
-          <div
-            key={noticia.id}
-            className={`absolute inset-0 transition-opacity duration-500 ${
-              index === indiceActual ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
-          >
-            <Link to={`/noticia/${noticia.id}`} className="block h-full group">
-              <div className="relative h-full">
-                <img
-                  src={noticia.imagen}
-                  alt={noticia.titulo}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                  <div className="mb-2">
-                    <span className="inline-block bg-guarico-gold text-black px-3 py-1 text-sm font-semibold rounded">
-                      {noticia.seccion}
-                    </span>
+        {noticiasParaMostrar.map((noticia, index) => {
+          // Obtener la imagen principal desde media
+          const imagenPrincipal = noticia.media?.find(m => m.tipo === 'imagen')?.url || '';
+          // Obtener nombre de la sección
+          const nombreSeccion = typeof noticia.seccion === 'object' && noticia.seccion !== null ? noticia.seccion.nombre : String(noticia.seccion);
+          return (
+            <div
+              key={noticia.id}
+              className={`absolute inset-0 transition-opacity duration-500 ${
+                index === indiceActual ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <Link to={`/noticia/${noticia.id}`} className="block h-full group">
+                <div className="relative h-full">
+                  <img
+                    src={imagenPrincipal}
+                    alt={noticia.titulo}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <div className="mb-2">
+                      <span className="inline-block bg-guarico-gold text-black px-3 py-1 text-sm font-semibold rounded">
+                        {nombreSeccion}
+                      </span>
+                    </div>
+                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 group-hover:text-guarico-gold transition-colors">
+                      {noticia.titulo}
+                    </h2>
+                    <p className="text-gray-200 text-sm md:text-base line-clamp-2">
+                      {noticia.resumen}
+                    </p>
                   </div>
-                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 group-hover:text-guarico-gold transition-colors">
-                    {noticia.titulo}
-                  </h2>
-                  <p className="text-gray-200 text-sm md:text-base line-clamp-2">
-                    {noticia.resumen}
-                  </p>
                 </div>
-              </div>
-            </Link>
-          </div>
-        ))}
+              </Link>
+            </div>
+          );
+        })}
       </div>
 
       {/* Controles del carrusel */}

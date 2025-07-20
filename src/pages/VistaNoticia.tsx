@@ -24,7 +24,7 @@ export default function VistaNoticia() {
   // Obtener la imagen principal desde media
   const imagenPrincipal = noticia.media?.find(m => m.tipo === 'imagen')?.url || '';
   // Obtener autores como string
-  const autores = noticia.autores?.join(', ');
+  const autores = [noticia.autorTexto, noticia.autorFoto].filter(Boolean).join(' / ');
   // Obtener nombre de la sección
   const nombreSeccion = noticia.seccion?.nombre || '';
 
@@ -74,10 +74,6 @@ export default function VistaNoticia() {
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6 text-sm text-gray-600 border-b border-gray-200 pb-4">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center">
-            <User size={16} className="mr-2 text-guarico-blue" />
-            <span>Por <strong>{autores}</strong></span>
-          </div>
-          <div className="flex items-center">
             <Calendar size={16} className="mr-2 text-guarico-blue" />
             <span>{convertirFecha(noticia.fecha_publicacion).toLocaleDateString('es-ES', {
               weekday: 'long',
@@ -86,6 +82,18 @@ export default function VistaNoticia() {
               day: 'numeric'
             })}</span>
           </div>
+          {noticia.autorTexto && (
+            <div className="flex items-center">
+              <User size={16} className="mr-2 text-guarico-blue" />
+              <span><span className="font-semibold">Redacción por</span> {noticia.autorTexto}</span>
+            </div>
+          )}
+          {noticia.autorFoto && (
+            <div className="flex items-center">
+              <Camera size={16} className="mr-2 text-guarico-blue" />
+              <span><span className="font-semibold">Fotografía por</span> {noticia.autorFoto}</span>
+            </div>
+          )}
         </div>
         
         <div className="flex items-center space-x-2">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, Menu, X } from 'lucide-react';
+import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 
 interface Props {
   isSticky?: boolean;
@@ -17,15 +18,16 @@ const secciones = [
   { nombre: 'SUCESOS', ruta: '/seccion/Sucesos' },
 ];
 
-export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
+export default function BarraNavegacion({ isSticky = false }: { isSticky?: boolean }) {
   const location = useLocation();
+  const { setTerminoBusqueda } = useContextoNoticias();
   const [menuAbierto, setMenuAbierto] = useState(false);
-  const [terminoBusqueda, setTerminoBusqueda] = useState('');
+  const [termino, setTermino] = useState('');
   const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
 
   const manejarSubmitBusqueda = (e: React.FormEvent) => {
     e.preventDefault();
-    onBuscar(terminoBusqueda);
+    setTerminoBusqueda(termino);
     setMenuAbierto(false);
     setMostrarBusqueda(false);
   };
@@ -91,8 +93,8 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
                 <input
                   type="text"
                   placeholder="Buscar noticias..."
-                  value={terminoBusqueda}
-                  onChange={(e) => setTerminoBusqueda(e.target.value)}
+                  value={termino}
+                  onChange={(e) => setTermino(e.target.value)}
                   className="w-56 xl:w-64 px-4 py-2 pl-10 text-sm rounded-lg bg-white text-gray-900 placeholder-gray-500 border border-transparent focus:border-guarico-gold focus:ring-2 focus:ring-guarico-gold/50 focus:outline-none shadow-sm"
                 />
                 <Search 
@@ -185,8 +187,8 @@ export default function BarraNavegacion({ isSticky = false, onBuscar }: Props) {
                     <input
                       type="text"
                       placeholder="Buscar noticias..."
-                      value={terminoBusqueda}
-                      onChange={(e) => setTerminoBusqueda(e.target.value)}
+                      value={termino}
+                      onChange={(e) => setTermino(e.target.value)}
                       className="w-full px-4 py-3 pl-10 text-sm rounded-lg bg-white text-gray-900 placeholder-gray-500 border border-transparent focus:border-guarico-gold focus:ring-2 focus:ring-guarico-gold/50 focus:outline-none shadow-sm"
                     />
                     <Search 

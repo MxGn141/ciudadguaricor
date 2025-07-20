@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import { News } from '../models/News';
-import { NewsAuthor } from '../models/NewsAuthor';
 import { NewsMedia } from '../models/NewsMedia';
 import { Section } from '../models/Section';
 import { validationResult } from 'express-validator';
@@ -15,8 +14,6 @@ export class NewsController {
       const news = await this.newsRepository.find({
         relations: [
           'seccion',
-          'newsAuthors',
-          'newsAuthors.autor',
           'newsMedia',
           'newsMedia.media'
         ],
@@ -30,8 +27,9 @@ export class NewsController {
         titulo: n.titulo,
         contenido: n.contenido,
         resumen: n.resumen,
-        seccion: n.seccion ? { id: n.seccion.id, nombre: n.seccion.nombre, color: n.seccion.color } : null,
-        autores: n.newsAuthors?.map(na => na.autor?.nombre) || [],
+        seccion: n.seccion ? { id: n.seccion.id, nombre: n.seccion.nombre } : null,
+        autorTexto: n.autorTexto,
+        autorFoto: n.autorFoto,
         media: n.newsMedia?.map(nm => ({ url: nm.media?.url, tipo: nm.media?.tipo, descripcion: nm.media?.descripcion })) || [],
         destacada: n.destacada,
         fecha_publicacion: n.fecha_publicacion,
@@ -51,8 +49,6 @@ export class NewsController {
         where: { id: parseInt(req.params.id) },
         relations: [
           'seccion',
-          'newsAuthors',
-          'newsAuthors.autor',
           'newsMedia',
           'newsMedia.media'
         ]
@@ -66,8 +62,9 @@ export class NewsController {
         titulo: news.titulo,
         contenido: news.contenido,
         resumen: news.resumen,
-        seccion: news.seccion ? { id: news.seccion.id, nombre: news.seccion.nombre, color: news.seccion.color } : null,
-        autores: news.newsAuthors?.map(na => na.autor?.nombre) || [],
+        seccion: news.seccion ? { id: news.seccion.id, nombre: news.seccion.nombre } : null,
+        autorTexto: news.autorTexto,
+        autorFoto: news.autorFoto,
         media: news.newsMedia?.map(nm => ({ url: nm.media?.url, tipo: nm.media?.tipo, descripcion: nm.media?.descripcion })) || [],
         destacada: news.destacada,
         fecha_publicacion: news.fecha_publicacion,
@@ -88,9 +85,8 @@ export class NewsController {
         res.status(400).json({ errors: errors.array() });
         return;
       }
-      const { titulo, contenido, resumen, seccion_id, destacada, fecha_publicacion, autores, media } = req.body;
+      const { titulo, contenido, resumen, seccion_id, autorTexto, autorFoto, destacada, fecha_publicacion, media } = req.body;
       const sectionRepo = getRepository(Section);
-      const authorRepo = getRepository('autores');
       const mediaRepo = getRepository('media');
       // Validar sección
       const seccion = await sectionRepo.findOne({ where: { id: seccion_id } });
@@ -104,19 +100,12 @@ export class NewsController {
         contenido,
         resumen,
         seccion,
+        autorTexto,
+        autorFoto,
         destacada: !!destacada,
         fecha_publicacion: fecha_publicacion ? new Date(fecha_publicacion) : undefined
       });
       await this.newsRepository.save(noticia);
-      // Asociar autores
-      if (Array.isArray(autores)) {
-        for (const autor_id of autores) {
-          const autor = await authorRepo.findOne({ where: { id: autor_id } });
-          if (autor) {
-            await getRepository('noticia_autor').save({ noticia_id: noticia.id, autor_id: autor.id });
-          }
-        }
-      }
       // Asociar media
       if (Array.isArray(media)) {
         for (const media_id of media) {
@@ -131,8 +120,6 @@ export class NewsController {
         where: { id: noticia.id },
         relations: [
           'seccion',
-          'newsAuthors',
-          'newsAuthors.autor',
           'newsMedia',
           'newsMedia.media'
         ]
@@ -151,9 +138,8 @@ export class NewsController {
         res.status(404).json({ message: 'Noticia no encontrada' });
         return;
       }
-      const { titulo, contenido, resumen, seccion_id, destacada, fecha_publicacion, autores, media } = req.body;
+      const { titulo, contenido, resumen, seccion_id, autorTexto, autorFoto, destacada, fecha_publicacion, media } = req.body;
       const sectionRepo = getRepository(Section);
-      const authorRepo = getRepository('autores');
       const mediaRepo = getRepository('media');
       // Validar sección
       if (seccion_id) {
@@ -164,22 +150,14 @@ export class NewsController {
         }
         noticia.seccion = seccion;
       }
+      if (autorTexto !== undefined) noticia.autorTexto = autorTexto;
+      if (autorFoto !== undefined) noticia.autorFoto = autorFoto;
       if (titulo !== undefined) noticia.titulo = titulo;
       if (contenido !== undefined) noticia.contenido = contenido;
       if (resumen !== undefined) noticia.resumen = resumen;
       if (destacada !== undefined) noticia.destacada = !!destacada;
       if (fecha_publicacion !== undefined) noticia.fecha_publicacion = new Date(fecha_publicacion);
       await this.newsRepository.save(noticia);
-      // Actualizar autores
-      if (Array.isArray(autores)) {
-        await getRepository('noticia_autor').delete({ noticia_id: noticia.id });
-        for (const autor_id of autores) {
-          const autor = await authorRepo.findOne({ where: { id: autor_id } });
-          if (autor) {
-            await getRepository('noticia_autor').save({ noticia_id: noticia.id, autor_id: autor.id });
-          }
-        }
-      }
       // Actualizar media
       if (Array.isArray(media)) {
         await getRepository('noticia_media').delete({ noticia_id: noticia.id });
@@ -195,8 +173,6 @@ export class NewsController {
         where: { id: noticia.id },
         relations: [
           'seccion',
-          'newsAuthors',
-          'newsAuthors.autor',
           'newsMedia',
           'newsMedia.media'
         ]
@@ -215,7 +191,6 @@ export class NewsController {
         res.status(404).json({ message: 'Noticia no encontrada' });
         return;
       }
-
       await this.newsRepository.remove(news);
       res.status(204).send();
     } catch (error) {
@@ -237,8 +212,6 @@ export class NewsController {
         where: { seccion: section },
         relations: [
           'seccion',
-          'newsAuthors',
-          'newsAuthors.autor',
           'newsMedia',
           'newsMedia.media'
         ],
@@ -251,8 +224,7 @@ export class NewsController {
         titulo: n.titulo,
         contenido: n.contenido,
         resumen: n.resumen,
-        seccion: n.seccion ? { id: n.seccion.id, nombre: n.seccion.nombre, color: n.seccion.color } : null,
-        autores: n.newsAuthors?.map(na => na.autor?.nombre) || [],
+        seccion: n.seccion ? { id: n.seccion.id, nombre: n.seccion.nombre } : null,
         media: n.newsMedia?.map(nm => ({ url: nm.media?.url, tipo: nm.media?.tipo, descripcion: nm.media?.descripcion })) || [],
         destacada: n.destacada,
         fecha_publicacion: n.fecha_publicacion,

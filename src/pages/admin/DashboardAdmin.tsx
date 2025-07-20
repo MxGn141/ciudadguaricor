@@ -42,7 +42,9 @@ export default function DashboardAdmin() {
 
   const noticiasDestacadas = noticias.filter(n => n.destacada).length;
   const noticiasPorSeccion = noticias.reduce((acc, noticia) => {
-    acc[noticia.seccion] = (acc[noticia.seccion] || 0) + 1;
+    if (noticia.seccion && noticia.seccion.nombre) {
+      acc[noticia.seccion.nombre] = (acc[noticia.seccion.nombre] || 0) + 1;
+    }
     return acc;
   }, {} as Record<string, number>);
 

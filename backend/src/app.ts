@@ -6,6 +6,8 @@ import { initializeDatabase } from './config/database';
 import authRoutes from './routes/auth';
 import newsRoutes from './routes/news';
 import contentRoutes from './routes/content';
+import sectionsRoutes from './routes/sections';
+import mediaRoutes from './routes/media';
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -36,6 +38,8 @@ const startServer = async () => {
     app.use('/api/auth', authRoutes);
     app.use('/api/news', newsRoutes);
     app.use('/api/content', contentRoutes);
+    app.use('/api/sections', sectionsRoutes);
+    app.use('/api/media', mediaRoutes);
 
     // Manejo básico de errores
     app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

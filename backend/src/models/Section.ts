@@ -7,7 +7,4 @@ export class Section {
 
   @Column({ unique: true })
   nombre!: string;
-
-  @Column({ nullable: true })
-  color?: string;
 } 

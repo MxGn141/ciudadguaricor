@@ -4,6 +4,19 @@ import { Link } from 'react-router-dom';
 import { useContextoNoticias, Noticia } from '../../contexts/ContextoNoticias';
 import axios from 'axios';
 
+// Notificación flotante
+function Notificacion({ mensaje, tipo, onClose }: { mensaje: string, tipo: 'exito' | 'error', onClose: () => void }) {
+  return (
+    <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-lg shadow-lg text-white transition-all animate-fade-in-down ${tipo === 'exito' ? 'bg-green-600' : 'bg-red-600'}`}
+      style={{ minWidth: 220 }}>
+      <div className="flex items-center justify-between gap-4">
+        <span>{mensaje}</span>
+        <button onClick={onClose} className="ml-4 text-white hover:text-gray-200 font-bold">×</button>
+      </div>
+    </div>
+  );
+}
+
 export default function GestionarNoticias() {
   const { noticias, eliminarNoticia, editarNoticia } = useContextoNoticias();
   const [seccionFiltro, setSeccionFiltro] = useState('');
@@ -12,11 +25,18 @@ export default function GestionarNoticias() {
   const [formularioEdicion, setFormularioEdicion] = useState<Partial<Noticia>>({});
   const [secciones, setSecciones] = useState<{ id: number; nombre: string }[]>([]);
   const [autores, setAutores] = useState<{ id: number; nombre: string }[]>([]);
+  const [notificacion, setNotificacion] = useState<{ mensaje: string, tipo: 'exito' | 'error' } | null>(null);
 
   React.useEffect(() => {
-    axios.get('/api/sections').then(res => setSecciones(res.data));
-    axios.get('/api/authors').then(res => setAutores(res.data));
+    axios.get('http://localhost:3000/api/sections').then(res => setSecciones(res.data));
+    // Si tienes autores, cámbialo también si es necesario
+    // axios.get('http://localhost:3000/api/authors').then(res => setAutores(res.data));
   }, []);
+
+  const mostrarNotificacion = (mensaje: string, tipo: 'exito' | 'error') => {
+    setNotificacion({ mensaje, tipo });
+    setTimeout(() => setNotificacion(null), 3500);
+  };
 
   const noticiasFiltradas = seccionFiltro 
     ? noticias.filter(noticia => noticia.seccion?.nombre === seccionFiltro)
@@ -29,14 +49,24 @@ export default function GestionarNoticias() {
   const seccionesOptions = secciones.map(s => ({ id: s.id, nombre: s.nombre }));
   const autoresOptions = autores.map(a => ({ id: a.id, nombre: a.nombre }));
 
-  const confirmarEliminacion = (id: string, titulo: string) => {
+  const confirmarEliminacion = async (id: string | number, titulo: string) => {
     if (window.confirm(`¿Está seguro de eliminar la noticia "${titulo}"?`)) {
-      eliminarNoticia(id);
+      try {
+        await eliminarNoticia(String(id));
+        mostrarNotificacion('Noticia eliminada exitosamente', 'exito');
+      } catch (error) {
+        mostrarNotificacion('Error al eliminar la noticia', 'error');
+      }
     }
   };
 
-  const alternarDestacada = (id: string, destacada: boolean) => {
-    editarNoticia(id, { destacada: !destacada });
+  const alternarDestacada = async (id: string | number, destacada: boolean) => {
+    try {
+      await editarNoticia(String(id), { destacada: !destacada });
+      mostrarNotificacion('Estado de destacada actualizado', 'exito');
+    } catch (error) {
+      mostrarNotificacion('Error al actualizar destacada', 'error');
+    }
   };
 
   const abrirModalEdicion = (noticia: Noticia) => {
@@ -45,8 +75,9 @@ export default function GestionarNoticias() {
       titulo: noticia.titulo,
       resumen: noticia.resumen,
       contenido: noticia.contenido,
-      seccion_id: noticia.seccion?.id ? String(noticia.seccion.id) : '',
-      autores: noticia.autores ? noticia.autores.map((_, i) => String(autoresOptions.find(a => a.nombre === noticia.autores[i])?.id || '')) : [],
+      seccion: noticia.seccion || null,
+      autorTexto: noticia.autorTexto || '',
+      autorFoto: noticia.autorFoto || '',
       destacada: noticia.destacada || false
     });
   };
@@ -62,34 +93,35 @@ export default function GestionarNoticias() {
     }
   }, [cerrarModalEdicion]);
 
-  const guardarEdicion = () => {
+  const guardarEdicion = async () => {
     if (noticiaEditando && Object.keys(formularioEdicion).length > 0) {
-      const payload = {
+      // Enviar solo los campos editables y seccion_id
+      const payload: any = {
         ...formularioEdicion,
-        seccion_id: Number(formularioEdicion.seccion_id),
-        autores: (formularioEdicion.autores || []).map(Number)
+        seccion_id: formularioEdicion.seccion?.id || noticiaEditando.seccion?.id || null
       };
-      editarNoticia(noticiaEditando.id, payload);
-      cerrarModalEdicion();
+      delete payload.seccion;
+      try {
+        await editarNoticia(String(noticiaEditando.id), payload);
+        mostrarNotificacion('Noticia editada exitosamente', 'exito');
+        cerrarModalEdicion();
+      } catch (error) {
+        mostrarNotificacion('Error al editar la noticia', 'error');
+      }
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    if (name === 'autores') {
-      const options = (e.target as HTMLSelectElement).options;
-      const values = Array.from(options).filter(o => o.selected).map(o => o.value);
-      setFormularioEdicion(prev => ({ ...prev, autores: values }));
-    } else {
-      setFormularioEdicion(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-      }));
-    }
+    setFormularioEdicion(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }));
   };
 
   return (
     <div className="space-y-6 p-4">
+      {notificacion && <Notificacion mensaje={notificacion.mensaje} tipo={notificacion.tipo} onClose={() => setNotificacion(null)} />}
       <div className="flex flex-col space-y-4">
         <h2 className="text-2xl font-bold text-gray-900">Gestionar Noticias</h2>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -123,13 +155,6 @@ export default function GestionarNoticias() {
             {noticiasBuscadas.map((noticia) => (
               <div key={noticia.id} className="p-4 border-b border-gray-200">
                 <div className="flex items-start space-x-3">
-                  {noticia.imagen && (
-                    <img 
-                      src={noticia.imagen} 
-                      alt={noticia.titulo} 
-                      className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
-                    />
-                  )}
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-gray-900 mb-1">
                       {noticia.titulo}
@@ -163,7 +188,6 @@ export default function GestionarNoticias() {
                       </button>
                       <Link
                         to={`/noticia/${noticia.id}`}
-                        target="_blank"
                         className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                         title="Ver noticia"
                       >
@@ -206,13 +230,6 @@ export default function GestionarNoticias() {
                 <tr key={noticia.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      {noticia.imagen && (
-                        <img 
-                          src={noticia.imagen} 
-                          alt={noticia.titulo} 
-                          className="h-10 w-10 rounded-lg object-cover mr-3"
-                        />
-                      )}
                       <div className="text-sm font-medium text-gray-900 max-w-md truncate">
                         {noticia.titulo}
                       </div>
@@ -224,7 +241,7 @@ export default function GestionarNoticias() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {noticia.autores?.join(', ')}
+                    {noticia.autorTexto}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -250,7 +267,6 @@ export default function GestionarNoticias() {
                       </button>
                       <Link
                         to={`/noticia/${noticia.id}`}
-                        target="_blank"
                         className="p-1 hover:bg-gray-100 rounded-full transition-colors"
                         title="Ver noticia"
                       >
@@ -356,8 +372,12 @@ export default function GestionarNoticias() {
                 <select
                   id="seccion_id"
                   name="seccion_id"
-                  value={formularioEdicion.seccion_id || ''}
-                  onChange={handleInputChange}
+                  value={formularioEdicion.seccion?.id || ''}
+                  onChange={e => {
+                    const id = Number(e.target.value);
+                    const seccion = secciones.find(s => s.id === id) || null;
+                    setFormularioEdicion(prev => ({ ...prev, seccion }));
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   required
                 >
@@ -368,21 +388,32 @@ export default function GestionarNoticias() {
                 </select>
               </div>
               <div className="mb-4">
-                <label htmlFor="autores" className="block text-sm font-medium text-gray-700 mb-2">Autores *</label>
-                <select
-                  id="autores"
-                  name="autores"
-                  multiple
-                  value={formularioEdicion.autores || []}
+                <label htmlFor="autorTexto" className="block text-sm font-medium text-gray-700 mb-2">
+                  Autor de Texto *
+                </label>
+                <input
+                  type="text"
+                  id="autorTexto"
+                  name="autorTexto"
+                  value={formularioEdicion.autorTexto || ''}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   required
-                >
-                  {autoresOptions.map(autor => (
-                    <option key={autor.id} value={autor.id}>{autor.nombre}</option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Puede seleccionar uno o varios autores (Ctrl+Click)</p>
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label htmlFor="autorFoto" className="block text-sm font-medium text-gray-700 mb-2">
+                  Autor de Foto *
+                </label>
+                <input
+                  type="text"
+                  id="autorFoto"
+                  name="autorFoto"
+                  value={formularioEdicion.autorFoto || ''}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  required
+                />
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 p-4 sm:p-6 border-t">

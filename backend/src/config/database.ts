@@ -2,10 +2,8 @@ import { DataSource } from 'typeorm';
 import { News } from '../models/News';
 import { User } from '../models/User';
 import { Section } from '../models/Section';
-import { Author } from '../models/Author';
 import { Role } from '../models/Role';
 import { UserRole } from '../models/UserRole';
-import { NewsAuthor } from '../models/NewsAuthor';
 import { NewsMedia } from '../models/NewsMedia';
 import { Media } from '../models/Media';
 import { Publicidad } from '../models/Publicidad';
@@ -22,7 +20,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'ciudadguaricor',
-  entities: [News, User, Section, Author, Role, UserRole, NewsAuthor, NewsMedia, Media, Publicidad, PDF],
+  entities: [News, User, Section, Role, UserRole, NewsMedia, Media, Publicidad, PDF],
   synchronize: true,
   logging: true,
   extra: {
