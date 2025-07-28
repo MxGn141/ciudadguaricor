@@ -29,6 +29,9 @@ export default function DashboardAdmin() {
 
   // Debug: verificar que las publicidades se estén cargando
   console.log('Dashboard - publicidades cargadas:', publicidades.length, publicidades);
+  
+  // Total de espacios de publicidad disponibles: 10 (6 side + 4 main/header)
+  const totalEspaciosPublicidad = 10;
 
   if (!estaAutenticado) {
     return <Navigate to="/admin/login" replace />;
@@ -76,7 +79,7 @@ export default function DashboardAdmin() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Publicidades</p>
-                    <p className="text-2xl font-bold text-gray-900">{publicidades.length}</p>
+                    <p className="text-2xl font-bold text-gray-900">{totalEspaciosPublicidad}</p>
                   </div>
                 </div>
               </div>

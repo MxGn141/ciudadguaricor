@@ -23,24 +23,21 @@ export default function LayoutPublico() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [scrolled]);
 
-  const manejarBusqueda = (termino: string) => {
-    console.log('Búsqueda:', termino);
-    // Implementar lógica de búsqueda
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <div className="bg-white">
         <CarruselPublicidad />
-        <EncabezadoPrincipal onBuscar={manejarBusqueda} />
+        <EncabezadoPrincipal />
       </div>
 
       {/* Navegación y Titulares (sticky) */}
       <div className={`sticky top-0 z-40 bg-white shadow-sm transition-all duration-300 ${
         scrolled ? 'shadow-md' : ''
       }`}>
-        <BarraNavegacion isSticky={scrolled} onBuscar={manejarBusqueda} />
+        <BarraNavegacion isSticky={scrolled} />
         <div className="border-b border-gray-200">
           <div className="max-w-7xl mx-auto">
             <CarruselTitulares />

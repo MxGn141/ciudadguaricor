@@ -1,12 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, Menu, X } from 'lucide-react';
 import { useContextoNoticias } from '../../contexts/ContextoNoticias';
-
-interface Props {
-  isSticky?: boolean;
-  onBuscar: (termino: string) => void;
-}
 
 const secciones = [
   { nombre: 'NACIONALES', ruta: '/seccion/Nacionales' },
@@ -23,6 +18,7 @@ const MAX_SECCIONES_DESKTOP = 6; // Secciones visibles antes de agrupar en 'Más
 
 export default function BarraNavegacion({ isSticky = false }: { isSticky?: boolean }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { setTerminoBusqueda } = useContextoNoticias();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [drawerAbierto, setDrawerAbierto] = useState(false);
@@ -48,10 +44,13 @@ export default function BarraNavegacion({ isSticky = false }: { isSticky?: boole
 
   const manejarSubmitBusqueda = (e: React.FormEvent) => {
     e.preventDefault();
-    setTerminoBusqueda(termino);
-    setMenuAbierto(false);
-    setMostrarBusqueda(false);
-    setDrawerAbierto(false);
+    if (termino.trim()) {
+      setTerminoBusqueda(termino);
+      navigate(`/buscar?q=${encodeURIComponent(termino.trim())}`);
+      setMenuAbierto(false);
+      setMostrarBusqueda(false);
+      setDrawerAbierto(false);
+    }
   };
 
   const cerrarMenu = () => {

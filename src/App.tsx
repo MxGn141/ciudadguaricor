@@ -7,6 +7,7 @@ import LayoutPublico from './components/layout/LayoutPublico';
 import PaginaPrincipal from './pages/PaginaPrincipal';
 import VistaNoticia from './pages/VistaNoticia';
 import PaginaSeccion from './pages/PaginaSeccion';
+import ResultadosBusqueda from './pages/ResultadosBusqueda';
 import LoginAdmin from './pages/admin/LoginAdmin';
 import DashboardAdmin from './pages/admin/DashboardAdmin';
 import GestionarPublicidad from './pages/admin/GestionarPublicidad';
@@ -23,6 +24,7 @@ export default function App() {
                 <Route index element={<PaginaPrincipal />} />
                 <Route path="seccion/:seccion" element={<PaginaSeccion />} />
                 <Route path="noticia/:id" element={<VistaNoticia />} />
+                <Route path="buscar" element={<ResultadosBusqueda />} />
               </Route>
               
               {/* Rutas de administración */}

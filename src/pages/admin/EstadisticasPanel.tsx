@@ -8,7 +8,11 @@ export default function EstadisticasPanel() {
   // Calcular estadísticas
   const totalNoticias = noticias.length;
   const noticiasDestacadas = noticias.filter(n => n.destacada).length;
-  const totalPublicidades = publicidades.length;
+  
+  // Total de espacios de publicidad disponibles: 10 (6 side + 4 main/header)
+  const totalEspaciosPublicidad = 10;
+  const publicidadesOcupadas = publicidades.length;
+  const totalPublicidades = totalEspaciosPublicidad;
   
   // Noticias por sección
   const noticiasPorSeccion = noticias.reduce((acc, noticia) => {
