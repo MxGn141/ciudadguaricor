@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Facebook, Twitter, Instagram } from 'lucide-react';
-import { useContextoContenido } from '../../contexts/ContextoContenido';
+import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 
 interface Props {
   onBuscar: (termino: string) => void;
@@ -10,7 +10,10 @@ interface Props {
 export default function EncabezadoPrincipal({ onBuscar }: Props) {
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
   const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
-  const { contenidoHeader } = useContextoContenido();
+  const { publicidades } = useContextoNoticias();
+  
+  // Buscar el banner header-bg para usarlo como fondo
+  const bannerHeader = publicidades.find(pub => pub.posicion === 'header-bg');
 
   const manejarBusqueda = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,12 +23,12 @@ export default function EncabezadoPrincipal({ onBuscar }: Props) {
 
   return (
     <header className="w-full">
-      {/* Barra superior con redes sociales */}
+      {/* Barra superior con redes comunitarias */}
       <div className="bg-gradient-to-r from-guarico-blue to-guarico-dark-blue">
         <div className="max-w-7xl mx-auto px-4 py-2">
           <div className="flex justify-between items-center">
             <div className="text-guarico-white text-sm hidden sm:block">
-              Síguenos en nuestras redes sociales
+              Síguenos en nuestras redes comunitarias
             </div>
             <div className="flex items-center space-x-4 mx-auto sm:mx-0">
               <a 
@@ -64,15 +67,15 @@ export default function EncabezadoPrincipal({ onBuscar }: Props) {
           className="relative w-full"
           style={{
             height: 'clamp(120px, 25vw, 256px)',
-            backgroundImage: `url(${contenidoHeader?.imagen || '/media/contenido/header-bg.png'})`,
+            backgroundImage: `url(${bannerHeader?.imagen || '/media/contenido/header-bg.png'})`,
             backgroundSize: '100% 100%',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
           }}
         >
-          {contenidoHeader?.enlace && (
+          {bannerHeader?.url && (
             <a 
-              href={contenidoHeader.enlace} 
+              href={bannerHeader.url} 
               target="_blank" 
               rel="noopener noreferrer"
               className="absolute inset-0 z-10 w-full h-full"
@@ -108,8 +111,8 @@ export default function EncabezadoPrincipal({ onBuscar }: Props) {
                   className="w-48 xl:w-64 px-3 xl:px-4 py-2 pl-10 rounded-lg bg-white/90 border border-gray-200 focus:border-guarico-gold focus:ring-2 focus:ring-guarico-gold focus:outline-none text-gray-800 placeholder-gray-600 shadow-sm text-sm xl:text-base"
                 />
                 <Search 
-                  size={18} 
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+                  size={20} 
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none"
                 />
               </form>
             </div>
@@ -141,7 +144,7 @@ export default function EncabezadoPrincipal({ onBuscar }: Props) {
               />
               <Search 
                 size={20} 
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none"
               />
             </form>
           </div>

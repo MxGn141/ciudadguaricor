@@ -27,6 +27,9 @@ export default function DashboardAdmin() {
   const { estaAutenticado, cerrarSesion } = useContextoAuth();
   const { noticias, publicidades } = useContextoNoticias();
 
+  // Debug: verificar que las publicidades se estén cargando
+  console.log('Dashboard - publicidades cargadas:', publicidades.length, publicidades);
+
   if (!estaAutenticado) {
     return <Navigate to="/admin/login" replace />;
   }

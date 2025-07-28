@@ -70,14 +70,16 @@ CREATE TABLE noticia_media (
     ON DELETE CASCADE
 );
 
--- Tabla de Publicidades
+-- Tabla de publicidades
 CREATE TABLE publicidades (
   id INT AUTO_INCREMENT PRIMARY KEY,
   imagen VARCHAR(255) NOT NULL,
-  url VARCHAR(255) DEFAULT NULL,
+  url VARCHAR(255),
   fecha_inicio DATE,
   fecha_fin DATE,
-  descripcion VARCHAR(255) DEFAULT NULL
+  descripcion TEXT,
+  posicion VARCHAR(50) NOT NULL,
+  visible BOOLEAN DEFAULT TRUE
 );
 
 -- Tabla de PDFs del periódico
@@ -88,10 +90,22 @@ CREATE TABLE pdfs (
   descripcion VARCHAR(255) DEFAULT NULL
 );
 
+-- Tabla de vistas/previsualizaciones
+CREATE TABLE views (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(255) NOT NULL,
+  descripcion TEXT,
+  tipo VARCHAR(50) NOT NULL,
+  configuracion JSON,
+  activo BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Inserción de datos de ejemplo
 INSERT INTO secciones (nombre) VALUES
   ('Nacionales'), ('Municipales'), ('Deportes'),
-  ('Cultura'), ('Economía'), ('Sociales'), ('Sucesos');
+  ('Cultura'), ('Produccion'), ('Comunidad'), ('Seguridad'), ('Turismo');
 
 INSERT INTO roles (nombre) VALUES ('admin'), ('editor'), ('reportero');
 
@@ -107,10 +121,18 @@ INSERT INTO noticias (titulo, contenido, resumen, seccion_id, autorTexto, autorF
 
 INSERT INTO noticia_media (noticia_id, media_id) VALUES (1, 1), (2, 1);
 
-INSERT INTO publicidades (imagen, url, fecha_inicio, fecha_fin, descripcion) VALUES
-  ('/uploads/publicidad/banner1.jpg', 'https://ejemplo.com', '2025-07-01', '2025-07-31', 'Banner principal');
+INSERT INTO publicidades (imagen, url, fecha_inicio, fecha_fin, descripcion, posicion) VALUES
+  ('/uploads/publicidad/banner1.jpg', 'https://ejemplo.com', '2025-07-01', '2025-07-31', 'Banner principal', 'header'),
+  ('/uploads/publicidad/banner2.jpg', 'https://ejemplo.com/otro', '2025-08-01', '2025-08-31', 'Banner secundario', 'sidebar');
 
 INSERT INTO pdfs (url, fecha, descripcion) VALUES
   ('/uploads/pdf/periodico_julio.pdf', '2025-07-01', 'Edición de julio 2025');
+
+-- Insertar algunas vistas predefinidas
+INSERT INTO views (nombre, descripcion, tipo, configuracion) VALUES
+('Vista Principal', 'Vista principal del sitio web', 'principal', '{"layout": "default", "sections": ["header", "main", "sidebar", "footer"]}'),
+('Vista Noticia', 'Vista detallada de una noticia', 'noticia', '{"layout": "article", "sections": ["header", "content", "sidebar", "related"]}'),
+('Vista Sección', 'Vista de noticias por sección', 'seccion', '{"layout": "grid", "sections": ["header", "filters", "content", "pagination"]}'),
+('Vista Admin', 'Panel de administración', 'admin', '{"layout": "dashboard", "sections": ["sidebar", "main", "stats"]}');
 
 -- FIN DEL SCRIPT

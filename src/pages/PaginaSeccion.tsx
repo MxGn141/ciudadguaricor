@@ -3,16 +3,17 @@ import { useParams, Navigate, Link } from 'react-router-dom';
 import { useContextoNoticias, Noticia } from '../contexts/ContextoNoticias';
 import { Calendar, Clock } from 'lucide-react';
 
-const seccionesValidas = ['Nacionales', 'Municipales', 'Deportes', 'Cultura', 'Economía', 'Sociales', 'Sucesos'];
+const seccionesValidas = ['Nacionales', 'Municipales', 'Deportes', 'Cultura', 'Produccion', 'Comunidad', 'Seguridad', 'Turismo'];
 
 const coloresSeccion = {
   'Nacionales': 'from-blue-600 to-blue-800',
   'Municipales': 'from-green-600 to-green-800',
   'Deportes': 'from-yellow-600 to-yellow-800',
   'Cultura': 'from-purple-600 to-purple-800',
-  'Economía': 'from-emerald-600 to-emerald-800',
-  'Sociales': 'from-pink-600 to-pink-800',
-  'Sucesos': 'from-red-600 to-red-800'
+  'Produccion': 'from-emerald-600 to-emerald-800',
+  'Comunidad': 'from-pink-600 to-pink-800',
+  'Seguridad': 'from-red-600 to-red-800',
+  'Turismo': 'from-cyan-600 to-cyan-800'
 };
 
 export default function PaginaSeccion() {

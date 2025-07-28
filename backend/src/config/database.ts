@@ -8,6 +8,7 @@ import { NewsMedia } from '../models/NewsMedia';
 import { Media } from '../models/Media';
 import { Publicidad } from '../models/Publicidad';
 import { PDF } from '../models/PDF';
+import { View } from '../models/View';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -20,7 +21,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'ciudadguaricor',
-  entities: [News, User, Section, Role, UserRole, NewsMedia, Media, Publicidad, PDF],
+  entities: [News, User, Section, Role, UserRole, NewsMedia, Media, Publicidad, PDF, View],
   synchronize: true,
   logging: true,
   extra: {

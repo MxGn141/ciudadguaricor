@@ -22,11 +22,14 @@ export interface Noticia {
 }
 
 export interface Publicidad {
-  id: string;
-  titulo: string;
+  id: string | number;
   imagen: string;
-  enlace?: string;
-  tipo: 'carrusel' | 'sidebar';
+  url?: string;
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  descripcion?: string;
+  posicion: string;
+  visible?: boolean;
 }
 
 interface ContextoNoticiasType {
@@ -45,20 +48,21 @@ interface ContextoNoticiasType {
 
 const ContextoNoticias = createContext<ContextoNoticiasType | undefined>(undefined);
 
-// Elimina el array noticiasIniciales y cualquier referencia a él
-
+// Publicidades iniciales para que el carrusel funcione mientras se cargan los banners
 const publicidadesIniciales: Publicidad[] = [
   {
     id: '1',
-    titulo: 'Banco Regional Guárico',
     imagen: 'https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=400',
-    tipo: 'carrusel'
+    posicion: 'header-bg',
+    descripcion: 'Banco Regional Guárico',
+    visible: true
   },
   {
     id: '2',
-    titulo: 'Supermercados El Llano',
     imagen: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=400',
-    tipo: 'sidebar'
+    posicion: 'main-1',
+    descripcion: 'Supermercados El Llano',
+    visible: true
   }
 ];
 
@@ -73,6 +77,35 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
 
   const config = {
     headers: { Authorization: `Bearer ${token}` }
+  };
+
+  // Cargar publicidades activas y visibles desde el backend
+  const cargarPublicidades = async () => {
+    try {
+      console.log('Cargando publicidades desde:', `${API_URL}/content/banners`);
+      const response = await axios.get(`${API_URL}/content/banners`);
+      console.log('Respuesta de banners:', response.data);
+      
+      // Cargar todos los banners del backend
+      const bannersDelBackend = response.data.map((b: any) => ({
+        ...b,
+        imagen: b.imagen && b.imagen.startsWith('/uploads') ? `http://localhost:3000${b.imagen}` : b.imagen
+      }));
+      
+      console.log('Banners procesados:', bannersDelBackend);
+      
+      if (bannersDelBackend.length > 0) {
+        setPublicidades(bannersDelBackend);
+        console.log('Banners cargados en el estado:', bannersDelBackend);
+      } else {
+        console.log('No hay banners del backend, usando iniciales');
+        setPublicidades(publicidadesIniciales);
+      }
+    } catch (error) {
+      console.error('Error al cargar publicidades:', error);
+      console.log('Manteniendo publicidades iniciales debido al error');
+      setPublicidades(publicidadesIniciales);
+    }
   };
 
   // Búsqueda global en el backend en tiempo real (autosuggest)
@@ -123,6 +156,7 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
 
   useEffect(() => {
     cargarNoticias();
+    cargarPublicidades();
   }, []);
 
   const cargarNoticias = async () => {

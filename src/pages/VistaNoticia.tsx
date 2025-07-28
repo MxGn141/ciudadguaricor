@@ -131,7 +131,7 @@ export default function VistaNoticia() {
         
         <div className="text-gray-800 leading-relaxed space-y-4">
           {noticia.contenido.split('\n').map((parrafo, index) => (
-            <p key={index} className="text-lg leading-relaxed text-justify">
+            <p key={index} className="text-lg leading-relaxed text-justify break-words overflow-wrap break-word">
               {parrafo}
             </p>
           ))}

@@ -10,9 +10,10 @@ const secciones = [
   { nombre: 'Municipales', color: 'bg-green-600', limite: 3 },
   { nombre: 'Deportes', color: 'bg-yellow-600', limite: 3 },
   { nombre: 'Cultura', color: 'bg-purple-600', limite: 3 },
-  { nombre: 'Economía', color: 'bg-emerald-600', limite: 3 },
-  { nombre: 'Sociales', color: 'bg-pink-600', limite: 3 },
-  { nombre: 'Sucesos', color: 'bg-red-600', limite: 3 }
+  { nombre: 'Produccion', color: 'bg-emerald-600', limite: 3 },
+  { nombre: 'Comunidad', color: 'bg-pink-600', limite: 3 },
+  { nombre: 'Seguridad', color: 'bg-red-600', limite: 3 },
+  { nombre: 'Turismo', color: 'bg-cyan-600', limite: 3 }
 ];
 
 // Paleta de colores para cada sección (igual que en PaginaSeccion)
@@ -21,18 +22,24 @@ const coloresSeccion = {
   'Municipales': 'bg-green-600 text-white',
   'Deportes': 'bg-yellow-500 text-gray-900',
   'Cultura': 'bg-purple-600 text-white',
-  'Economía': 'bg-emerald-600 text-white',
-  'Sociales': 'bg-pink-600 text-white',
-  'Sucesos': 'bg-red-600 text-white'
+  'Produccion': 'bg-emerald-600 text-white',
+  'Comunidad': 'bg-pink-600 text-white',
+  'Seguridad': 'bg-red-600 text-white',
+  'Turismo': 'bg-cyan-600 text-white'
 };
 
 export default function PaginaPrincipal() {
   const [noticiasPorSeccion, setNoticiasPorSeccion] = useState<Record<string, Noticia[]>>({});
   const [todasLasNoticias, setTodasLasNoticias] = useState<Noticia[]>([]);
   const [noticiasDestacadas, setNoticiasDestacadas] = useState<Noticia[]>([]);
-  const { obtenerNoticiasPorSeccion, noticias, cargandoBusqueda } = useContextoNoticias();
+  const { obtenerNoticiasPorSeccion, noticias, cargandoBusqueda, publicidades } = useContextoNoticias();
   const { contenidoInicio, contenidoInicioBack, contenidoInicio2 } = useContextoContenido();
   const [noticiaActual, setNoticiaActual] = useState(0);
+
+  // Filtrar banners por posición
+  const bannerMain1 = publicidades.find(pub => pub.posicion === 'main-1');
+  const bannerMain2 = publicidades.find(pub => pub.posicion === 'main-2');
+  const bannerMainBg = publicidades.find(pub => pub.posicion === 'main-bg');
 
   // Función para convertir fecha a Date si es string
   const convertirFecha = (fecha: Date | string): Date => {
@@ -69,7 +76,7 @@ export default function PaginaPrincipal() {
   }, [noticias]);
 
   const cargarNoticiasPorSeccion = async () => {
-    const secciones = ['Nacionales', 'Municipales', 'Deportes', 'Cultura', 'Economía', 'Sociales', 'Sucesos'];
+    const secciones = ['Nacionales', 'Municipales', 'Deportes', 'Cultura', 'Produccion', 'Comunidad', 'Seguridad', 'Turismo'];
     const noticiasTemp: Record<string, Noticia[]> = {};
     
     for (const seccion of secciones) {
@@ -300,21 +307,21 @@ export default function PaginaPrincipal() {
             </div>
 
             {/* Contenido Destacado */}
-            {contenidoInicio && (
+            {bannerMain1 && (
               <article className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                {contenidoInicio.enlace ? (
-                  <a href={contenidoInicio.enlace} target="_blank" rel="noopener noreferrer">
+                {bannerMain1.url ? (
+                  <a href={bannerMain1.url} target="_blank" rel="noopener noreferrer">
                     <img 
-                      src={contenidoInicio.imagen}
-                      alt="Contenido destacado"
-                      className="w-full h-auto object-contain"
+                      src={bannerMain1.imagen}
+                      alt={bannerMain1.descripcion || 'Banner publicitario'}
+                      className="w-full h-60 object-cover"
                     />
                   </a>
                 ) : (
                   <img 
-                    src={contenidoInicio.imagen}
-                    alt="Contenido destacado"
-                    className="w-full h-auto object-contain"
+                    src={bannerMain1.imagen}
+                    alt={bannerMain1.descripcion || 'Banner publicitario'}
+                    className="w-full h-60 object-cover"
                   />
                 )}
               </article>
@@ -327,21 +334,21 @@ export default function PaginaPrincipal() {
                 return (
                   <React.Fragment key={seccion.nombre}>
                     {/* Contenido Relacionado */}
-                    {contenidoInicio2 && (
+                    {bannerMain2 && (
                       <article className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                        {contenidoInicio2.enlace ? (
-                          <a href={contenidoInicio2.enlace} target="_blank" rel="noopener noreferrer">
+                        {bannerMain2.url ? (
+                          <a href={bannerMain2.url} target="_blank" rel="noopener noreferrer">
                             <img 
-                              src={contenidoInicio2.imagen}
-                              alt="Contenido relacionado"
-                              className="w-full h-auto object-contain"
+                              src={bannerMain2.imagen}
+                              alt={bannerMain2.descripcion || 'Banner publicitario'}
+                              className="w-full h-60 object-cover"
                             />
                           </a>
                         ) : (
                           <img 
-                            src={contenidoInicio2.imagen}
-                            alt="Contenido relacionado"
-                            className="w-full h-auto object-contain"
+                            src={bannerMain2.imagen}
+                            alt={bannerMain2.descripcion || 'Banner publicitario'}
+                            className="w-full h-60 object-cover"
                           />
                         )}
                       </article>
@@ -354,21 +361,21 @@ export default function PaginaPrincipal() {
             })}
 
             {/* Banner publicitario final */}
-            {contenidoInicioBack && (
+            {bannerMainBg && (
               <div className="w-full mt-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                {contenidoInicioBack.enlace ? (
-                  <a href={contenidoInicioBack.enlace} target="_blank" rel="noopener noreferrer">
+                {bannerMainBg.url ? (
+                  <a href={bannerMainBg.url} target="_blank" rel="noopener noreferrer">
                     <img 
-                      src={contenidoInicioBack.imagen}
-                      alt="Publicidad"
-                      className="w-full h-auto object-contain"
+                      src={bannerMainBg.imagen}
+                      alt={bannerMainBg.descripcion || 'Banner publicitario'}
+                      className="w-full h-60 object-cover"
                     />
                   </a>
                 ) : (
                   <img 
-                    src={contenidoInicioBack.imagen}
-                    alt="Publicidad"
-                    className="w-full h-auto object-contain"
+                    src={bannerMainBg.imagen}
+                    alt={bannerMainBg.descripcion || 'Banner publicitario'}
+                    className="w-full h-60 object-cover"
                   />
                 )}
               </div>

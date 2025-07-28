@@ -4,9 +4,22 @@ import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 export default function CarruselPublicidad() {
   const { publicidades } = useContextoNoticias();
   
-  const publicidadesCarrusel = publicidades.filter(pub => pub.tipo === 'carrusel');
+  // Debug: verificar las publicidades disponibles
+  console.log('CarruselPublicidad - publicidades totales:', publicidades.length, publicidades);
+  
+  // Filtrar banners para el carrusel (solo banners específicos para carrusel, NO header-bg, main ni side)
+  const bannersCarrusel = publicidades.filter(pub => {
+    // Solo banners que tengan tipo 'carrusel' o posiciones específicas para carrusel
+    const esTipoCarrusel = (pub as any).tipo === 'carrusel';
+    const esPosicionCarrusel = ['carrusel', 'banner-carrusel'].includes(pub.posicion);
+    console.log(`Banner ${pub.id}: posicion=${pub.posicion}, tipo=${(pub as any).tipo}, esTipoCarrusel=${esTipoCarrusel}, esPosicionCarrusel=${esPosicionCarrusel}`);
+    return esTipoCarrusel || esPosicionCarrusel;
+  });
+  
+  // Debug: verificar banners filtrados
+  console.log('CarruselPublicidad - banners filtrados:', bannersCarrusel.length, bannersCarrusel);
 
-  if (publicidadesCarrusel.length === 0) {
+  if (bannersCarrusel.length === 0) {
     return (
       <div className="h-16 md:h-20 bg-gradient-to-r from-guarico-blue to-guarico-dark-blue flex items-center justify-center border-b-2 border-guarico-light-blue overflow-x-auto">
         <div className="flex animate-scroll-right min-w-full">
@@ -41,20 +54,26 @@ export default function CarruselPublicidad() {
   }
 
   // Duplicamos muchas veces para asegurar un scroll perpetuo
-  const publicidadesDuplicadas = Array(12).fill(publicidadesCarrusel).flat();
+  const bannersDuplicados = Array(12).fill(bannersCarrusel).flat();
 
   return (
     <div className="h-16 md:h-20 bg-gradient-to-r from-guarico-blue to-guarico-dark-blue overflow-x-hidden border-b-2 border-guarico-light-blue relative">
       <div className="flex h-full animate-scroll-right" style={{ minWidth: '400%' }}>
-        {publicidadesDuplicadas.map((pub, index) => (
-          <div key={`${pub.id}-${index}`} className="flex items-center justify-center px-4 md:px-8 whitespace-nowrap">
+        {bannersDuplicados.map((banner, index) => (
+          <div key={`${banner.id}-${index}`} className="flex items-center justify-center px-4 md:px-8 whitespace-nowrap">
             <div className="flex items-center space-x-2 md:space-x-4">
               <img 
-                src={pub.imagen} 
-                alt={pub.titulo}
-                className="h-8 w-8 md:h-12 md:w-12 object-cover rounded"
+                src={banner.imagen} 
+                alt={(banner as any).titulo || banner.descripcion || 'Banner publicitario'}
+                className={`object-cover rounded ${
+                  banner.posicion === 'header-bg' 
+                    ? 'w-full h-16 md:h-20' 
+                    : 'h-8 w-8 md:h-12 md:w-12'
+                }`}
               />
-              <span className="text-guarico-gold font-semibold text-sm md:text-lg">{pub.titulo}</span>
+              <span className="text-guarico-gold font-semibold text-sm md:text-lg">
+                {(banner as any).titulo || banner.descripcion || 'Publicidad'}
+              </span>
             </div>
             <span className="text-guarico-light-gold mx-3 md:mx-6">•</span>
           </div>

@@ -19,4 +19,10 @@ export class Publicidad {
 
   @Column({ nullable: true })
   descripcion?: string;
+
+  @Column({ nullable: false })
+  posicion!: string; // Ejemplo: 'header-bg', 'main-1', 'side-2', etc.
+
+  @Column({ default: true })
+  visible!: boolean;
 } 
