@@ -215,8 +215,8 @@ export default function GestionarPublicidad() {
     setEditBanner(null);
     setModalSection('');
   };
-
-  return (
+    
+    return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-900 mb-8">Gestión de Banners Publicitarios</h1>
       {/* MODAL PARA AGREGAR/EDITAR */}
@@ -242,7 +242,7 @@ export default function GestionarPublicidad() {
               </div>
               {/* Previsualización del banner */}
               {previsualizarBanner()}
-              <div>
+          <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Enlace (opcional)</label>
                 <input name="url" value={form.url} onChange={handleInputChange} className="w-full px-3 py-2 border rounded-lg" />
               </div>
@@ -254,8 +254,8 @@ export default function GestionarPublicidad() {
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin *</label>
                   <input type="date" name="fecha_fin" value={form.fecha_fin} onChange={handleInputChange} className="w-full px-3 py-2 border rounded-lg" />
-                </div>
-              </div>
+          </div>
+        </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                 <textarea name="descripcion" value={form.descripcion} onChange={handleInputChange} className="w-full px-3 py-2 border rounded-lg" />
@@ -272,8 +272,8 @@ export default function GestionarPublicidad() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+          </div>
+        )}
       {/* LISTA DE BANNERS EN UNA SOLA COLUMNA, GRANDES Y CENTRADAS */}
       <div className="grid grid-cols-1 gap-8">
         {POSICIONES.map(pos => (
@@ -296,18 +296,18 @@ export default function GestionarPublicidad() {
                   <div key={banner.id} className="relative bg-gray-50 rounded-xl border border-gray-200 flex flex-col md:flex-row items-center p-4 w-full max-w-3xl hover:shadow-xl transition-all">
                     <div className="flex-shrink-0 w-full md:w-96 flex justify-center items-center mb-4 md:mb-0">
                       <img src={banner.imagen} alt="banner" className="w-full h-40 object-contain rounded bg-white border" />
-                    </div>
+                  </div>
                     <div className="flex-1 flex flex-col items-center md:items-start px-0 md:px-6">
                       <div className="mb-2 flex items-center gap-2">
                         <span className={`px-2 py-1 rounded text-xs font-semibold ${activo ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'}`}>{activo ? 'Activo' : 'Inactivo'}</span>
                         {banner.url && <a href={banner.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline text-xs">Enlace</a>}
-                      </div>
+                  </div>
                       <div className="text-xs text-gray-500 mb-1">{banner.fecha_inicio} - {banner.fecha_fin}</div>
                       <div className="text-xs text-gray-700 mb-2 text-center md:text-left">{banner.descripcion}</div>
                       <div className="flex gap-2 mt-2">
                         <button onClick={() => openModal(banner, pos.key)} className="px-3 py-1 bg-guarico-blue text-white rounded hover:bg-guarico-light-blue text-xs font-semibold">Editar</button>
                         <button onClick={() => handleDelete(banner.id)} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-semibold">Eliminar</button>
-                      </div>
+                </div>
                     </div>
                   </div>
                 );

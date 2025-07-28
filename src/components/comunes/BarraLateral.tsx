@@ -5,49 +5,23 @@ import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 export default function BarraLateral() {
   const { contenidosLaterales } = useContextoContenido();
   const { publicidades } = useContextoNoticias();
-  
-  // Filtrar banners para la barra lateral (posiciones side-1 a side-6)
-  const bannersLaterales = publicidades.filter(pub => 
-    ['side-1', 'side-2', 'side-3', 'side-4', 'side-5', 'side-6'].includes(pub.posicion)
-  );
+
+  // Obtener los banners side en orden específico
+  const bannersSide = [
+    publicidades.find(pub => pub.posicion === 'side-1'),
+    publicidades.find(pub => pub.posicion === 'side-2'),
+    publicidades.find(pub => pub.posicion === 'side-3'),
+    publicidades.find(pub => pub.posicion === 'side-4'),
+    publicidades.find(pub => pub.posicion === 'side-5'),
+    publicidades.find(pub => pub.posicion === 'side-6'),
+  ];
+
+  // Debug: mostrar qué banners se encontraron
+  console.log('Publicidades disponibles:', publicidades);
+  console.log('Banners side encontrados:', bannersSide);
 
   return (
     <aside className="space-y-6">
-      {/* Banner lateral superior */}
-      {bannersLaterales.length > 0 && (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="bg-guarico-blue text-white px-4 py-3">
-            <h3 className="font-bold">PUBLICIDAD</h3>
-          </div>
-          <div className="p-4 space-y-4">
-            {bannersLaterales.map((banner) => (
-              <article key={banner.id} className="overflow-hidden rounded-lg">
-                {banner.url ? (
-                  <a 
-                    href={banner.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="block hover:opacity-90 transition-opacity"
-                  >
-                    <img
-                      src={banner.imagen}
-                      alt={banner.descripcion || 'Banner publicitario'}
-                      className="w-full h-auto object-contain"
-                    />
-                  </a>
-                ) : (
-                  <img
-                    src={banner.imagen}
-                    alt={banner.descripcion || 'Banner publicitario'}
-                    className="w-full h-auto object-contain"
-                  />
-                )}
-              </article>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Enlaces Institucionales */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="bg-guarico-blue text-white px-4 py-3">
@@ -98,44 +72,45 @@ export default function BarraLateral() {
         </div>
       </div>
 
-      {/* Contenido Relacionado */}
+      {/* Contenido Relacionado (banners side) */}
       <section className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="bg-guarico-blue text-white px-4 py-3">
           <h3 className="font-bold">CONTENIDO RELACIONADO</h3>
         </div>
         <div className="p-4 space-y-4">
-          {contenidosLaterales.length > 0 ? (
-            contenidosLaterales.map((contenido) => (
-              <article key={contenido.id} className="overflow-hidden rounded-lg">
-                {contenido.enlace ? (
+          {bannersSide.map((banner, idx) => {
+            if (!banner) {
+              console.log(`No se encontró banner para posición ${idx + 1}`);
+              return null;
+            }
+            
+            console.log(`Renderizando banner ${banner.posicion}:`, banner);
+            
+            return (
+              <div key={banner.id} className="flex justify-center">
+                {banner.url ? (
                   <a 
-                    href={contenido.enlace} 
+                    href={banner.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="block hover:opacity-90 transition-opacity"
                   >
                     <img
-                      src={contenido.imagen}
-                      alt="Contenido relacionado"
+                      src={banner.imagen}
+                      alt={banner.descripcion || 'Banner publicitario'}
                       className="w-full h-auto object-contain"
                     />
                   </a>
                 ) : (
                   <img
-                    src={contenido.imagen}
-                    alt="Contenido relacionado"
+                    src={banner.imagen}
+                    alt={banner.descripcion || 'Banner publicitario'}
                     className="w-full h-auto object-contain"
                   />
                 )}
-              </article>
-            ))
-          ) : (
-            <div className="text-center py-6 text-gray-500">
-              <div className="border-2 border-dashed border-guarico-light-blue rounded-lg p-4">
-                <p className="text-sm">Próximamente más contenido</p>
               </div>
-            </div>
-          )}
+            );
+          })}
         </div>
       </section>
 
