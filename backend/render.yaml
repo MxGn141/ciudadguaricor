@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: ciudadguaricor-backend
+    env: node
+    plan: free
+    buildCommand: npm install && npx prisma generate
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        value: postgresql://postgres.hwdurinddscmbicshdko:ciudad%232025@aws-0-us-east-2.pooler.supabase.com:5432/postgres
+      - key: JWT_SECRET
+        value: $2b$10$XKXZq.3Zp/qwNNrdBfxOJ.9X9qp/HaB2WYgZqq1YzF4kqZ5ZtO5Vy
+      - key: JWT_EXPIRES_IN
+        value: 24h 

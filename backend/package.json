@@ -6,7 +6,8 @@
     "dev": "nodemon src/app.ts",
     "start": "ts-node src/app.ts",
     "create-admin": "ts-node src/scripts/createAdminUserPrisma.ts",
-    "seed": "ts-node src/scripts/seedDatabase.ts"
+    "seed": "ts-node src/scripts/seedDatabase.ts",
+    "test-db": "node test-connection.js"
   },
   "dependencies": {
     "@prisma/client": "^6.13.0",
