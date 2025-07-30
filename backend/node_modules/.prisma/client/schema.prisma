@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Seccion {
+  id       Int       @id @default(autoincrement())
+  nombre   String    @unique
+  noticias Noticia[]
+}
+
+model Rol {
+  id           Int          @id @default(autoincrement())
+  nombre       String       @unique
+  usuarioRoles UsuarioRol[]
+}
+
+model Usuario {
+  id           Int          @id @default(autoincrement())
+  username     String       @unique
+  password     String
+  createdAt    DateTime     @default(now())
+  usuarioRoles UsuarioRol[]
+}
+
+model UsuarioRol {
+  usuarioId Int
+  rolId     Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  rol       Rol     @relation(fields: [rolId], references: [id])
+
+  @@id([usuarioId, rolId])
+}
+
+model Media {
+  id           Int            @id @default(autoincrement())
+  url          String
+  tipo         MediaTipo
+  descripcion  String?
+  noticiaMedia NoticiaMedia[]
+}
+
+enum MediaTipo {
+  imagen
+  video
+  pdf
+}
+
+model Noticia {
+  id               Int            @id @default(autoincrement())
+  titulo           String
+  contenido        String
+  resumen          String
+  autorTexto       String
+  autorFoto        String
+  destacada        Boolean        @default(false)
+  fechaPublicacion DateTime       @default(now())
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  seccionId        Int?
+  seccion          Seccion?       @relation(fields: [seccionId], references: [id])
+  noticiaMedia     NoticiaMedia[]
+}
+
+model NoticiaMedia {
+  noticiaId Int
+  mediaId   Int
+  noticia   Noticia @relation(fields: [noticiaId], references: [id])
+  media     Media   @relation(fields: [mediaId], references: [id])
+
+  @@id([noticiaId, mediaId])
+}
+
+model Publicidad {
+  id          Int       @id @default(autoincrement())
+  imagen      String
+  url         String?
+  fechaInicio DateTime?
+  fechaFin    DateTime?
+  descripcion String?
+  posicion    String
+  visible     Boolean   @default(true)
+}
+
+model PDF {
+  id          Int      @id @default(autoincrement())
+  url         String
+  fecha       DateTime
+  descripcion String?
+}
+
+model View {
+  id            Int      @id @default(autoincrement())
+  nombre        String
+  descripcion   String?
+  tipo          String
+  configuracion Json
+  activo        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
