@@ -15,6 +15,11 @@ dotenv.config();
 // Crear aplicación Express
 const app = express();
 
+// Ruta de bienvenida para la raíz
+app.get('/', (req, res) => {
+  res.send('API ciudadguaricor backend funcionando 🚀');
+});
+
 // Configuración de CORS
 app.use(cors({
   origin: 'http://localhost:5173',
