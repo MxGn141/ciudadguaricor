@@ -89,7 +89,11 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
       // Cargar todos los banners del backend
       const bannersDelBackend = response.data.map((b: any) => ({
         ...b,
-        imagen: b.imagen && b.imagen.startsWith('/uploads') ? `http://localhost:3000${b.imagen}` : b.imagen
+        imagen: b.imagen && b.imagen.startsWith('/uploads') ? `http://localhost:3000${b.imagen}` : b.imagen,
+        // Agregar campos necesarios para el carrusel
+        titulo: b.descripcion,
+        posicion: b.posicion,
+        tipo: b.posicion === 'carrusel' ? 'carrusel' : 'banner'
       }));
       
       console.log('Banners procesados:', bannersDelBackend);

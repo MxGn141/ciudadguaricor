@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import { initializeDatabase } from './config/database';
+import { initializePrisma } from './config/prisma';
 import authRoutes from './routes/auth';
 import newsRoutes from './routes/news';
 import contentRoutes from './routes/content';
@@ -31,8 +31,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Inicializar base de datos y servidor
 const startServer = async () => {
   try {
-    // Conectar a la base de datos
-    await initializeDatabase();
+    // Conectar a Supabase con Prisma
+    await initializePrisma();
 
     // Rutas
     app.use('/api/auth', authRoutes);
@@ -55,7 +55,8 @@ const startServer = async () => {
 
     // Iniciar servidor
     app.listen(PORT, () => {
-      console.log(`Servidor corriendo en puerto ${PORT}`);
+      console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+      console.log(`📊 Conectado a Supabase con Prisma`);
     });
   } catch (error) {
     console.error('Error al iniciar el servidor:', error);

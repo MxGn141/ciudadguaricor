@@ -1,28 +1,27 @@
 import { Router } from 'express';
-import { AppDataSource } from '../config/database';
-import { News } from '../models/News';
-import { Section } from '../models/Section';
-import { Media } from '../models/Media';
+import { getPrismaClient } from '../config/prisma';
 import { upload } from '../middleware/upload';
 
 const router = Router();
-const newsRepo = AppDataSource.getRepository(News);
-const sectionRepo = AppDataSource.getRepository(Section);
-const mediaRepo = AppDataSource.getRepository(Media);
 
 // Obtener todas las noticias (con búsqueda global)
 router.get('/', async (req, res) => {
   try {
+    const prisma = getPrismaClient();
     const search = req.query.search ? String(req.query.search).toLowerCase() : '';
+    
     let news;
     if (search) {
-      news = await newsRepo.find({
-        relations: [
-          'seccion',
-          'newsMedia',
-          'newsMedia.media'
-        ],
-        order: { fecha_publicacion: 'DESC' }
+      news = await prisma.noticia.findMany({
+        include: {
+          seccion: true,
+          noticiaMedia: {
+            include: {
+              media: true
+            }
+          }
+        },
+        orderBy: { fechaPublicacion: 'desc' }
       });
       news = news.filter(n =>
         n.titulo.toLowerCase().includes(search) ||
@@ -32,15 +31,19 @@ router.get('/', async (req, res) => {
         n.autorFoto.toLowerCase().includes(search)
       );
     } else {
-      news = await newsRepo.find({
-        relations: [
-          'seccion',
-          'newsMedia',
-          'newsMedia.media'
-        ],
-        order: { fecha_publicacion: 'DESC' }
+      news = await prisma.noticia.findMany({
+        include: {
+          seccion: true,
+          noticiaMedia: {
+            include: {
+              media: true
+            }
+          }
+        },
+        orderBy: { fechaPublicacion: 'desc' }
       });
     }
+    
     const formatted = news.map(n => ({
       id: n.id,
       titulo: n.titulo,
@@ -49,14 +52,19 @@ router.get('/', async (req, res) => {
       seccion: n.seccion ? { id: n.seccion.id, nombre: n.seccion.nombre } : null,
       autorTexto: n.autorTexto,
       autorFoto: n.autorFoto,
-      media: n.newsMedia?.map(nm => ({ url: nm.media?.url, tipo: nm.media?.tipo, descripcion: nm.media?.descripcion })) || [],
+      media: n.noticiaMedia?.map(nm => ({ 
+        url: nm.media?.url, 
+        tipo: nm.media?.tipo, 
+        descripcion: nm.media?.descripcion 
+      })) || [],
       destacada: n.destacada,
-      fecha_publicacion: n.fecha_publicacion,
-      created_at: n.created_at,
-      updated_at: n.updated_at
+      fecha_publicacion: n.fechaPublicacion,
+      created_at: n.createdAt,
+      updated_at: n.updatedAt
     }));
     res.json(formatted);
   } catch (error) {
+    console.error('Error al obtener noticias:', error);
     res.status(500).json({ message: 'Error al obtener las noticias' });
   }
 });
@@ -64,16 +72,20 @@ router.get('/', async (req, res) => {
 // Obtener noticias por sección (por nombre)
 router.get('/section/:seccion', async (req, res) => {
   try {
-    const section = await sectionRepo.findOne({ where: { nombre: req.params.seccion } });
+    const prisma = getPrismaClient();
+    const section = await prisma.seccion.findFirst({ where: { nombre: req.params.seccion } });
     if (!section) return res.status(404).json({ message: 'Sección no encontrada' });
-    const news = await newsRepo.find({
-      where: { seccion: section },
-      relations: [
-        'seccion',
-        'newsMedia',
-        'newsMedia.media'
-      ],
-      order: { fecha_publicacion: 'DESC' }
+    const news = await prisma.noticia.findMany({
+      where: { seccionId: section.id },
+      include: {
+        seccion: true,
+        noticiaMedia: {
+          include: {
+            media: true
+          }
+        }
+      },
+      orderBy: { fechaPublicacion: 'desc' }
     });
     const formatted = news.map(n => ({
       id: n.id,
@@ -83,14 +95,15 @@ router.get('/section/:seccion', async (req, res) => {
       seccion: n.seccion ? { id: n.seccion.id, nombre: n.seccion.nombre } : null,
       autorTexto: n.autorTexto,
       autorFoto: n.autorFoto,
-      media: n.newsMedia?.map(nm => ({ url: nm.media?.url, tipo: nm.media?.tipo, descripcion: nm.media?.descripcion })) || [],
+      media: n.noticiaMedia?.map(nm => ({ url: nm.media?.url, tipo: nm.media?.tipo, descripcion: nm.media?.descripcion })) || [],
       destacada: n.destacada,
-      fecha_publicacion: n.fecha_publicacion,
-      created_at: n.created_at,
-      updated_at: n.updated_at
+      fecha_publicacion: n.fechaPublicacion,
+      created_at: n.createdAt,
+      updated_at: n.updatedAt
     }));
     res.json(formatted);
   } catch (error) {
+    console.error('Error al obtener noticias por sección:', error);
     res.status(500).json({ message: 'Error al obtener las noticias de la sección' });
   }
 });
@@ -98,13 +111,17 @@ router.get('/section/:seccion', async (req, res) => {
 // Obtener noticia por ID
 router.get('/:id', async (req, res) => {
   try {
-    const noticia = await newsRepo.findOne({
+    const prisma = getPrismaClient();
+    const noticia = await prisma.noticia.findUnique({
       where: { id: parseInt(req.params.id) },
-      relations: [
-        'seccion',
-        'newsMedia',
-        'newsMedia.media'
-      ]
+      include: {
+        seccion: true,
+        noticiaMedia: {
+          include: {
+            media: true
+          }
+        }
+      }
     });
     if (!noticia) return res.status(404).json({ message: 'Noticia no encontrada' });
     const formatted = {
@@ -115,14 +132,15 @@ router.get('/:id', async (req, res) => {
       seccion: noticia.seccion ? { id: noticia.seccion.id, nombre: noticia.seccion.nombre } : null,
       autorTexto: noticia.autorTexto,
       autorFoto: noticia.autorFoto,
-      media: noticia.newsMedia?.map(nm => ({ url: nm.media?.url, tipo: nm.media?.tipo, descripcion: nm.media?.descripcion })) || [],
+      media: noticia.noticiaMedia?.map(nm => ({ url: nm.media?.url, tipo: nm.media?.tipo, descripcion: nm.media?.descripcion })) || [],
       destacada: noticia.destacada,
-      fecha_publicacion: noticia.fecha_publicacion,
-      created_at: noticia.created_at,
-      updated_at: noticia.updated_at
+      fecha_publicacion: noticia.fechaPublicacion,
+      created_at: noticia.createdAt,
+      updated_at: noticia.updatedAt
     };
     res.json(formatted);
   } catch (error) {
+    console.error('Error al obtener noticia por ID:', error);
     res.status(500).json({ message: 'Error al obtener la noticia' });
   }
 });
@@ -130,6 +148,7 @@ router.get('/:id', async (req, res) => {
 // Crear noticia
 router.post('/', upload.none(), async (req, res) => {
   try {
+    const prisma = getPrismaClient();
     // Normalizar datos para aceptar FormData
     let { titulo, contenido, resumen, seccion_id, autorTexto, autorFoto, media, destacada, fecha_publicacion } = req.body;
     console.log('REQ.BODY:', req.body);
@@ -145,41 +164,47 @@ router.post('/', upload.none(), async (req, res) => {
       console.error('Faltan campos:', { titulo, contenido, resumen, seccion_id, autorTexto, autorFoto });
       return res.status(400).json({ message: 'Faltan campos obligatorios', detalle: { titulo, contenido, resumen, seccion_id, autorTexto, autorFoto } });
     }
-    const seccion = await sectionRepo.findOne({ where: { id: seccion_id } });
+    const seccion = await prisma.seccion.findUnique({ where: { id: seccion_id } });
     if (!seccion) {
       console.error('Sección no válida:', seccion_id);
       return res.status(400).json({ message: 'Sección no válida' });
     }
-    const noticia = newsRepo.create({
-      titulo,
-      contenido,
-      resumen,
-      seccion,
-      autorTexto,
-      autorFoto,
-      destacada: !!destacada,
-      fecha_publicacion: fecha_publicacion ? new Date(fecha_publicacion) : undefined
+    const noticia = await prisma.noticia.create({
+      data: {
+        titulo,
+        contenido,
+        resumen,
+        seccion: { connect: { id: seccion_id } },
+        autorTexto,
+        autorFoto,
+        destacada: !!destacada,
+        fechaPublicacion: fecha_publicacion ? new Date(fecha_publicacion) : undefined
+      },
+      include: {
+        seccion: true,
+        noticiaMedia: {
+          include: {
+            media: true
+          }
+        }
+      }
     });
-    await newsRepo.save(noticia);
     // Asociar media
     if (Array.isArray(media)) {
       for (const media_id of media) {
-        const mediaItem = await mediaRepo.findOne({ where: { id: media_id } });
+        const mediaItem = await prisma.media.findUnique({ where: { id: media_id } });
         if (mediaItem) {
-          await AppDataSource.getRepository('noticia_media').save({ noticia_id: noticia.id, media_id: mediaItem.id });
+          await prisma.noticiaMedia.create({
+            data: {
+              noticiaId: noticia.id,
+              mediaId: mediaItem.id
+            }
+          });
         }
       }
     }
     // Devolver noticia con relaciones
-    const noticiaCompleta = await newsRepo.findOne({
-      where: { id: noticia.id },
-      relations: [
-        'seccion',
-        'newsMedia',
-        'newsMedia.media'
-      ]
-    });
-    res.status(201).json(noticiaCompleta);
+    res.status(201).json(noticia);
   } catch (error) {
     console.error('Error al crear noticia:', error);
     let errorMsg = '';
@@ -197,43 +222,40 @@ router.post('/', upload.none(), async (req, res) => {
 // Editar noticia
 router.put('/:id', async (req, res) => {
   try {
-    const noticia = await newsRepo.findOne({ where: { id: parseInt(req.params.id) } });
+    const prisma = getPrismaClient();
+    const noticia = await prisma.noticia.findUnique({ where: { id: parseInt(req.params.id) } });
     if (!noticia) return res.status(404).json({ message: 'Noticia no encontrada' });
     const { titulo, contenido, resumen, seccion_id, autorTexto, autorFoto, media, destacada, fecha_publicacion } = req.body;
+    
+    const updateData: any = {};
     if (seccion_id) {
-      const seccion = await sectionRepo.findOne({ where: { id: seccion_id } });
+      const seccion = await prisma.seccion.findUnique({ where: { id: seccion_id } });
       if (!seccion) return res.status(400).json({ message: 'Sección no válida' });
-      noticia.seccion = seccion;
+      updateData.seccionId = seccion_id;
     }
-    if (autorTexto !== undefined) noticia.autorTexto = autorTexto;
-    if (autorFoto !== undefined) noticia.autorFoto = autorFoto;
-    if (titulo !== undefined) noticia.titulo = titulo;
-    if (contenido !== undefined) noticia.contenido = contenido;
-    if (resumen !== undefined) noticia.resumen = resumen;
-    if (destacada !== undefined) noticia.destacada = !!destacada;
-    if (fecha_publicacion !== undefined) noticia.fecha_publicacion = new Date(fecha_publicacion);
-    await newsRepo.save(noticia);
-    // Actualizar media
-    if (Array.isArray(media)) {
-      await AppDataSource.getRepository('noticia_media').delete({ noticia_id: noticia.id });
-      for (const media_id of media) {
-        const mediaItem = await mediaRepo.findOne({ where: { id: media_id } });
-        if (mediaItem) {
-          await AppDataSource.getRepository('noticia_media').save({ noticia_id: noticia.id, media_id: mediaItem.id });
+    if (autorTexto !== undefined) updateData.autorTexto = autorTexto;
+    if (autorFoto !== undefined) updateData.autorFoto = autorFoto;
+    if (titulo !== undefined) updateData.titulo = titulo;
+    if (contenido !== undefined) updateData.contenido = contenido;
+    if (resumen !== undefined) updateData.resumen = resumen;
+    if (destacada !== undefined) updateData.destacada = !!destacada;
+    if (fecha_publicacion !== undefined) updateData.fechaPublicacion = new Date(fecha_publicacion);
+    
+    const updatedNoticia = await prisma.noticia.update({
+      where: { id: noticia.id },
+      data: updateData,
+      include: {
+        seccion: true,
+        noticiaMedia: {
+          include: {
+            media: true
+          }
         }
       }
-    }
-    // Devolver noticia con relaciones
-    const noticiaCompleta = await newsRepo.findOne({
-      where: { id: noticia.id },
-      relations: [
-        'seccion',
-        'newsMedia',
-        'newsMedia.media'
-      ]
     });
-    res.json(noticiaCompleta);
+    res.json(updatedNoticia);
   } catch (error) {
+    console.error('Error al actualizar noticia:', error);
     res.status(500).json({ message: 'Error al actualizar la noticia' });
   }
 });
@@ -241,13 +263,15 @@ router.put('/:id', async (req, res) => {
 // Eliminar noticia
 router.delete('/:id', async (req, res) => {
   try {
-    const noticia = await newsRepo.findOne({ where: { id: parseInt(req.params.id) } });
+    const prisma = getPrismaClient();
+    const noticia = await prisma.noticia.findUnique({ where: { id: parseInt(req.params.id) } });
     if (!noticia) return res.status(404).json({ message: 'Noticia no encontrada' });
     // Eliminar relaciones
-    await AppDataSource.getRepository('noticia_media').delete({ noticia_id: noticia.id });
-    await newsRepo.remove(noticia);
+    await prisma.noticiaMedia.deleteMany({ where: { noticiaId: noticia.id } });
+    await prisma.noticia.delete({ where: { id: noticia.id } });
     res.status(204).send();
   } catch (error) {
+    console.error('Error al eliminar noticia:', error);
     res.status(500).json({ message: 'Error al eliminar la noticia' });
   }
 });
