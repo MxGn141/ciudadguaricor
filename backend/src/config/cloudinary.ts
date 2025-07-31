@@ -13,25 +13,15 @@ export const storageNoticias = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'ciudadguaricor/noticias',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-    transformation: [
-      { width: 1200, height: 800, crop: 'limit' }, // Tamaño máximo
-      { quality: 'auto:good', fetch_format: 'auto' }, // Optimización automática
-    ],
-  },
+  } as any,
 });
 
-// Configurar almacenamiento para publicidad
-export const storagePublicidad = new CloudinaryStorage({
+// Configurar almacenamiento para contenido destacado
+export const storageContenido = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'ciudadguaricor/publicidad',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-    transformation: [
-      { width: 800, height: 600, crop: 'limit' }, // Tamaño para banners
-      { quality: 'auto:good', fetch_format: 'auto' }, // Optimización automática
-    ],
-  },
+    folder: 'ciudadguaricor/contenido',
+  } as any,
 });
 
 // Función para obtener URL optimizada

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getPrismaClient } from '../config/prisma';
-import { uploadPublicidad } from '../middleware/upload';
+import { uploadContenido } from '../middleware/upload';
 
 const router = Router();
 
@@ -9,16 +9,16 @@ router.get('/', (req, res) => {
   res.json({ message: 'Rutas de contenido' });
 });
 
-// Obtener todos los banners (opcional: filtrar por posición y fechas activas)
-router.get('/banners', async (req, res) => {
+// Obtener todos los contenidos destacados
+router.get('/contenido-destacado', async (req, res) => {
   try {
-    const { posicion, activos } = req.query;
+    const { ubicacion, activos } = req.query;
     const prisma = getPrismaClient();
     
     let where: any = {};
     
-    if (posicion) {
-      where.posicion = posicion;
+    if (ubicacion) {
+      where.ubicacion = ubicacion;
     }
     
     if (activos === 'true') {
@@ -39,42 +39,42 @@ router.get('/banners', async (req, res) => {
       ];
     }
     
-    const banners = await prisma.publicidad.findMany({ where });
-    res.json(banners);
+    const contenidos = await prisma.contenidoDestacado.findMany({ where });
+    res.json(contenidos);
   } catch (error) {
-    console.error('Error al obtener banners:', error);
-    res.status(500).json({ message: 'Error al obtener los banners' });
+    console.error('Error al obtener contenidos destacados:', error);
+    res.status(500).json({ message: 'Error al obtener los contenidos destacados' });
   }
 });
 
-// Subir banner
-router.post('/banners', uploadPublicidad.single('file'), async (req, res) => {
+// Subir contenido destacado
+router.post('/contenido-destacado', uploadContenido.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'No se subió ningún archivo' });
     
-    const { url, fecha_inicio, fecha_fin, descripcion, posicion } = req.body;
+    const { url, fecha_inicio, fecha_fin, titulo, ubicacion } = req.body;
     const prisma = getPrismaClient();
     
-    if (!posicion) return res.status(400).json({ message: 'La posición es obligatoria' });
+    if (!ubicacion) return res.status(400).json({ message: 'La ubicación es obligatoria' });
     
     // Cloudinary devuelve la URL completa en req.file.path
-    const imagen = req.file.path;
-    const banner = await prisma.publicidad.create({ 
+    const media = req.file.path;
+    const contenido = await prisma.contenidoDestacado.create({ 
       data: {
-        imagen, 
+        media, 
         url, 
         fechaInicio: fecha_inicio ? new Date(fecha_inicio) : null, 
         fechaFin: fecha_fin ? new Date(fecha_fin) : null, 
-        descripcion, 
-        posicion,
+        titulo, 
+        ubicacion,
         visible: true
       }
     });
     
-    res.status(201).json(banner);
+    res.status(201).json(contenido);
   } catch (error) {
-    console.error('Error al crear banner:', error);
-    res.status(500).json({ message: 'Error al crear el banner', error: error instanceof Error ? error.message : 'Unknown error' });
+    console.error('Error al crear contenido destacado:', error);
+    res.status(500).json({ message: 'Error al crear el contenido destacado', error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
 

@@ -75,14 +75,14 @@ model NoticiaMedia {
   @@id([noticiaId, mediaId])
 }
 
-model Publicidad {
+model ContenidoDestacado {
   id          Int       @id @default(autoincrement())
-  imagen      String
+  media       String    // antes: imagen
   url         String?
   fechaInicio DateTime?
   fechaFin    DateTime?
-  descripcion String?
-  posicion    String
+  titulo      String?   // antes: descripcion
+  ubicacion   String    // antes: posicion
   visible     Boolean   @default(true)
 }
 

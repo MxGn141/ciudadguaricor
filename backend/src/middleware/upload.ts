@@ -1,5 +1,5 @@
 import multer from 'multer';
-import { storageNoticias, storagePublicidad } from '../config/cloudinary';
+import { storageNoticias, storageContenido } from '../config/cloudinary';
 
 // Filtro de archivos
 const fileFilter = (_req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
@@ -20,9 +20,9 @@ export const upload = multer({
   }
 });
 
-// Configuración de multer para publicidad con Cloudinary
-export const uploadPublicidad = multer({
-  storage: storagePublicidad,
+// Configuración de multer para contenido destacado con Cloudinary
+export const uploadContenido = multer({
+  storage: storageContenido,
   fileFilter: fileFilter,
   limits: {
     fileSize: 10 * 1024 * 1024 // 10MB (Cloudinary maneja la optimización)
