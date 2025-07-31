@@ -10,7 +10,7 @@ import PaginaSeccion from './pages/PaginaSeccion';
 import ResultadosBusqueda from './pages/ResultadosBusqueda';
 import LoginAdmin from './pages/admin/LoginAdmin';
 import DashboardAdmin from './pages/admin/DashboardAdmin';
-import GestionarPublicidad from './pages/admin/GestionarPublicidad';
+import GestionarContenidoDestacado from './pages/admin/GestionarPublicidad';
 
 export default function App() {
   return (
@@ -19,7 +19,7 @@ export default function App() {
         <ProveedorContextoContenido>
           <Router>
             <Routes>
-              {/* Rutas públicas ss */}
+              {/* Rutas públicas */}
               <Route path="/" element={<LayoutPublico />}>
                 <Route index element={<PaginaPrincipal />} />
                 <Route path="seccion/:seccion" element={<PaginaSeccion />} />
@@ -30,7 +30,7 @@ export default function App() {
               {/* Rutas de administración */}
               <Route path="/admin/login" element={<LoginAdmin />} />
               <Route path="/admin/dashboard" element={<DashboardAdmin />} />
-              <Route path="/admin/publicidad" element={<GestionarPublicidad />} />
+              <Route path="/admin/contenido-destacado" element={<GestionarContenidoDestacado />} />
             </Routes>
           </Router>
         </ProveedorContextoContenido>

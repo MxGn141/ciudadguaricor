@@ -32,14 +32,28 @@ export interface Publicidad {
   visible?: boolean;
 }
 
+export interface ContenidoDestacado {
+  id: string | number;
+  media: string; // antes: imagen
+  url?: string;
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  titulo?: string; // antes: descripcion
+  ubicacion: string; // antes: posicion
+  visible?: boolean;
+}
+
 interface ContextoNoticiasType {
   noticias: Noticia[];
   publicidades: Publicidad[];
+  contenidosDestacados: ContenidoDestacado[];
   agregarNoticia: (formData: FormData) => Promise<void>;
   editarNoticia: (id: string, noticia: Partial<Noticia>) => Promise<void>;
   eliminarNoticia: (id: string) => Promise<void>;
   agregarPublicidad: (publicidad: Omit<Publicidad, 'id'>) => void;
   eliminarPublicidad: (id: string) => void;
+  agregarContenidoDestacado: (contenido: Omit<ContenidoDestacado, 'id'>) => void;
+  eliminarContenidoDestacado: (id: string) => void;
   obtenerNoticiasPorSeccion: (seccion: string) => Promise<Noticia[]>;
   obtenerNoticiaPorId: (id: string) => Noticia | undefined;
   setTerminoBusqueda: (termino: string) => void;
@@ -71,6 +85,7 @@ const API_URL = 'https://ciudadguaricor.onrender.com/api'; // Backend en producc
 export function ProveedorContextoNoticias({ children }: { children: ReactNode }) {
   const [noticias, setNoticias] = useState<Noticia[]>([]);
   const [publicidades, setPublicidades] = useState<Publicidad[]>(publicidadesIniciales);
+  const [contenidosDestacados, setContenidosDestacados] = useState<ContenidoDestacado[]>([]);
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
   const [cargandoBusqueda, setCargandoBusqueda] = useState(false);
   const { token } = useContextoAuth();
@@ -79,36 +94,28 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
     headers: { Authorization: `Bearer ${token}` }
   };
 
-  // Cargar publicidades activas y visibles desde el backend
-  const cargarPublicidades = async () => {
+  // Cargar contenidos destacados activos y visibles desde el backend
+  const cargarContenidosDestacados = async () => {
     try {
-      console.log('Cargando publicidades desde:', `${API_URL}/content/banners`);
-      const response = await axios.get(`${API_URL}/content/banners`);
-      console.log('Respuesta de banners:', response.data);
+      console.log('Cargando contenidos destacados desde:', `${API_URL}/content/contenido-destacado`);
+      const response = await axios.get(`${API_URL}/content/contenido-destacado`);
+      console.log('Respuesta de contenidos destacados:', response.data);
       
-      // Cargar todos los banners del backend
-      const bannersDelBackend = response.data.map((b: any) => ({
-        ...b,
-        imagen: b.imagen, // URL directa de Cloudinary
+      // Cargar todos los contenidos destacados del backend
+      const contenidosDelBackend = response.data.map((c: any) => ({
+        ...c,
+        media: c.media, // URL directa de Cloudinary
         // Agregar campos necesarios para el carrusel
-        titulo: b.descripcion,
-        posicion: b.posicion,
-        tipo: b.posicion === 'carrusel' ? 'carrusel' : 'banner'
+        titulo: c.titulo,
+        ubicacion: c.ubicacion,
+        tipo: c.ubicacion === 'carrusel' ? 'carrusel' : 'banner'
       }));
       
-      console.log('Banners procesados:', bannersDelBackend);
-      
-      if (bannersDelBackend.length > 0) {
-        setPublicidades(bannersDelBackend);
-        console.log('Banners cargados en el estado:', bannersDelBackend);
-      } else {
-        console.log('No hay banners del backend, usando iniciales');
-        setPublicidades(publicidadesIniciales);
-      }
+      console.log('Contenidos destacados procesados:', contenidosDelBackend);
+      setContenidosDestacados(contenidosDelBackend);
     } catch (error) {
-      console.error('Error al cargar publicidades:', error);
-      console.log('Manteniendo publicidades iniciales debido al error');
-      setPublicidades(publicidadesIniciales);
+      console.error('Error al cargar contenidos destacados:', error);
+      // Mantener los contenidos iniciales si hay error
     }
   };
 
@@ -160,7 +167,7 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
 
   useEffect(() => {
     cargarNoticias();
-    cargarPublicidades();
+    cargarContenidosDestacados(); // Cargar contenidos destacados
   }, []);
 
   const cargarNoticias = async () => {
@@ -249,6 +256,18 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
     setPublicidades(prev => prev.filter(pub => pub.id !== id));
   };
 
+  const agregarContenidoDestacado = (nuevoContenido: Omit<ContenidoDestacado, 'id'>) => {
+    const contenido: ContenidoDestacado = {
+      ...nuevoContenido,
+      id: Date.now().toString(),
+    };
+    setContenidosDestacados(prev => [contenido, ...prev]);
+  };
+
+  const eliminarContenidoDestacado = (id: string) => {
+    setContenidosDestacados(prev => prev.filter(cont => cont.id !== id));
+  };
+
   const obtenerNoticiasPorSeccion = async (seccion: string): Promise<Noticia[]> => {
     try {
       const response = await axios.get(`${API_URL}/news/section/${seccion}`);
@@ -291,11 +310,14 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
     <ContextoNoticias.Provider value={{
       noticias,
       publicidades,
+      contenidosDestacados, // Agregar contenidos destacados al contexto
       agregarNoticia,
       editarNoticia,
       eliminarNoticia,
       agregarPublicidad,
       eliminarPublicidad,
+      agregarContenidoDestacado,
+      eliminarContenidoDestacado,
       obtenerNoticiasPorSeccion,
       obtenerNoticiaPorId,
       setTerminoBusqueda,

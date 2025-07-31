@@ -32,7 +32,7 @@ model UsuarioRol {
   rolId     Int
   usuario   Usuario @relation(fields: [usuarioId], references: [id])
   rol       Rol     @relation(fields: [rolId], references: [id])
-
+  
   @@id([usuarioId, rolId])
 }
 
@@ -71,19 +71,8 @@ model NoticiaMedia {
   mediaId   Int
   noticia   Noticia @relation(fields: [noticiaId], references: [id])
   media     Media   @relation(fields: [mediaId], references: [id])
-
+  
   @@id([noticiaId, mediaId])
-}
-
-model ContenidoDestacado {
-  id          Int       @id @default(autoincrement())
-  media       String    // antes: imagen
-  url         String?
-  fechaInicio DateTime?
-  fechaFin    DateTime?
-  titulo      String?   // antes: descripcion
-  ubicacion   String    // antes: posicion
-  visible     Boolean   @default(true)
 }
 
 model PDF {
@@ -102,4 +91,15 @@ model View {
   activo        Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model ContenidoDestacado {
+  id          Int       @id @default(autoincrement())
+  media       String
+  url         String?
+  fechaInicio DateTime?
+  fechaFin    DateTime?
+  titulo      String?
+  ubicacion   String
+  visible     Boolean   @default(true)
 }

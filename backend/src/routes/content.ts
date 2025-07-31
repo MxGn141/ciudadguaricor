@@ -78,48 +78,48 @@ router.post('/contenido-destacado', uploadContenido.single('file'), async (req, 
   }
 });
 
-// Editar banner
-router.put('/banners/:id', uploadPublicidad.single('file'), async (req, res) => {
+// Editar contenido destacado
+router.put('/contenido-destacado/:id', uploadContenido.single('file'), async (req, res) => {
   try {
     const prisma = getPrismaClient();
-    const banner = await prisma.publicidad.findUnique({ where: { id: parseInt(req.params.id) } });
-    if (!banner) return res.status(404).json({ message: 'Banner no encontrado' });
+    const contenido = await prisma.contenidoDestacado.findUnique({ where: { id: parseInt(req.params.id) } });
+    if (!contenido) return res.status(404).json({ message: 'Contenido destacado no encontrado' });
     
-    const { url, fecha_inicio, fecha_fin, descripcion, posicion } = req.body;
+    const { url, fecha_inicio, fecha_fin, titulo, ubicacion } = req.body;
     
     const updateData: any = {};
-    if (posicion) updateData.posicion = posicion;
+    if (ubicacion) updateData.ubicacion = ubicacion;
     if (url !== undefined) updateData.url = url;
     if (fecha_inicio !== undefined) updateData.fechaInicio = fecha_inicio ? new Date(fecha_inicio) : null;
     if (fecha_fin !== undefined) updateData.fechaFin = fecha_fin ? new Date(fecha_fin) : null;
-    if (descripcion !== undefined) updateData.descripcion = descripcion;
-    if (req.file) updateData.imagen = req.file.path; // URL de Cloudinary
+    if (titulo !== undefined) updateData.titulo = titulo;
+    if (req.file) updateData.media = req.file.path; // URL de Cloudinary
     
-    const updatedBanner = await prisma.publicidad.update({
+    const updatedContenido = await prisma.contenidoDestacado.update({
       where: { id: parseInt(req.params.id) },
       data: updateData
     });
     
-    res.json(updatedBanner);
+    res.json(updatedContenido);
   } catch (error) {
-    console.error('Error al actualizar banner:', error);
-    res.status(500).json({ message: 'Error al actualizar el banner' });
+    console.error('Error al actualizar contenido destacado:', error);
+    res.status(500).json({ message: 'Error al actualizar el contenido destacado' });
   }
 });
 
-// Eliminar banner
-router.delete('/banners/:id', async (req, res) => {
+// Eliminar contenido destacado
+router.delete('/contenido-destacado/:id', async (req, res) => {
   try {
     const prisma = getPrismaClient();
-    const banner = await prisma.publicidad.findUnique({ where: { id: parseInt(req.params.id) } });
-    if (!banner) return res.status(404).json({ message: 'Banner no encontrado' });
+    const contenido = await prisma.contenidoDestacado.findUnique({ where: { id: parseInt(req.params.id) } });
+    if (!contenido) return res.status(404).json({ message: 'Contenido destacado no encontrado' });
     
-    await prisma.publicidad.delete({ where: { id: parseInt(req.params.id) } });
+    await prisma.contenidoDestacado.delete({ where: { id: parseInt(req.params.id) } });
     res.status(204).send();
   } catch (error) {
-    console.error('Error al eliminar banner:', error);
-    res.status(500).json({ message: 'Error al eliminar el banner' });
+    console.error('Error al eliminar contenido destacado:', error);
+    res.status(500).json({ message: 'Error al eliminar el contenido destacado' });
   }
 });
 
-export default router; 
+export default router;
