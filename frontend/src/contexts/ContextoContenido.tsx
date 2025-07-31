@@ -25,8 +25,17 @@ export function ProveedorContextoContenido({ children }: { children: React.React
 
   const cargarContenidos = async () => {
     try {
-      const res = await axios.get('/api/content/contenido-destacado');
-      setContenidos(res.data);
+      // Usa la URL absoluta del backend para evitar problemas de CORS y entorno
+      const API_URL = 'https://ciudadguaricor.onrender.com/api/content/contenido-destacado';
+      const res = await axios.get(API_URL);
+      // Ajusta la URL de la imagen si empieza con /uploads (igual que en el admin)
+      const contenidosAjustados = res.data.map((c: any) => ({
+        ...c,
+        media: c.media && c.media.startsWith('/uploads')
+          ? `https://ciudadguaricor.onrender.com${c.media}`
+          : c.media
+      }));
+      setContenidos(contenidosAjustados);
     } catch (error) {
       console.error('Error al cargar contenidos destacados:', error);
     }
