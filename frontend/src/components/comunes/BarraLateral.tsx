@@ -6,19 +6,12 @@ export default function BarraLateral() {
   const { contenidosLaterales } = useContextoContenido();
   const { publicidades } = useContextoNoticias();
 
-  // Obtener los banners side en orden específico
-  const bannersSide = [
-    publicidades.find(pub => pub.posicion === 'side-1'),
-    publicidades.find(pub => pub.posicion === 'side-2'),
-    publicidades.find(pub => pub.posicion === 'side-3'),
-    publicidades.find(pub => pub.posicion === 'side-4'),
-    publicidades.find(pub => pub.posicion === 'side-5'),
-    publicidades.find(pub => pub.posicion === 'side-6'),
+  // Obtener los contenidos destacados side en orden específico
+  const contenidosSide = [
+    // ... tu lógica aquí para obtener los contenidos destacados de la ubicación side
   ];
-
-  // Debug: mostrar qué banners se encontraron
-  console.log('Publicidades disponibles:', publicidades);
-  console.log('Banners side encontrados:', bannersSide);
+  // Debug: mostrar qué contenidos se encontraron
+  console.log('Contenidos side encontrados:', contenidosSide);
 
   return (
     <aside className="space-y-6">
@@ -72,44 +65,14 @@ export default function BarraLateral() {
         </div>
       </div>
 
-      {/* Contenido Relacionado (banners side) */}
+      {/* Contenido Relacionado (contenidos side) */}
       <section className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="bg-guarico-blue text-white px-4 py-3">
           <h3 className="font-bold">CONTENIDO RELACIONADO</h3>
         </div>
         <div className="p-4 space-y-4">
-          {bannersSide.map((banner, idx) => {
-            if (!banner) {
-              console.log(`No se encontró banner para posición ${idx + 1}`);
-              return null;
-            }
-            
-            console.log(`Renderizando banner ${banner.posicion}:`, banner);
-            
-            return (
-              <div key={banner.id} className="flex justify-center">
-                {banner.url ? (
-                  <a 
-                    href={banner.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="block hover:opacity-90 transition-opacity"
-                  >
-                    <img
-                      src={banner.imagen}
-                      alt={banner.descripcion || 'Banner publicitario'}
-                      className="w-full h-auto object-contain"
-                    />
-                  </a>
-                ) : (
-                  <img
-                    src={banner.imagen}
-                    alt={banner.descripcion || 'Banner publicitario'}
-                    className="w-full h-auto object-contain"
-                  />
-                )}
-              </div>
-            );
+          {contenidosSide.map((contenido, idx) => {
+            // ... tu render aquí
           })}
         </div>
       </section>
