@@ -58,6 +58,7 @@ interface ContextoNoticiasType {
   obtenerNoticiaPorId: (id: string) => Noticia | undefined;
   setTerminoBusqueda: (termino: string) => void;
   cargandoBusqueda: boolean;
+  cargarNoticias: () => Promise<void>;
 }
 
 const ContextoNoticias = createContext<ContextoNoticiasType | undefined>(undefined);
@@ -119,6 +120,34 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
     }
   };
 
+
+  // Función para cargar todas las noticias
+  const cargarNoticias = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/news`);
+      const noticiasMapeadas = response.data.map((noticia: any) => ({
+        id: noticia.id,
+        titulo: noticia.titulo,
+        contenido: noticia.contenido,
+        resumen: noticia.resumen,
+        seccion: noticia.seccion,
+        autorTexto: noticia.autorTexto,
+        autorFoto: noticia.autorFoto,
+        media: (noticia.media || []).map((m: any) => ({
+          ...m,
+          url: m.url // URL directa de Cloudinary
+        })),
+        fecha_publicacion: noticia.fecha_publicacion,
+        destacada: noticia.destacada,
+        created_at: noticia.created_at,
+        updated_at: noticia.updated_at
+      }));
+      setNoticias(noticiasMapeadas || []);
+    } catch (error) {
+      setNoticias([]);
+    }
+  };
+
   // Búsqueda global en el backend en tiempo real (autosuggest)
   React.useEffect(() => {
     let cancelado = false;
@@ -159,46 +188,15 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
       }
     };
     const timeout = setTimeout(buscarNoticias, 250);
-    return () => {
-      cancelado = true;
-      clearTimeout(timeout);
-    };
+    return () => clearTimeout(timeout);
   }, [terminoBusqueda]);
 
-  useEffect(() => {
-    cargarNoticias();
-    cargarContenidosDestacados(); // Cargar contenidos destacados
-  }, []);
+  // Todas las funciones y variables exportadas deben estar declaradas antes del return
 
-  const cargarNoticias = async () => {
-    try {
-      console.log('Cargando noticias desde:', `${API_URL}/news`);
-      const response = await axios.get(`${API_URL}/news`);
-      console.log('Respuesta del backend:', response.data);
-      // Mapear la nueva estructura
-      const noticiasMapeadas = response.data.map((noticia: any) => ({
-        id: noticia.id,
-        titulo: noticia.titulo,
-        contenido: noticia.contenido,
-        resumen: noticia.resumen,
-        seccion: noticia.seccion,
-        autorTexto: noticia.autorTexto,
-        autorFoto: noticia.autorFoto,
-        media: (noticia.media || []).map((m: any) => ({
-          ...m,
-          url: m.url && m.url.startsWith('/uploads') ? `https://ciudadguaricor.onrender.com${m.url}` : m.url
-        })),
-        fecha_publicacion: noticia.fecha_publicacion,
-        destacada: noticia.destacada,
-        created_at: noticia.created_at,
-        updated_at: noticia.updated_at
-      }));
-      setNoticias(noticiasMapeadas || []);
-    } catch (error) {
-      console.error('Error al cargar noticias:', error);
-      setNoticias([]);
-    }
-  };
+  // ... (todas las funciones ya están declaradas aquí) ...
+
+  // El return del provider debe ir al final, después de todas las funciones
+
 
   // Cambiado para aceptar FormData
   const agregarNoticia = async (formData: FormData) => {
@@ -224,10 +222,8 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
 
   const editarNoticia = async (id: string, cambios: Partial<Noticia>) => {
     try {
-      const response = await axios.put(`${API_URL}/news/${id}`, cambios, config);
-    setNoticias(prev => prev.map(noticia => 
-        noticia.id === id ? response.data : noticia
-    ));
+      await axios.put(`${API_URL}/news/${id}`, cambios, config);
+      await cargarNoticias(); // Refresca el estado con los datos reales del backend
     } catch (error) {
       console.error('Error al editar noticia:', error);
       throw error;
@@ -321,7 +317,8 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
       obtenerNoticiasPorSeccion,
       obtenerNoticiaPorId,
       setTerminoBusqueda,
-      cargandoBusqueda
+      cargandoBusqueda,
+      cargarNoticias
     }}>
       {children}
     </ContextoNoticias.Provider>

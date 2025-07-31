@@ -18,7 +18,7 @@ function Notificacion({ mensaje, tipo, onClose }: { mensaje: string, tipo: 'exit
 }
 
 export default function GestionarNoticias() {
-  const { noticias, eliminarNoticia, editarNoticia } = useContextoNoticias();
+  const { noticias, eliminarNoticia, editarNoticia, cargarNoticias } = useContextoNoticias();
   const [seccionFiltro, setSeccionFiltro] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [noticiaEditando, setNoticiaEditando] = useState<Noticia | null>(null);
@@ -53,6 +53,7 @@ export default function GestionarNoticias() {
     if (window.confirm(`¿Está seguro de eliminar la noticia "${titulo}"?`)) {
       try {
         await eliminarNoticia(String(id));
+        await cargarNoticias();
         mostrarNotificacion('Noticia eliminada exitosamente', 'exito');
       } catch (error) {
         mostrarNotificacion('Error al eliminar la noticia', 'error');
