@@ -1,15 +1,10 @@
 import React from 'react';
 import { useContextoContenido } from '../../contexts/ContextoContenido';
-import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 
 export default function BarraLateral() {
-  const { contenidosLaterales } = useContextoContenido();
-  const { publicidades } = useContextoNoticias();
-
-  // Obtener los contenidos destacados side en orden específico
-  const contenidosSide = [
-    // ... tu lógica aquí para obtener los contenidos destacados de la ubicación side
-  ];
+  const { contenidos } = useContextoContenido();
+  // Filtrar los contenidos destacados de la ubicación 'sidebar' y visibles
+  const contenidosSide = contenidos.filter(c => c.ubicacion === 'sidebar' && c.visible);
   // Debug: mostrar qué contenidos se encontraron
   console.log('Contenidos side encontrados:', contenidosSide);
 
@@ -71,9 +66,34 @@ export default function BarraLateral() {
           <h3 className="font-bold">CONTENIDO RELACIONADO</h3>
         </div>
         <div className="p-4 space-y-4">
-          {contenidosSide.map((contenido, idx) => {
-            // ... tu render aquí
-          })}
+          {contenidosSide.length === 0 ? (
+            <p className="text-gray-500 text-center">No hay contenido relacionado</p>
+          ) : (
+            contenidosSide.map((contenido, idx) => (
+              <div key={contenido.id} className="mb-4">
+                {contenido.url ? (
+                  <a href={contenido.url} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={contenido.media}
+                      alt={contenido.titulo || 'Contenido relacionado'}
+                      className="w-full h-32 object-cover rounded"
+                    />
+                  </a>
+                ) : (
+                  <img
+                    src={contenido.media}
+                    alt={contenido.titulo || 'Contenido relacionado'}
+                    className="w-full h-32 object-cover rounded"
+                  />
+                )}
+                {contenido.titulo && (
+                  <div className="mt-2 text-center text-sm text-gray-700 font-medium">
+                    {contenido.titulo}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </section>
 

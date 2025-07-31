@@ -33,13 +33,13 @@ export default function PaginaPrincipal() {
   const [todasLasNoticias, setTodasLasNoticias] = useState<Noticia[]>([]);
   const [noticiasDestacadas, setNoticiasDestacadas] = useState<Noticia[]>([]);
   const { obtenerNoticiasPorSeccion, noticias, cargandoBusqueda, publicidades } = useContextoNoticias();
-  const { contenidoInicio, contenidoInicioBack, contenidoInicio2 } = useContextoContenido();
+  const { contenidos } = useContextoContenido();
   const [noticiaActual, setNoticiaActual] = useState(0);
 
-  // Filtrar banners por posición
-  const bannerMain1 = publicidades.find(pub => pub.posicion === 'main-1');
-  const bannerMain2 = publicidades.find(pub => pub.posicion === 'main-2');
-  const bannerMainBg = publicidades.find(pub => pub.posicion === 'main-bg');
+  // Filtrar contenido destacado por ubicación (nombres neutrales)
+  const contenidoMain1 = contenidos.find(c => c.ubicacion === 'principal-izq' && c.visible);
+  const contenidoMain2 = contenidos.find(c => c.ubicacion === 'principal-der' && c.visible);
+  const contenidoMainBg = contenidos.find(c => c.ubicacion === 'principal-fondo' && c.visible);
 
   // Función para convertir fecha a Date si es string
   const convertirFecha = (fecha: Date | string): Date => {
@@ -307,20 +307,20 @@ export default function PaginaPrincipal() {
             </div>
 
             {/* Contenido Destacado */}
-            {bannerMain1 && (
+            {contenidoMain1 && (
               <article className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                {bannerMain1.url ? (
-                  <a href={bannerMain1.url} target="_blank" rel="noopener noreferrer">
+                {contenidoMain1.url ? (
+                  <a href={contenidoMain1.url} target="_blank" rel="noopener noreferrer">
                     <img 
-                      src={bannerMain1.imagen}
-                      alt={bannerMain1.descripcion || 'Banner publicitario'}
+                      src={contenidoMain1.media}
+                      alt={contenidoMain1.titulo || 'Contenido destacado'}
                       className="w-full h-60 object-cover"
                     />
                   </a>
                 ) : (
                   <img 
-                    src={bannerMain1.imagen}
-                    alt={bannerMain1.descripcion || 'Banner publicitario'}
+                    src={contenidoMain1.media}
+                    alt={contenidoMain1.titulo || 'Contenido destacado'}
                     className="w-full h-60 object-cover"
                   />
                 )}
@@ -334,20 +334,20 @@ export default function PaginaPrincipal() {
                 return (
                   <React.Fragment key={seccion.nombre}>
                     {/* Contenido Relacionado */}
-                    {bannerMain2 && (
+                    {contenidoMain2 && (
                       <article className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                        {bannerMain2.url ? (
-                          <a href={bannerMain2.url} target="_blank" rel="noopener noreferrer">
+                        {contenidoMain2.url ? (
+                          <a href={contenidoMain2.url} target="_blank" rel="noopener noreferrer">
                             <img 
-                              src={bannerMain2.imagen}
-                              alt={bannerMain2.descripcion || 'Banner publicitario'}
+                              src={contenidoMain2.media}
+                              alt={contenidoMain2.titulo || 'Contenido destacado'}
                               className="w-full h-60 object-cover"
                             />
                           </a>
                         ) : (
                           <img 
-                            src={bannerMain2.imagen}
-                            alt={bannerMain2.descripcion || 'Banner publicitario'}
+                            src={contenidoMain2.media}
+                            alt={contenidoMain2.titulo || 'Contenido destacado'}
                             className="w-full h-60 object-cover"
                           />
                         )}
@@ -361,20 +361,20 @@ export default function PaginaPrincipal() {
             })}
 
             {/* Banner publicitario final */}
-            {bannerMainBg && (
+            {contenidoMainBg && (
               <div className="w-full mt-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                {bannerMainBg.url ? (
-                  <a href={bannerMainBg.url} target="_blank" rel="noopener noreferrer">
+                {contenidoMainBg.url ? (
+                  <a href={contenidoMainBg.url} target="_blank" rel="noopener noreferrer">
                     <img 
-                      src={bannerMainBg.imagen}
-                      alt={bannerMainBg.descripcion || 'Banner publicitario'}
+                      src={contenidoMainBg.media}
+                      alt={contenidoMainBg.titulo || 'Contenido destacado'}
                       className="w-full h-60 object-cover"
                     />
                   </a>
                 ) : (
                   <img 
-                    src={bannerMainBg.imagen}
-                    alt={bannerMainBg.descripcion || 'Banner publicitario'}
+                    src={contenidoMainBg.media}
+                    alt={contenidoMainBg.titulo || 'Contenido destacado'}
                     className="w-full h-60 object-cover"
                   />
                 )}
