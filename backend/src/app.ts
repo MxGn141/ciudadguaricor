@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://ciudadguaricor-m86aek5b0-mxgn141s-projects.vercel.app'
+    'https://ciudadguaricor.vercel.app'
   ],
   credentials: true
 }));
