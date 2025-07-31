@@ -8,7 +8,8 @@ async function limpiarContenidoDestacado() {
   const todos = await prisma.contenidoDestacado.findMany();
   let eliminados = 0;
   for (const c of todos) {
-    if (!c.media.startsWith('https://res.cloudinary.com')) {
+    // Elimina si no es Cloudinary o si es un banner de prueba (contiene '-demo' en la URL)
+    if (!c.media.startsWith('https://res.cloudinary.com') || c.media.includes('-demo')) {
       await prisma.contenidoDestacado.delete({ where: { id: c.id } });
       eliminados++;
       console.log(`Eliminado registro id=${c.id} media=${c.media}`);

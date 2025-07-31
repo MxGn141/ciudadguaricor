@@ -3,8 +3,11 @@ import { useContextoContenido } from '../../contexts/ContextoContenido';
 
 export default function BarraLateral() {
   const { contenidos } = useContextoContenido();
-  // Filtrar los contenidos destacados de la ubicación 'sidebar' y visibles
-  const contenidosSide = contenidos.filter(c => c.ubicacion === 'sidebar' && c.visible);
+  // Filtrar los contenidos destacados de las ubicaciones side-1 a side-6 y visibles, solo Cloudinary
+  const ubicacionesSide = ['side-1', 'side-2', 'side-3', 'side-4', 'side-5', 'side-6'];
+  const contenidosSide = contenidos.filter(
+    c => ubicacionesSide.includes(c.ubicacion) && c.visible && typeof c.media === 'string' && c.media.startsWith('https://res.cloudinary.com')
+  );
   // Debug: mostrar qué contenidos se encontraron
   console.log('Contenidos side encontrados:', contenidosSide);
 
@@ -69,27 +72,22 @@ export default function BarraLateral() {
           {contenidosSide.length === 0 ? (
             <p className="text-gray-500 text-center">No hay contenido relacionado</p>
           ) : (
-            contenidosSide.map((contenido, idx) => (
+            contenidosSide.map((contenido) => (
               <div key={contenido.id} className="mb-4">
                 {contenido.url ? (
                   <a href={contenido.url} target="_blank" rel="noopener noreferrer">
                     <img
                       src={contenido.media}
                       alt={contenido.titulo || 'Contenido relacionado'}
-                      className="w-full h-32 object-cover rounded"
+                      style={{ borderRadius: '0.5rem', maxWidth: '100%', height: 'auto', display: 'block', margin: '0 auto' }}
                     />
                   </a>
                 ) : (
                   <img
                     src={contenido.media}
                     alt={contenido.titulo || 'Contenido relacionado'}
-                    className="w-full h-32 object-cover rounded"
+                    style={{ borderRadius: '0.5rem', maxWidth: '100%', height: 'auto', display: 'block', margin: '0 auto' }}
                   />
-                )}
-                {contenido.titulo && (
-                  <div className="mt-2 text-center text-sm text-gray-700 font-medium">
-                    {contenido.titulo}
-                  </div>
                 )}
               </div>
             ))
