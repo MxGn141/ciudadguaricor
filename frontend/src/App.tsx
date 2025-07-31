@@ -19,7 +19,7 @@ export default function App() {
         <ProveedorContextoContenido>
           <Router>
             <Routes>
-              {/* Rutas públicas */}
+              {/* Rutas públicas ss */}
               <Route path="/" element={<LayoutPublico />}>
                 <Route index element={<PaginaPrincipal />} />
                 <Route path="seccion/:seccion" element={<PaginaSeccion />} />
