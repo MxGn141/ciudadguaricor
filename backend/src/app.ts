@@ -21,11 +21,11 @@ app.get('/', (req, res) => {
 });
 
 // Configuración de CORS
-
 app.use(cors({
   origin: [
-    'http://localhost:5173',
-    'https://ciudadguaricor.vercel.app'
+    'http://localhost:5173', // Desarrollo local
+    'https://ciudadguaricor.vercel.app', // Producción Vercel
+    'https://ciudadguaricor-git-test-mxgn141s-projects.vercel.app' // URL alternativa de Vercel
   ],
   credentials: true
 }));
