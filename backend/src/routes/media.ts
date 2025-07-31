@@ -13,9 +13,9 @@ router.post('/', upload.single('file'), async (req, res) => {
     
     const prisma = getPrismaClient();
     
-    // Guardar en la base de datos
-    const url = `/uploads/noticias/${req.file.filename}`;
-    const tipo = 'imagen'; // Solo imágenes por ahora
+    // Cloudinary devuelve la URL completa en req.file.path
+    const url = req.file.path; // URL completa de Cloudinary
+    const tipo = 'imagen';
     const descripcion = req.body.descripcion || null;
     
     const media = await prisma.media.create({

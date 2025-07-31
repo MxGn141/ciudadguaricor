@@ -89,7 +89,7 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
       // Cargar todos los banners del backend
       const bannersDelBackend = response.data.map((b: any) => ({
         ...b,
-        imagen: b.imagen && b.imagen.startsWith('/uploads') ? `https://ciudadguaricor.onrender.com${b.imagen}` : b.imagen,
+        imagen: b.imagen, // URL directa de Cloudinary
         // Agregar campos necesarios para el carrusel
         titulo: b.descripcion,
         posicion: b.posicion,
@@ -136,7 +136,7 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
             autorFoto: noticia.autorFoto,
             media: (noticia.media || []).map((m: any) => ({
               ...m,
-              url: m.url && m.url.startsWith('/uploads') ? `https://ciudadguaricor.onrender.com${m.url}` : m.url
+              url: m.url // URL directa de Cloudinary
             })),
             fecha_publicacion: noticia.fecha_publicacion,
             destacada: noticia.destacada,
@@ -206,7 +206,7 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
       // Procesar la imagen de la noticia recién creada
       const noticiaConImagen = {
         ...response.data,
-        imagen: response.data.imagen ? `https://ciudadguaricor.onrender.com${response.data.imagen}` : response.data.imagen
+        imagen: response.data.imagen // URL directa de Cloudinary
       };
       setNoticias(prev => [noticiaConImagen, ...prev]);
     } catch (error) {

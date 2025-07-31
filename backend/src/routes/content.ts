@@ -57,7 +57,8 @@ router.post('/banners', uploadPublicidad.single('file'), async (req, res) => {
     
     if (!posicion) return res.status(400).json({ message: 'La posición es obligatoria' });
     
-    const imagen = `/uploads/publicidad/${req.file.filename}`;
+    // Cloudinary devuelve la URL completa en req.file.path
+    const imagen = req.file.path;
     const banner = await prisma.publicidad.create({ 
       data: {
         imagen, 
@@ -92,7 +93,7 @@ router.put('/banners/:id', uploadPublicidad.single('file'), async (req, res) => 
     if (fecha_inicio !== undefined) updateData.fechaInicio = fecha_inicio ? new Date(fecha_inicio) : null;
     if (fecha_fin !== undefined) updateData.fechaFin = fecha_fin ? new Date(fecha_fin) : null;
     if (descripcion !== undefined) updateData.descripcion = descripcion;
-    if (req.file) updateData.imagen = `/uploads/publicidad/${req.file.filename}`;
+    if (req.file) updateData.imagen = req.file.path; // URL de Cloudinary
     
     const updatedBanner = await prisma.publicidad.update({
       where: { id: parseInt(req.params.id) },
