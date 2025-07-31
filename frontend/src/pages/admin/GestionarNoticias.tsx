@@ -28,7 +28,7 @@ export default function GestionarNoticias() {
   const [notificacion, setNotificacion] = useState<{ mensaje: string, tipo: 'exito' | 'error' } | null>(null);
 
   React.useEffect(() => {
-    axios.get('http://localhost:3000/api/sections').then(res => setSecciones(res.data));
+    axios.get('https://ciudadguaricor.onrender.com/api/sections').then(res => setSecciones(res.data));
     // Si tienes autores, cámbialo también si es necesario
     // axios.get('http://localhost:3000/api/authors').then(res => setAutores(res.data));
   }, []);

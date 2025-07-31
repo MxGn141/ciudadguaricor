@@ -16,7 +16,7 @@ export function ProveedorContextoAuth({ children }: { children: ReactNode }) {
 
   const iniciarSesion = async (usuario: string, contrasena: string): Promise<boolean> => {
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', {
+      const response = await axios.post('https://ciudadguaricor.onrender.com/api/auth/login', {
         username: usuario,
         password: contrasena
       });

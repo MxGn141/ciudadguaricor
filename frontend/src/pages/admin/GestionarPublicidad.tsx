@@ -52,12 +52,12 @@ export default function GestionarPublicidad() {
   const fetchBanners = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:3000/api/content/banners');
+      const res = await axios.get('https://ciudadguaricor.onrender.com/api/content/banners');
       // Asegúrate de que la URL sea absoluta
       const banners = res.data.map((b: any) => ({
         ...b,
         imagen: b.imagen && b.imagen.startsWith('/uploads')
-          ? `http://localhost:3000${b.imagen}`
+          ? `https://ciudadguaricor.onrender.com${b.imagen}`
           : b.imagen
       }));
       setBanners(banners);
@@ -115,9 +115,9 @@ export default function GestionarPublicidad() {
     data.append('visible', String(form.visible));
     try {
       if (editBanner) {
-        await axios.put(`http://localhost:3000/api/content/banners/${editBanner.id}`, data);
+        await axios.put(`https://ciudadguaricor.onrender.com/api/content/banners/${editBanner.id}`, data);
       } else {
-        await axios.post('http://localhost:3000/api/content/banners', data);
+        await axios.post('https://ciudadguaricor.onrender.com/api/content/banners', data);
       }
       setForm({ imagen: '', file: null, url: '', fecha_inicio: '', fecha_fin: '', descripcion: '', posicion: POSICIONES[0].key, visible: true });
       setFormOpen(false);
@@ -193,7 +193,7 @@ export default function GestionarPublicidad() {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('¿Eliminar este banner?')) return;
-    await axios.delete(`http://localhost:3000/api/content/banners/${id}`);
+    await axios.delete(`https://ciudadguaricor.onrender.com/api/content/banners/${id}`);
     fetchBanners();
   };
 
