@@ -132,17 +132,6 @@ export default function LoginAdmin() {
             </button>
           </form>
 
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600 mb-1">Credenciales de prueba:</p>
-            <div className="space-y-1 bg-gray-50 p-3 rounded-lg">
-              <p className="text-sm">
-                Usuario: <span className="font-mono text-[#4CAF50]">admin</span>
-              </p>
-              <p className="text-sm">
-                Contraseña: <span className="font-mono text-[#4CAF50]">ciudad2025</span>
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
