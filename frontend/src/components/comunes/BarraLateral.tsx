@@ -1,13 +1,15 @@
 import React from 'react';
 import { useContextoContenido } from '../../contexts/ContextoContenido';
+import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 
 export default function BarraLateral() {
   const { contenidos } = useContextoContenido();
-  // Filtrar los contenidos destacados de las ubicaciones side-1 a side-6 y visibles, solo Cloudinary
-  const ubicacionesSide = ['side-1', 'side-2', 'side-3', 'side-4', 'side-5', 'side-6'];
-  const contenidosSide = contenidos.filter(
-    c => ubicacionesSide.includes(c.ubicacion) && c.visible && typeof c.media === 'string' && c.media.startsWith('https://res.cloudinary.com')
-  );
+  const { publicidades } = useContextoNoticias();
+
+  // Filtrar los contenidos destacados con ubicación 'side' y visibles
+  const contenidosSide = Array.isArray(contenidos)
+    ? contenidos.filter(c => c.ubicacion === 'side' && c.visible)
+    : [];
   // Debug: mostrar qué contenidos se encontraron
   console.log('Contenidos side encontrados:', contenidosSide);
 
@@ -70,26 +72,27 @@ export default function BarraLateral() {
         </div>
         <div className="p-4 space-y-4">
           {contenidosSide.length === 0 ? (
-            <p className="text-gray-500 text-center">No hay contenido relacionado</p>
+            <div className="text-gray-400 text-center py-6">
+              No hay banners laterales disponibles.
+            </div>
           ) : (
-            contenidosSide.map((contenido) => (
-              <div key={contenido.id} className="mb-4">
-                {contenido.url ? (
-                  <a href={contenido.url} target="_blank" rel="noopener noreferrer">
-                    <img
-                      src={contenido.media}
-                      alt={contenido.titulo || 'Contenido relacionado'}
-                      style={{ borderRadius: '0.5rem', maxWidth: '100%', height: 'auto', display: 'block', margin: '0 auto' }}
-                    />
-                  </a>
-                ) : (
-                  <img
-                    src={contenido.media}
-                    alt={contenido.titulo || 'Contenido relacionado'}
-                    style={{ borderRadius: '0.5rem', maxWidth: '100%', height: 'auto', display: 'block', margin: '0 auto' }}
-                  />
+            contenidosSide.map((contenido, idx) => (
+              <a
+                key={contenido.id || idx}
+                href={contenido.url || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block hover:opacity-90 transition-opacity"
+              >
+                <img
+                  src={contenido.media}
+                  alt={contenido.titulo || 'Banner lateral'}
+                  className="w-full h-auto object-contain rounded-lg shadow"
+                />
+                {contenido.titulo && (
+                  <div className="mt-2 text-xs text-gray-600 text-center">{contenido.titulo}</div>
                 )}
-              </div>
+              </a>
             ))
           )}
         </div>

@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Save } from 'lucide-react';
 import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 import axios from 'axios';
+// TipTap imports
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
 
 // Notificación flotante
 function Notificacion({ mensaje, tipo, onClose }: { mensaje: string, tipo: 'exito' | 'error', onClose: () => void }) {
@@ -31,6 +35,14 @@ interface Autor {
 }
 
 export default function CrearNoticia({ onCreada }: Props) {
+  // TipTap editor para el contenido
+  const editor = useEditor({
+    extensions: [StarterKit, Image],
+    content: '',
+    onUpdate: ({ editor }) => {
+      setFormulario(prev => ({ ...prev, contenido: editor.getHTML() }));
+    },
+  });
   const { agregarNoticia } = useContextoNoticias();
   const [formulario, setFormulario] = useState({
     titulo: '',
@@ -110,6 +122,10 @@ export default function CrearNoticia({ onCreada }: Props) {
         destacada: false
       });
       setImagen(null);
+      // Limpiar también el editor
+      if (editor) {
+        editor.commands.setContent('');
+      }
       onCreada();
     } catch (error) {
       mostrarNotificacion('Error al crear la noticia', 'error');
@@ -119,7 +135,75 @@ export default function CrearNoticia({ onCreada }: Props) {
   return (
     <div className="space-y-6">
       {notificacion && <Notificacion mensaje={notificacion.mensaje} tipo={notificacion.tipo} onClose={() => setNotificacion(null)} />}
+      
+      {/* Estilos CSS para el editor TipTap */}
+      <style>{`
+        .editor-container .ProseMirror {
+          min-height: 400px !important;
+          padding: 16px !important;
+          font-size: 14px !important;
+          line-height: 1.6 !important;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          outline: none !important;
+          border: none !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+          color: #374151 !important;
+        }
+        
+        .editor-container .ProseMirror:focus {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        
+        .editor-container .ProseMirror p {
+          margin: 0 0 12px 0 !important;
+        }
+        
+        .editor-container .ProseMirror p:last-child {
+          margin-bottom: 0 !important;
+        }
+        
+        .editor-container .ProseMirror img {
+          max-width: 100% !important;
+          height: auto !important;
+          border-radius: 8px !important;
+          margin: 16px 0 !important;
+          display: block !important;
+        }
+        
+        .editor-container .ProseMirror.is-editor-empty:first-child::before {
+          color: #9ca3af !important;
+          content: "Escribe aquí el contenido de tu noticia. Puedes insertar imágenes usando el botón de arriba..." !important;
+          float: left !important;
+          height: 0 !important;
+          pointer-events: none !important;
+        }
+        
+        .editor-container .ProseMirror h1, 
+        .editor-container .ProseMirror h2, 
+        .editor-container .ProseMirror h3 {
+          font-weight: bold !important;
+          margin: 24px 0 16px 0 !important;
+        }
+        
+        .editor-container .ProseMirror h1 { font-size: 24px !important; }
+        .editor-container .ProseMirror h2 { font-size: 20px !important; }
+        .editor-container .ProseMirror h3 { font-size: 18px !important; }
+        
+        .editor-container .ProseMirror ul, 
+        .editor-container .ProseMirror ol {
+          margin: 12px 0 !important;
+          padding-left: 24px !important;
+        }
+        
+        .editor-container .ProseMirror li {
+          margin: 4px 0 !important;
+        }
+      `}</style>
+
       <h2 className="text-2xl font-bold text-gray-900">Crear Nueva Noticia</h2>
+      
       <form onSubmit={manejarSubmit} encType="multipart/form-data" className="bg-white rounded-lg shadow-md p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
@@ -190,6 +274,7 @@ export default function CrearNoticia({ onCreada }: Props) {
               required
             />
           </div>
+          
           <div className="md:col-span-2">
             <label htmlFor="autorFoto" className="block text-sm font-medium text-gray-700 mb-2">
               Autor de Foto *
@@ -225,22 +310,68 @@ export default function CrearNoticia({ onCreada }: Props) {
           <p className="text-xs text-gray-500 mt-1">{formulario.resumen.length}/300 caracteres</p>
         </div>
 
+        {/* EDITOR DE CONTENIDO MEJORADO */}
         <div>
           <label htmlFor="contenido" className="block text-sm font-medium text-gray-700 mb-2">
             Contenido de la Noticia *
           </label>
-          <textarea
-            id="contenido"
-            name="contenido"
-            value={formulario.contenido}
-            onChange={manejarCambio}
-            rows={10}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            placeholder="Contenido completo de la noticia"
-            maxLength={5000}
-            required
-          />
-          <p className="text-xs text-gray-500 mt-1">{formulario.contenido.length}/5000 caracteres</p>
+          
+          {/* Contenedor principal del editor */}
+          <div className="editor-container border border-gray-300 rounded-lg bg-white overflow-hidden shadow-sm">
+            {/* Barra de herramientas */}
+            <div className="border-b border-gray-200 px-4 py-3 bg-gray-50">
+              <button
+                type="button"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+                onClick={() => document.getElementById('input-img-editor')?.click()}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
+                </svg>
+                Insertar imagen
+              </button>
+              
+              <input
+                type="file"
+                id="input-img-editor"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={async (e) => {
+                  if (!e.target.files || !e.target.files[0] || !editor) return;
+                  const file = e.target.files[0];
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  try {
+                    const res = await fetch('https://ciudadguaricor.onrender.com/api/media', {
+                      method: 'POST',
+                      body: formData
+                    });
+                    if (!res.ok) throw new Error('Error al subir la imagen');
+                    const data = await res.json();
+                    if (!data.url) throw new Error('No se obtuvo la URL de la imagen');
+                    editor.chain().focus().setImage({ src: data.url }).run();
+                    mostrarNotificacion('Imagen insertada correctamente', 'exito');
+                  } catch (err) {
+                    mostrarNotificacion('Error al subir la imagen', 'error');
+                  } finally {
+                    e.target.value = '';
+                  }
+                }}
+              />
+            </div>
+            
+            {/* Área del editor - con altura mínima grande */}
+            <div className="min-h-[400px] w-full">
+              <EditorContent 
+                editor={editor}
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+          
+          <p className="text-xs text-gray-500 mt-2">
+            {formulario.contenido.replace(/<[^>]+>/g, '').length}/5000 caracteres (texto)
+          </p>
         </div>
 
         <div className="flex items-center">
@@ -271,6 +402,10 @@ export default function CrearNoticia({ onCreada }: Props) {
                 destacada: false
               });
               setImagen(null);
+              // Limpiar también el editor
+              if (editor) {
+                editor.commands.setContent('');
+              }
             }}
             className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >

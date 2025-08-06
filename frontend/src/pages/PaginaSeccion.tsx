@@ -3,10 +3,10 @@ import { useParams, Navigate, Link } from 'react-router-dom';
 import { useContextoNoticias, Noticia } from '../contexts/ContextoNoticias';
 import { Calendar, Clock } from 'lucide-react';
 
-const seccionesValidas = ['Nacionales', 'Municipales', 'Deportes', 'Cultura', 'Produccion', 'Comunidad', 'Seguridad', 'Turismo'];
+const seccionesValidas = ['Gestión', 'Municipales', 'Deportes', 'Cultura', 'Produccion', 'Comunidad', 'Seguridad', 'Turismo'];
 
 const coloresSeccion = {
-  'Nacionales': 'from-blue-600 to-blue-800',
+  'Gestión': 'from-blue-600 to-blue-800',
   'Municipales': 'from-green-600 to-green-800',
   'Deportes': 'from-yellow-600 to-yellow-800',
   'Cultura': 'from-purple-600 to-purple-800',

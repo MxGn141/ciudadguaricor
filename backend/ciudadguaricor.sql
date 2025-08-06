@@ -209,7 +209,7 @@ INSERT INTO `secciones` (`id`, `nombre`) VALUES
 (4, 'Cultura'),
 (3, 'Deportes'),
 (2, 'Municipales'),
-(1, 'Nacionales'),
+(1, 'Gestion'),
 (5, 'Produccion'),
 (7, 'Seguridad'),
 (8, 'Turismo');

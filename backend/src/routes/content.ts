@@ -59,7 +59,6 @@ router.post('/contenido-destacado', uploadContenido.single('file'), async (req, 
     
     // Cloudinary devuelve la URL completa en req.file.path
     const media = req.file.path;
-    console.log('MEDIA GUARDADA EN CONTENIDO DESTACADO:', media);
     const contenido = await prisma.contenidoDestacado.create({ 
       data: {
         media, 
@@ -71,7 +70,7 @@ router.post('/contenido-destacado', uploadContenido.single('file'), async (req, 
         visible: true
       }
     });
-    console.log('CONTENIDO DESTACADO CREADO:', contenido);
+    
     res.status(201).json(contenido);
   } catch (error) {
     console.error('Error al crear contenido destacado:', error);

@@ -130,12 +130,12 @@ export default function VistaNoticia() {
         </p>
         
         <div className="text-gray-800 leading-relaxed space-y-4">
-          {noticia.contenido.split('\n').map((parrafo, index) => (
-            <p key={index} className="text-lg leading-relaxed text-justify break-words overflow-wrap break-word">
-              {parrafo}
-            </p>
-          ))}
-        </div>
+  {/* Renderizar el contenido como HTML enriquecido (incluyendo imágenes) */}
+  <div
+    className="prose prose-lg max-w-none"
+    dangerouslySetInnerHTML={{ __html: noticia.contenido }}
+  />
+</div>
       </div>
 
       {/* Noticias relacionadas */}

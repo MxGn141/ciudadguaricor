@@ -51,6 +51,7 @@ export default function CarruselNoticias() {
     <div className="relative group">
       <div className="relative h-[400px] md:h-[500px] overflow-hidden rounded-xl">
         {noticiasParaMostrar.map((noticia, index) => {
+          console.log('Carrusel noticia:', noticia);
           // Obtener la imagen principal desde media
           const imagenPrincipal = noticia.media?.find(m => m.tipo === 'imagen')?.url || '';
           // Obtener nombre de la sección
@@ -79,9 +80,6 @@ export default function CarruselNoticias() {
                     <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 group-hover:text-guarico-gold transition-colors">
                       {noticia.titulo}
                     </h2>
-                    <p className="text-gray-200 text-sm md:text-base line-clamp-2">
-                      {noticia.resumen}
-                    </p>
                   </div>
                 </div>
               </Link>

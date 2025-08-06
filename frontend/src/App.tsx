@@ -12,6 +12,15 @@ import LoginAdmin from './pages/admin/LoginAdmin';
 import DashboardAdmin from './pages/admin/DashboardAdmin';
 import GestionarContenidoDestacado from './pages/admin/GestionarPublicidad';
 
+const Opinion = React.lazy(() => import('./pages/Opinion'));
+const OpinionEditoriales = React.lazy(() => import('./pages/OpinionEditoriales'));
+const OpinionColumnistas = React.lazy(() => import('./pages/OpinionColumnistas'));
+const OpinionDetalleEditorial = React.lazy(() => import('./pages/OpinionDetalleEditorial'));
+const OpinionDetalleColumnista = React.lazy(() => import('./pages/OpinionDetalleColumnista'));
+
+
+
+
 export default function App() {
   return (
     <ProveedorContextoAuth>
@@ -25,6 +34,12 @@ export default function App() {
                 <Route path="seccion/:seccion" element={<PaginaSeccion />} />
                 <Route path="noticia/:id" element={<VistaNoticia />} />
                 <Route path="buscar" element={<ResultadosBusqueda />} />
+                {/* Opinión */}
+                <Route path="opinion" element={<React.Suspense fallback={null}><Opinion /></React.Suspense>} />
+                <Route path="opinion/editoriales" element={<React.Suspense fallback={null}><OpinionEditoriales /></React.Suspense>} />
+                <Route path="opinion/columnistas" element={<React.Suspense fallback={null}><OpinionColumnistas /></React.Suspense>} />
+                <Route path="opinion/editorial/:id" element={<React.Suspense fallback={null}><OpinionDetalleEditorial /></React.Suspense>} />
+                <Route path="opinion/columnista/:id" element={<React.Suspense fallback={null}><OpinionDetalleColumnista /></React.Suspense>} />
               </Route>
               
               {/* Rutas de administración */}

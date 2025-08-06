@@ -6,7 +6,7 @@ import { useContextoContenido } from '../contexts/ContextoContenido';
 import TarjetaNoticia from '../components/noticias/TarjetaNoticia';
 
 const secciones = [
-  { nombre: 'Nacionales', color: 'bg-blue-600', limite: 3 },
+  { nombre: 'Gestión', color: 'bg-blue-600', limite: 3 },
   { nombre: 'Municipales', color: 'bg-green-600', limite: 3 },
   { nombre: 'Deportes', color: 'bg-yellow-600', limite: 3 },
   { nombre: 'Cultura', color: 'bg-purple-600', limite: 3 },
@@ -18,7 +18,7 @@ const secciones = [
 
 // Paleta de colores para cada sección (igual que en PaginaSeccion)
 const coloresSeccion = {
-  'Nacionales': 'bg-blue-600 text-white',
+  'Gestión': 'bg-blue-600 text-white',
   'Municipales': 'bg-green-600 text-white',
   'Deportes': 'bg-yellow-500 text-gray-900',
   'Cultura': 'bg-purple-600 text-white',
@@ -76,7 +76,7 @@ export default function PaginaPrincipal() {
   }, [noticias]);
 
   const cargarNoticiasPorSeccion = async () => {
-    const secciones = ['Nacionales', 'Municipales', 'Deportes', 'Cultura', 'Produccion', 'Comunidad', 'Seguridad', 'Turismo'];
+    const secciones = ['Gestión', 'Municipales', 'Deportes', 'Cultura', 'Produccion', 'Comunidad', 'Seguridad', 'Turismo'];
     const noticiasTemp: Record<string, Noticia[]> = {};
     
     for (const seccion of secciones) {
@@ -128,7 +128,7 @@ export default function PaginaPrincipal() {
           <div className={`flex-1 h-0.5 ml-4 ${coloresSeccion[seccion as keyof typeof coloresSeccion]?.split(' ')[0] || 'bg-blue-600'} opacity-30`} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {noticiasSeccion.map((noticia) => (
+          {noticiasSeccion.slice(0, 6).map((noticia) => (
             <TarjetaNoticia key={noticia.id} noticia={noticia} />
           ))}
         </div>

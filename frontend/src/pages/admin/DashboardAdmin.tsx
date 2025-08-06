@@ -18,8 +18,20 @@ import CrearNoticia from './CrearNoticia';
 import GestionarPublicidad from './GestionarPublicidad';
 import EstadisticasPanel from './EstadisticasPanel';
 import EdicionPDF from './EdicionPDF';
+import GestionarColumnistas from './GestionarColumnistas';
+import GestionarEditoriales from './GestionarEditoriales';
+import GestionarOpiniones from './GestionarOpiniones';
 
-type VistaActiva = 'resumen' | 'noticias' | 'crear' | 'publicidad' | 'estadisticas' | 'pdf';
+type VistaActiva =
+  | 'resumen'
+  | 'noticias'
+  | 'crear'
+  | 'publicidad'
+  | 'estadisticas'
+  | 'pdf'
+  | 'columnistas'
+  | 'editoriales'
+  | 'opiniones';
 
 export default function DashboardAdmin() {
   const [vistaActiva, setVistaActiva] = useState<VistaActiva>('resumen');
@@ -44,6 +56,10 @@ export default function DashboardAdmin() {
     { id: 'publicidad', nombre: 'Publicidad', icono: Image },
     { id: 'estadisticas', nombre: 'Estadísticas', icono: Settings },
     { id: 'pdf', nombre: 'Edición PDF', icono: FileText },
+    // Opinión
+    { id: 'columnistas', nombre: 'Columnistas', icono: Users },
+    { id: 'editoriales', nombre: 'Editoriales', icono: FileText },
+    { id: 'opiniones', nombre: 'Opiniones', icono: FileText },
   ];
 
   const noticiasDestacadas = noticias.filter(n => n.destacada).length;
@@ -139,6 +155,12 @@ export default function DashboardAdmin() {
         return <EstadisticasPanel />;
       case 'pdf':
         return <EdicionPDF />;
+      case 'columnistas':
+        return <GestionarColumnistas />;
+      case 'editoriales':
+        return <GestionarEditoriales />;
+      case 'opiniones':
+        return <GestionarOpiniones />;
       default:
         return null;
     }

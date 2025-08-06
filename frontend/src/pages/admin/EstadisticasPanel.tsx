@@ -16,13 +16,31 @@ export default function EstadisticasPanel() {
   
   // Noticias por sección
   const noticiasPorSeccion = noticias.reduce((acc, noticia) => {
-    acc[noticia.seccion] = (acc[noticia.seccion] || 0) + 1;
+    let clave = '';
+    if (noticia.seccion && typeof noticia.seccion === 'object' && noticia.seccion.nombre) {
+      clave = noticia.seccion.nombre;
+    } else if (typeof noticia.seccion === 'string') {
+      clave = noticia.seccion;
+    } else {
+      clave = 'Sin sección';
+    }
+    acc[clave] = (acc[clave] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   // Noticias por mes
   const noticiasPorMes = noticias.reduce((acc, noticia) => {
-    const mes = noticia.fechaPublicacion.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    const fecha = noticia.fecha_publicacion;
+    if (!fecha) return acc;
+    let fechaObj;
+    if (fecha instanceof Date) {
+      fechaObj = fecha;
+    } else {
+      const parsed = new Date(fecha);
+      if (isNaN(parsed.getTime())) return acc;
+      fechaObj = parsed;
+    }
+    const mes = fechaObj.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
     acc[mes] = (acc[mes] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -173,14 +191,14 @@ export default function EstadisticasPanel() {
           <div>
             <h4 className="font-medium text-gray-700 mb-2">Publicidad del Carrusel</h4>
             <p className="text-2xl font-bold text-blue-600">
-              {publicidades.filter(p => p.tipo === 'carrusel').length}
+              {publicidades.filter(p => p.tipo && p.tipo === 'carrusel').length}
             </p>
             <p className="text-sm text-gray-500">anuncios activos</p>
           </div>
           <div>
             <h4 className="font-medium text-gray-700 mb-2">Publicidad del Sidebar</h4>
             <p className="text-2xl font-bold text-green-600">
-              {publicidades.filter(p => p.tipo === 'sidebar').length}
+              {publicidades.filter(p => p.tipo && p.tipo === 'sidebar').length}
             </p>
             <p className="text-sm text-gray-500">de 6 espacios disponibles</p>
           </div>

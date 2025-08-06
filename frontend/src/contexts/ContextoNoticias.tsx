@@ -30,6 +30,7 @@ export interface Publicidad {
   descripcion?: string;
   posicion: string;
   visible?: boolean;
+  tipo: 'carrusel' | 'sidebar' | 'header' | string; // Tipo de publicidad
 }
 
 export interface ContenidoDestacado {
@@ -70,16 +71,19 @@ const publicidadesIniciales: Publicidad[] = [
     imagen: 'https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=400',
     posicion: 'header-bg',
     descripcion: 'Banco Regional Guárico',
-    visible: true
+    visible: true,
+    tipo: 'header'
   },
   {
     id: '2',
     imagen: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=400',
     posicion: 'main-1',
     descripcion: 'Supermercados El Llano',
-    visible: true
+    visible: true,
+    tipo: 'sidebar'
   }
 ];
+
 
 const API_URL = 'https://ciudadguaricor.onrender.com/api'; // Backend en producción
 

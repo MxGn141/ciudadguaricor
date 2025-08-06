@@ -8,6 +8,9 @@ import newsRoutes from './routes/news';
 import contentRoutes from './routes/content';
 import sectionsRoutes from './routes/sections';
 import mediaRoutes from './routes/media';
+import columnistaRoutes from './routes/columnista';
+import editorialRoutes from './routes/editorial';
+import opinionRoutes from './routes/opinion';
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -36,6 +39,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Servir archivos estáticos de uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Inicializar base de datos y servidor
 const startServer = async () => {
@@ -49,6 +54,9 @@ const startServer = async () => {
     app.use('/api/content', contentRoutes);
     app.use('/api/sections', sectionsRoutes);
     app.use('/api/media', mediaRoutes);
+    app.use('/api/columnistas', columnistaRoutes);
+    app.use('/api/editoriales', editorialRoutes);
+    app.use('/api/opiniones', opinionRoutes);
 
     // Manejo básico de errores
     app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

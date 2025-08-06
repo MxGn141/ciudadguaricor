@@ -6,9 +6,9 @@ import axios from 'axios';
 const POSICIONES = [
   { key: 'carrusel', label: 'Carrusel Superior (Máx. 7)', maxItems: 7, description: 'Contenidos que aparecen en el carrusel superior del sitio' },
   { key: 'header-bg', label: 'Header (Fondo Principal)', maxItems: 1, description: 'Contenido de fondo para el header principal' },
-  { key: 'principal-izq', label: 'Principal Izquierda', maxItems: 1, description: 'Contenido principal izquierdo' },
-  { key: 'principal-der', label: 'Principal Derecha', maxItems: 1, description: 'Contenido principal derecho' },
-  { key: 'principal-fondo', label: 'Principal Fondo', maxItems: 1, description: 'Contenido de fondo para la sección principal' },
+  { key: 'main-1', label: 'Main 1', maxItems: 1, description: 'Contenido principal izquierdo' },
+  { key: 'main-2', label: 'Main 2', maxItems: 1, description: 'Contenido principal derecho' },
+  { key: 'main-bg', label: 'Main Fondo', maxItems: 1, description: 'Contenido de fondo para la sección principal' },
   { key: 'side-1', label: 'Side 1', maxItems: 1, description: 'Contenido lateral superior' },
   { key: 'side-2', label: 'Side 2', maxItems: 1, description: 'Contenido lateral medio' },
   { key: 'side-3', label: 'Side 3', maxItems: 1, description: 'Contenido lateral inferior' },
@@ -140,9 +140,9 @@ export default function GestionarContenidoDestacado() {
         case 'header-bg':
           return { width: '100%', height: '200px', objectFit: 'cover' } as const;
         case 'main-1':
-        case 'principal-izq':
-        case 'principal-der':
-        case 'principal-fondo':
+        case 'main-2':
+          return { width: '300px', height: '150px', objectFit: 'cover' } as const;
+        case 'main-bg':
           return { width: '400px', height: '200px', objectFit: 'cover' } as const;
         case 'side-1':
         case 'side-2':

@@ -34,7 +34,7 @@ export default function PiePagina() {
           <div>
             <h4 className="text-lg font-semibold mb-4 text-guarico-gold">Secciones</h4>
             <ul className="space-y-3 text-gray-300">
-              <li><Link to="/seccion/Nacionales" className="hover:text-guarico-gold transition-colors">Nacionales</Link></li>
+              <li><Link to="/seccion/Gestión" className="hover:text-guarico-gold transition-colors">Gestión</Link></li>
               <li><Link to="/seccion/Municipales" className="hover:text-guarico-gold transition-colors">Municipales</Link></li>
               <li><Link to="/seccion/Deportes" className="hover:text-guarico-gold transition-colors">Deportes</Link></li>
               <li><Link to="/seccion/Cultura" className="hover:text-guarico-gold transition-colors">Cultura</Link></li>
