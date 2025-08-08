@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Home, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useContextoNoticias, Noticia } from '../contexts/ContextoNoticias';
-import { useContextoContenido } from '../contexts/ContextoContenido';
 import TarjetaNoticia from '../components/noticias/TarjetaNoticia';
 
 const secciones = [
@@ -32,14 +31,13 @@ export default function PaginaPrincipal() {
   const [noticiasPorSeccion, setNoticiasPorSeccion] = useState<Record<string, Noticia[]>>({});
   const [todasLasNoticias, setTodasLasNoticias] = useState<Noticia[]>([]);
   const [noticiasDestacadas, setNoticiasDestacadas] = useState<Noticia[]>([]);
-  const { obtenerNoticiasPorSeccion, noticias, cargandoBusqueda, publicidades } = useContextoNoticias();
-  const { contenidos } = useContextoContenido();
+  const { obtenerNoticiasPorSeccion, noticias, cargandoBusqueda, publicidades, contenidos } = useContextoNoticias();
   const [noticiaActual, setNoticiaActual] = useState(0);
 
-  // Filtrar contenido destacado por ubicación (nombres neutrales)
-  const contenidoMain1 = contenidos.find(c => c.ubicacion === 'principal-izq' && c.visible);
-  const contenidoMain2 = contenidos.find(c => c.ubicacion === 'principal-der' && c.visible);
-  const contenidoMainBg = contenidos.find(c => c.ubicacion === 'principal-fondo' && c.visible);
+  // Filtrar contenido destacado por ubicación (coincidiendo con backend)
+  const contenidoMain1 = contenidos.find(c => c.ubicacion === 'main-1' && c.visible);
+  const contenidoMain2 = contenidos.find(c => c.ubicacion === 'main-2' && c.visible);
+  const contenidoMainBg = contenidos.find(c => c.ubicacion === 'main-bg' && c.visible); // Fondo del main, no del header
 
   // Función para convertir fecha a Date si es string
   const convertirFecha = (fecha: Date | string): Date => {

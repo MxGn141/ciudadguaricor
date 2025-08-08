@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ProveedorContextoNoticias } from './contexts/ContextoNoticias';
 import { ProveedorContextoAuth } from './contexts/ContextoAuth';
-import { ProveedorContextoContenido } from './contexts/ContextoContenido';
 import LayoutPublico from './components/layout/LayoutPublico';
 import PaginaPrincipal from './pages/PaginaPrincipal';
 import VistaNoticia from './pages/VistaNoticia';
@@ -25,7 +24,6 @@ export default function App() {
   return (
     <ProveedorContextoAuth>
       <ProveedorContextoNoticias>
-        <ProveedorContextoContenido>
           <Router>
             <Routes>
               {/* Rutas públicas */}
@@ -48,7 +46,6 @@ export default function App() {
               <Route path="/admin/contenido-destacado" element={<GestionarContenidoDestacado />} />
             </Routes>
           </Router>
-        </ProveedorContextoContenido>
       </ProveedorContextoNoticias>
     </ProveedorContextoAuth>
   );

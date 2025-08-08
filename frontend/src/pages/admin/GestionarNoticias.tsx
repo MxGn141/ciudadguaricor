@@ -63,8 +63,33 @@ export default function GestionarNoticias() {
 
   const alternarDestacada = async (id: string | number, destacada: boolean) => {
     try {
+      // Si se intenta marcar como destacada, verificar el límite
+      if (!destacada) {
+        const noticiasDestacadas = noticias.filter(n => n.destacada && n.id !== id);
+        if (noticiasDestacadas.length >= 3) {
+          // Preguntar al usuario si quiere continuar
+          const confirmar = window.confirm(
+            `Ya hay 3 noticias destacadas (máximo permitido).\n\n¿Deseas continuar? Esto reemplazará automáticamente la noticia destacada más antigua.`
+          );
+          if (!confirmar) {
+            mostrarNotificacion('Operación cancelada', 'error');
+            return; // Salir sin hacer nada
+          }
+        }
+      }
+      
       await editarNoticia(String(id), { destacada: !destacada });
-      mostrarNotificacion('Estado de destacada actualizado', 'exito');
+      
+      // Esperar un momento para que el backend procese y luego recargar
+      setTimeout(async () => {
+        await cargarNoticias();
+        mostrarNotificacion(
+          destacada 
+            ? 'Noticia removida de destacadas' 
+            : 'Noticia marcada como destacada', 
+          'exito'
+        );
+      }, 800);
     } catch (error) {
       mostrarNotificacion('Error al actualizar destacada', 'error');
     }

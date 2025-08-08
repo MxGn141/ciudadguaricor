@@ -169,6 +169,23 @@ router.post('/', upload.none(), async (req, res) => {
       console.error('Sección no válida:', seccion_id);
       return res.status(400).json({ message: 'Sección no válida' });
     }
+    // Si se marca como destacada, verificar el límite de 3
+    if (!!destacada) {
+      const noticiasDestacadas = await prisma.noticia.findMany({
+        where: { destacada: true },
+        orderBy: { fechaPublicacion: 'asc' }, // Más antigua primero
+        select: { id: true }
+      });
+      
+      // Si ya hay 3 destacadas, quitar la más antigua
+      if (noticiasDestacadas.length >= 3) {
+        await prisma.noticia.update({
+          where: { id: noticiasDestacadas[0].id },
+          data: { destacada: false }
+        });
+      }
+    }
+
     const noticia = await prisma.noticia.create({
       data: {
         titulo,
@@ -238,7 +255,26 @@ router.put('/:id', async (req, res) => {
     if (titulo !== undefined) updateData.titulo = titulo;
     if (contenido !== undefined) updateData.contenido = contenido;
     if (resumen !== undefined) updateData.resumen = resumen;
-    if (destacada !== undefined) updateData.destacada = !!destacada;
+    if (destacada !== undefined) {
+      updateData.destacada = !!destacada;
+      
+      // Si se marca como destacada, verificar el límite de 3
+      if (!!destacada && !noticia.destacada) { // Solo si no era destacada antes
+        const noticiasDestacadas = await prisma.noticia.findMany({
+          where: { destacada: true },
+          orderBy: { fechaPublicacion: 'asc' }, // Más antigua primero
+          select: { id: true }
+        });
+        
+        // Si ya hay 3 destacadas, quitar la más antigua
+        if (noticiasDestacadas.length >= 3) {
+          await prisma.noticia.update({
+            where: { id: noticiasDestacadas[0].id },
+            data: { destacada: false }
+          });
+        }
+      }
+    }
     if (fecha_publicacion !== undefined) updateData.fechaPublicacion = new Date(fecha_publicacion);
     
     const updatedNoticia = await prisma.noticia.update({

@@ -8,6 +8,7 @@ const seccionesPrincipales = [
   { nombre: 'GESTIÓN', ruta: '/seccion/Gestión' },
   { nombre: 'MUNICIPALES', ruta: '/seccion/Municipales' },
   { nombre: 'DEPORTES', ruta: '/seccion/Deportes' },
+  { nombre: 'SALUD', ruta: '/seccion/Salud' },
   { nombre: 'CULTURA', ruta: '/seccion/Cultura' },
   { nombre: 'PRODUCCIÓN', ruta: '/seccion/Produccion' },
 ];

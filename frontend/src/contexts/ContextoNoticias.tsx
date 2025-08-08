@@ -48,6 +48,7 @@ interface ContextoNoticiasType {
   noticias: Noticia[];
   publicidades: Publicidad[];
   contenidosDestacados: ContenidoDestacado[];
+  contenidos: ContenidoDestacado[]; // Alias para compatibilidad con ContextoContenido
   agregarNoticia: (formData: FormData) => Promise<void>;
   editarNoticia: (id: string, noticia: Partial<Noticia>) => Promise<void>;
   eliminarNoticia: (id: string) => Promise<void>;
@@ -60,6 +61,7 @@ interface ContextoNoticiasType {
   setTerminoBusqueda: (termino: string) => void;
   cargandoBusqueda: boolean;
   cargarNoticias: () => Promise<void>;
+  cargarContenidos: () => Promise<void>; // Alias para compatibilidad
 }
 
 const ContextoNoticias = createContext<ContextoNoticiasType | undefined>(undefined);
@@ -151,6 +153,12 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
       setNoticias([]);
     }
   };
+
+  // Cargar contenidos destacados al inicializar
+  useEffect(() => {
+    cargarNoticias();
+    cargarContenidosDestacados();
+  }, []);
 
   // Búsqueda global en el backend en tiempo real (autosuggest)
   React.useEffect(() => {
@@ -310,7 +318,8 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
     <ContextoNoticias.Provider value={{
       noticias,
       publicidades,
-      contenidosDestacados, // Agregar contenidos destacados al contexto
+      contenidosDestacados,
+      contenidos: contenidosDestacados, // Alias para compatibilidad
       agregarNoticia,
       editarNoticia,
       eliminarNoticia,
@@ -322,7 +331,8 @@ export function ProveedorContextoNoticias({ children }: { children: ReactNode })
       obtenerNoticiaPorId,
       setTerminoBusqueda,
       cargandoBusqueda,
-      cargarNoticias
+      cargarNoticias,
+      cargarContenidos: cargarContenidosDestacados // Alias para compatibilidad
     }}>
       {children}
     </ContextoNoticias.Provider>

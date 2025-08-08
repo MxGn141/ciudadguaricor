@@ -4,12 +4,18 @@ import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 export default function CarruselContenidoDestacado() {
   const { contenidosDestacados } = useContextoNoticias();
   
+  // Debug: mostrar todos los contenidos disponibles
+  console.log('Contenidos destacados para carrusel:', contenidosDestacados);
+  console.log('Ubicaciones disponibles:', contenidosDestacados.map(c => c.ubicacion));
+  
   // Filtrar contenidos para el carrusel (solo contenidos específicos para carrusel)
   const contenidosCarrusel = contenidosDestacados.filter(cont => {
     const esTipoCarrusel = (cont as any).tipo === 'carrusel';
-    const esUbicacionCarrusel = ['carrusel', 'banner-carrusel'].includes(cont.ubicacion);
+    const esUbicacionCarrusel = cont.ubicacion === 'carrusel';
     return esTipoCarrusel || esUbicacionCarrusel;
   }).slice(0, 7); // Límite de 7 contenidos
+  
+  console.log('Contenidos filtrados para carrusel:', contenidosCarrusel);
   
   if (contenidosCarrusel.length === 0) {
     return (

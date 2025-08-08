@@ -1,17 +1,18 @@
 import React from 'react';
-import { useContextoContenido } from '../../contexts/ContextoContenido';
 import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 
 export default function BarraLateral() {
-  const { contenidos } = useContextoContenido();
-  const { publicidades } = useContextoNoticias();
+  const { contenidos } = useContextoNoticias();
 
-  // Filtrar los contenidos destacados con ubicación 'side' y visibles
+  // Filtrar los contenidos destacados con ubicaciones laterales (side-1, side-2, etc.) y visibles
   const contenidosSide = Array.isArray(contenidos)
-    ? contenidos.filter(c => c.ubicacion === 'side' && c.visible)
+    ? contenidos.filter(c => c.ubicacion?.startsWith('side-') && c.visible)
     : [];
+  
   // Debug: mostrar qué contenidos se encontraron
+  console.log('Todos los contenidos:', contenidos);
   console.log('Contenidos side encontrados:', contenidosSide);
+  console.log('Ubicaciones disponibles:', contenidos.map(c => c.ubicacion));
 
   return (
     <aside className="space-y-6">

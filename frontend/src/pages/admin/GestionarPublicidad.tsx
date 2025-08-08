@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useContextoContenido } from '../../contexts/ContextoContenido';
+import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 import { Upload, X, Eye, EyeOff, Plus, Image as ImageIcon, Settings, Users } from 'lucide-react';
 import axios from 'axios';
 

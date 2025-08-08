@@ -4,10 +4,14 @@ import { Facebook, Twitter, Instagram } from 'lucide-react';
 import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 
 export default function EncabezadoPrincipal() {
-  const { publicidades } = useContextoNoticias();
+  const { contenidos } = useContextoNoticias();
   
   // Buscar el banner header-bg para usarlo como fondo
-  const bannerHeader = publicidades.find(pub => pub.posicion === 'header-bg');
+  const bannerHeader = contenidos.find(cont => cont.ubicacion === 'header-bg' && cont.visible);
+  
+  // Debug: mostrar qué contenidos se encontraron
+  console.log('Contenidos header encontrados:', contenidos.filter(c => c.ubicacion === 'header-bg'));
+  console.log('Banner header seleccionado:', bannerHeader);
 
   return (
     <header className="w-full">
@@ -55,7 +59,7 @@ export default function EncabezadoPrincipal() {
           className="relative w-full"
           style={{
             height: 'clamp(120px, 25vw, 256px)',
-            backgroundImage: `url(${bannerHeader?.imagen || '/media/contenido/header-bg.png'})`,
+            backgroundImage: `url(${bannerHeader?.media || '/media/contenido/header-bg.png'})`,
             backgroundSize: '100% 100%',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
