@@ -53,16 +53,17 @@ export default function EncabezadoPrincipal() {
       </div>
 
       {/* Encabezado principal con imagen de fondo */}
-      <div className="w-full relative">
+      <div className="w-full relative overflow-hidden">
         {/* Imagen de fondo */}
         <div 
-          className="relative w-full"
+          className="relative w-full bg-cover bg-center bg-no-repeat"
           style={{
-            height: 'clamp(120px, 25vw, 256px)',
+            height: 'clamp(140px, 30vw, 280px)',
             backgroundImage: `url(${bannerHeader?.media || '/media/contenido/header-bg.png'})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'scroll'
           }}
         >
           {bannerHeader?.url && (
@@ -76,15 +77,15 @@ export default function EncabezadoPrincipal() {
           )}
           
           {/* Contenido del encabezado */}
-          <div className="relative z-20 max-w-7xl mx-auto px-4 h-full flex items-center justify-center">
+          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-center">
             {/* Logo */}
             <Link to="/" className="block">
               <img 
                 src="/logo.png"
                 alt="Logo Ciudad Guárico" 
-                className="w-auto transition-transform duration-300 hover:scale-105"
+                className="w-auto transition-transform duration-300 hover:scale-105 max-w-full"
                 style={{
-                  height: 'clamp(80px, 20vw, 200px)',
+                  height: 'clamp(70px, 18vw, 180px)',
                   filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))'
                 }}
               />
