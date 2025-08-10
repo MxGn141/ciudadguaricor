@@ -51,6 +51,7 @@ const startServer = async () => {
     // Rutas
     app.use('/api/auth', authRoutes);
     app.use('/api/news', newsRoutes);
+    app.use('/api/noticias', newsRoutes); // Alias para compatibilidad con frontend
     app.use('/api/content', contentRoutes);
     app.use('/api/sections', sectionsRoutes);
     app.use('/api/media', mediaRoutes);
@@ -67,8 +68,8 @@ const startServer = async () => {
       });
     });
 
-    // Puerto
-    const PORT = process.env.PORT || 3000;
+    // Puerto - Usar 3000 como solicita el usuario
+    const PORT = 3000;
 
     // Iniciar servidor
     app.listen(PORT, () => {

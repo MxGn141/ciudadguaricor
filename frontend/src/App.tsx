@@ -36,8 +36,8 @@ export default function App() {
                 <Route path="opinion" element={<React.Suspense fallback={null}><Opinion /></React.Suspense>} />
                 <Route path="opinion/editoriales" element={<React.Suspense fallback={null}><OpinionEditoriales /></React.Suspense>} />
                 <Route path="opinion/columnistas" element={<React.Suspense fallback={null}><OpinionColumnistas /></React.Suspense>} />
-                <Route path="opinion/editorial/:id" element={<React.Suspense fallback={null}><OpinionDetalleEditorial /></React.Suspense>} />
-                <Route path="opinion/columnista/:id" element={<React.Suspense fallback={null}><OpinionDetalleColumnista /></React.Suspense>} />
+                <Route path="opinion/editoriales/:id" element={<React.Suspense fallback={null}><OpinionDetalleEditorial /></React.Suspense>} />
+                <Route path="opinion/columnistas/:id" element={<React.Suspense fallback={null}><OpinionDetalleColumnista /></React.Suspense>} />
               </Route>
               
               {/* Rutas de administración */}

@@ -186,14 +186,46 @@ export class NewsController {
   // Eliminar una noticia
   public deleteNews = async (req: Request, res: Response): Promise<void> => {
     try {
-      const news = await this.newsRepository.findOne({ where: { id: parseInt(req.params.id) } });
+      // Buscar la noticia con sus imágenes asociadas
+      const news = await this.newsRepository.findOne({ 
+        where: { id: parseInt(req.params.id) },
+        relations: ['newsMedia', 'newsMedia.media']
+      });
+      
       if (!news) {
         res.status(404).json({ message: 'Noticia no encontrada' });
         return;
       }
+
+      // Extraer URLs de imágenes para eliminar de Cloudinary
+      const imageUrls: string[] = [];
+      if (news.newsMedia && news.newsMedia.length > 0) {
+        news.newsMedia.forEach((newsMediaItem: any) => {
+          if (newsMediaItem.media && newsMediaItem.media.url && newsMediaItem.media.tipo === 'imagen') {
+            imageUrls.push(newsMediaItem.media.url);
+          }
+        });
+      }
+
+      // Eliminar la noticia de la base de datos
       await this.newsRepository.remove(news);
+
+      // Eliminar imágenes de Cloudinary de forma asíncrona
+      if (imageUrls.length > 0) {
+        // Importar las funciones de Cloudinary
+        const { deleteMultipleImages } = require('../config/cloudinary');
+        
+        // Eliminar imágenes en segundo plano (no bloquear la respuesta)
+        deleteMultipleImages(imageUrls).catch((error: any) => {
+          console.error('Error al limpiar imágenes de Cloudinary:', error);
+        });
+        
+        console.log(`Noticia eliminada. Limpiando ${imageUrls.length} imágenes de Cloudinary...`);
+      }
+
       res.status(204).send();
     } catch (error) {
+      console.error('Error al eliminar la noticia:', error);
       res.status(500).json({ message: 'Error al eliminar la noticia' });
     }
   };

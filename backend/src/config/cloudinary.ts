@@ -39,9 +39,42 @@ export const getOptimizedImageUrl = (publicId: string, options: any = {}) => {
 export const deleteImage = async (publicId: string) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId);
+    console.log(`Imagen eliminada de Cloudinary: ${publicId}`, result);
     return result;
   } catch (error) {
     console.error('Error al eliminar imagen:', error);
+    throw error;
+  }
+};
+
+// Función para extraer public_id de URL de Cloudinary
+export const extractPublicIdFromUrl = (url: string): string | null => {
+  try {
+    // Ejemplo de URL: https://res.cloudinary.com/your-cloud/image/upload/v1234567890/ciudadguaricor/noticias/abc123.jpg
+    const regex = /\/v\d+\/(.+)\.[a-zA-Z]{3,4}$/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  } catch (error) {
+    console.error('Error al extraer public_id:', error);
+    return null;
+  }
+};
+
+// Función para limpiar múltiples imágenes
+export const deleteMultipleImages = async (urls: string[]): Promise<void> => {
+  try {
+    const deletePromises = urls.map(async (url) => {
+      const publicId = extractPublicIdFromUrl(url);
+      if (publicId) {
+        return await deleteImage(publicId);
+      }
+      return null;
+    });
+    
+    await Promise.all(deletePromises);
+    console.log(`Eliminadas ${urls.length} imágenes de Cloudinary`);
+  } catch (error) {
+    console.error('Error al eliminar múltiples imágenes:', error);
     throw error;
   }
 };

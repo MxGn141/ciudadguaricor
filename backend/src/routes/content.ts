@@ -111,10 +111,38 @@ router.put('/contenido-destacado/:id', uploadContenido.single('file'), async (re
 router.delete('/contenido-destacado/:id', async (req, res) => {
   try {
     const prisma = getPrismaClient();
-    const contenido = await prisma.contenidoDestacado.findUnique({ where: { id: parseInt(req.params.id) } });
-    if (!contenido) return res.status(404).json({ message: 'Contenido destacado no encontrado' });
     
+    // Buscar el contenido destacado antes de eliminarlo
+    const contenido = await prisma.contenidoDestacado.findUnique({ 
+      where: { id: parseInt(req.params.id) } 
+    });
+    
+    if (!contenido) {
+      return res.status(404).json({ message: 'Contenido destacado no encontrado' });
+    }
+    
+    // Extraer URL de la imagen para eliminar de Cloudinary
+    const imageUrl = contenido.media;
+    
+    // Eliminar el contenido de la base de datos
     await prisma.contenidoDestacado.delete({ where: { id: parseInt(req.params.id) } });
+    
+    // Eliminar imagen de Cloudinary de forma asíncrona
+    if (imageUrl) {
+      // Importar las funciones de Cloudinary
+      const { extractPublicIdFromUrl, deleteImage } = require('../config/cloudinary');
+      
+      // Eliminar imagen en segundo plano (no bloquear la respuesta)
+      const publicId = extractPublicIdFromUrl(imageUrl);
+      if (publicId) {
+        deleteImage(publicId).catch((error: any) => {
+          console.error('Error al limpiar imagen de Cloudinary:', error);
+        });
+        
+        console.log(`Contenido destacado eliminado. Limpiando imagen de Cloudinary: ${publicId}`);
+      }
+    }
+    
     res.status(204).send();
   } catch (error) {
     console.error('Error al eliminar contenido destacado:', error);

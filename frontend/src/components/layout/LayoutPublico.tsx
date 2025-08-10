@@ -58,7 +58,7 @@ export default function LayoutPublico() {
 
             {/* Barra Lateral */}
             <aside className="w-full md:w-80 shrink-0 order-2 md:order-none">
-              <div className="sticky top-[calc(var(--header-height)+1rem)] space-y-6">
+              <div className="space-y-6">
                 <BarraLateral />
               </div>
             </aside>

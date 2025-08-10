@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, User, ArrowRight, Newspaper, Filter, Search } from 'lucide-react';
-import BarraLateral from '../components/comunes/BarraLateral';
+import { Calendar, BookOpen, MessageSquare, User } from 'lucide-react';
 import axios from 'axios';
+import { createApiUrl } from '../config/api';
 
 interface Editorial {
   id: number;
@@ -12,70 +12,112 @@ interface Editorial {
   autor?: string;
 }
 
+interface Noticia {
+  id: number;
+  titulo: string;
+  fecha_publicacion: string;
+  seccion: { nombre: string };
+}
+
 const OpinionEditoriales: React.FC = () => {
   const [editoriales, setEditoriales] = useState<Editorial[]>([]);
-  const [editorialesFiltrados, setEditorialesFiltrados] = useState<Editorial[]>([]);
+  const [noticias, setNoticias] = useState<Noticia[]>([]);
   const [loading, setLoading] = useState(true);
-  const [busqueda, setBusqueda] = useState('');
-  const [ordenPor, setOrdenPor] = useState<'fecha' | 'titulo'>('fecha');
 
   useEffect(() => {
-    const fetchEditoriales = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('/api/editoriales');
-        setEditoriales(response.data);
-        setEditorialesFiltrados(response.data);
+        const [editorialesRes, noticiasRes] = await Promise.all([
+          axios.get(createApiUrl('/api/editoriales')),
+          axios.get(createApiUrl('/api/noticias?limit=5'))
+        ]);
+        setEditoriales(editorialesRes.data);
+        setNoticias(noticiasRes.data);
       } catch (error) {
-        console.error('Error fetching editoriales:', error);
+        console.error('Error fetching data:', error);
+        // Datos de ejemplo si falla la API
+        setEditoriales([
+          {
+            id: 1,
+            titulo: "Reflexiones sobre el futuro de nuestra región",
+            contenido: "En estos tiempos de cambio, es fundamental que como sociedad reflexionemos sobre el rumbo que queremos tomar. La participación ciudadana y el compromiso con el desarrollo sostenible son claves para construir un mejor mañana. Necesitamos líderes visionarios que entiendan las necesidades de nuestra comunidad y trabajen incansablemente por el progreso de todos.",
+            fecha: "2024-01-15",
+            autor: "Redacción Editorial"
+          },
+          {
+            id: 2,
+            titulo: "La importancia de la educación en el desarrollo local",
+            contenido: "La educación sigue siendo la herramienta más poderosa para transformar nuestra realidad. Invertir en educación de calidad es invertir en el futuro de nuestras comunidades. Debemos garantizar que todos los niños y jóvenes tengan acceso a una formación integral que les permita desarrollar su máximo potencial.",
+            fecha: "2024-01-12",
+            autor: "Redacción Editorial"
+          },
+          {
+            id: 3,
+            titulo: "Desarrollo económico y sostenibilidad ambiental",
+            contenido: "El crecimiento económico debe ir de la mano con la protección del medio ambiente y la justicia social. Es posible crear empleos y generar riqueza sin comprometer los recursos naturales para las futuras generaciones. La innovación y la tecnología verde son aliados fundamentales en esta misión.",
+            fecha: "2024-01-10",
+            autor: "Redacción Editorial"
+          },
+          {
+            id: 4,
+            titulo: "Fortalecimiento de la democracia participativa",
+            contenido: "La democracia no se limita al ejercicio del voto, sino que requiere la participación activa y constante de la ciudadanía. Es necesario crear espacios de diálogo y consulta que permitan a todos los sectores de la sociedad contribuir en la toma de decisiones que afectan su futuro.",
+            fecha: "2024-01-08",
+            autor: "Redacción Editorial"
+          },
+          {
+            id: 5,
+            titulo: "La cultura como motor de identidad y progreso",
+            contenido: "Nuestra riqueza cultural es un patrimonio invaluable que debe ser preservado y promovido. Las tradiciones, el arte y las expresiones culturales locales no solo fortalecen nuestra identidad, sino que también pueden convertirse en motores de desarrollo económico a través del turismo cultural y las industrias creativas.",
+            fecha: "2024-01-05",
+            autor: "Redacción Editorial"
+          }
+        ]);
+        setNoticias([
+          {
+            id: 1,
+            titulo: "Análisis de la situación política actual",
+            fecha_publicacion: "2024-01-15",
+            seccion: { nombre: "Política" }
+          },
+          {
+            id: 2,
+            titulo: "Perspectivas económicas para el nuevo año",
+            fecha_publicacion: "2024-01-14",
+            seccion: { nombre: "Economía" }
+          },
+          {
+            id: 3,
+            titulo: "Iniciativas culturales en la región",
+            fecha_publicacion: "2024-01-13",
+            seccion: { nombre: "Cultura" }
+          },
+          {
+            id: 4,
+            titulo: "Avances en infraestructura educativa",
+            fecha_publicacion: "2024-01-12",
+            seccion: { nombre: "Educación" }
+          },
+          {
+            id: 5,
+            titulo: "Proyectos de desarrollo sostenible",
+            fecha_publicacion: "2024-01-11",
+            seccion: { nombre: "Medio Ambiente" }
+          }
+        ]);
       } finally {
         setLoading(false);
       }
     };
-    fetchEditoriales();
+    fetchData();
   }, []);
-
-  useEffect(() => {
-    let filtrados = [...editoriales];
-
-    // Filtrar por búsqueda
-    if (busqueda.trim()) {
-      filtrados = filtrados.filter(editorial =>
-        editorial.titulo.toLowerCase().includes(busqueda.toLowerCase()) ||
-        editorial.contenido.toLowerCase().includes(busqueda.toLowerCase()) ||
-        (editorial.autor && editorial.autor.toLowerCase().includes(busqueda.toLowerCase()))
-      );
-    }
-
-    // Ordenar
-    filtrados.sort((a, b) => {
-      if (ordenPor === 'fecha') {
-        return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
-      } else {
-        return a.titulo.localeCompare(b.titulo);
-      }
-    });
-
-    setEditorialesFiltrados(filtrados);
-  }, [editoriales, busqueda, ordenPor]);
-
-  const formatearFecha = (fecha: string) => {
-    return new Date(fecha).toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
-
-  const truncarTexto = (texto: string, limite: number) => {
-    return texto.length > limite ? texto.substring(0, limite) + '...' : texto;
-  };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-guarico-green mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-guarico-blue mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando editoriales...</p>
         </div>
       </div>
@@ -85,159 +127,146 @@ const OpinionEditoriales: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-guarico-gold to-yellow-500 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="bg-gradient-to-r from-guarico-blue to-blue-700 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
-              <Newspaper className="h-12 w-12 text-white mr-4" />
-              <h1 className="text-4xl md:text-5xl font-bold">Editoriales</h1>
+              <BookOpen className="h-12 w-12 text-white mr-4" />
+              <h1 className="text-5xl font-bold">Editoriales</h1>
             </div>
-            <p className="text-lg md:text-xl text-yellow-100 max-w-2xl mx-auto">
-              La voz institucional de Ciudad Guárico. Análisis y posiciones sobre los temas más relevantes.
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              Análisis profundos y reflexiones editoriales sobre los temas más relevantes de nuestra región
             </p>
             <div className="mt-6">
               <Link 
                 to="/opinion"
-                className="inline-flex items-center text-yellow-200 hover:text-white transition-colors duration-300"
+                className="inline-flex items-center text-blue-200 hover:text-white transition-colors duration-300"
               >
-                <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
-                Volver a Opinión
+                ← Volver a Opinión
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Contenido principal */}
-        <div className="lg:col-span-2 flex flex-col gap-12">
-          {/* Controles de búsqueda y filtros */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="text"
-                  placeholder="Buscar en editoriales..."
-                  value={busqueda}
-                  onChange={(e) => setBusqueda(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-guarico-gold focus:border-guarico-gold transition-colors duration-300"
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-5 w-5 text-gray-500" />
-                  <select
-                    value={ordenPor}
-                    onChange={(e) => setOrdenPor(e.target.value as 'fecha' | 'titulo')}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-guarico-gold focus:border-guarico-gold"
-                  >
-                    <option value="fecha">Más recientes</option>
-                    <option value="titulo">Por título</option>
-                  </select>
-                </div>
-                <div className="text-sm text-gray-600">
-                  {editorialesFiltrados.length} editorial{editorialesFiltrados.length !== 1 ? 'es' : ''}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Editorial destacado */}
-          {editorialesFiltrados.length > 0 && (
-            <div className="mb-2">
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-guarico-green to-green-600 px-8 py-6">
-                  <div className="flex items-center">
-                    <Newspaper className="h-8 w-8 text-white mr-3" />
-                    <h2 className="text-2xl font-bold text-white">Editorial Destacado</h2>
-                  </div>
-                </div>
-                <div className="p-8">
-                  <Link 
-                    to={`/opinion/editorial/${editorialesFiltrados[0].id}`}
-                    className="group block"
-                  >
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 group-hover:text-guarico-green transition-colors duration-300">
-                      {editorialesFiltrados[0].titulo}
-                    </h3>
-                    <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                      {truncarTexto(editorialesFiltrados[0].contenido.replace(/<[^>]*>/g, ''), 300)}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center text-gray-500">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Contenido Principal */}
+          <div className="flex-1">
+            {/* Lista de Editoriales */}
+            <div className="space-y-8">
+              {editoriales.map((editorial, index) => (
+                <article key={editorial.id} className={`bg-white rounded-2xl shadow-lg border hover:shadow-xl transition-all duration-300 overflow-hidden ${
+                  index === 0 ? 'transform hover:-translate-y-2' : 'hover:shadow-md'
+                }`}>
+                  <div className={`p-8 ${index === 0 ? 'bg-gradient-to-r from-blue-50 to-indigo-50' : ''}`}>
+                    <Link 
+                      to={`/opinion/editoriales/${editorial.id}`}
+                      className="group block"
+                    >
+                      {index === 0 && (
+                        <div className="inline-flex items-center px-3 py-1 bg-guarico-blue text-white text-sm font-medium rounded-full mb-4">
+                          <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+                          Editorial Destacado
+                        </div>
+                      )}
+                      
+                      <h2 className={`font-bold text-gray-900 group-hover:text-guarico-blue transition-colors duration-300 mb-4 ${
+                        index === 0 ? 'text-3xl' : 'text-2xl'
+                      }`}>
+                        {editorial.titulo}
+                      </h2>
+                      
+                      <div className="flex items-center text-sm text-gray-500 mb-4">
                         <Calendar className="h-4 w-4 mr-2" />
-                        <span>{formatearFecha(editorialesFiltrados[0].fecha)}</span>
-                        {editorialesFiltrados[0].autor && (
+                        <span>{new Date(editorial.fecha).toLocaleDateString('es-ES', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}</span>
+                        {editorial.autor && (
                           <>
-                            <User className="h-4 w-4 ml-4 mr-2" />
-                            <span>{editorialesFiltrados[0].autor}</span>
+                            <span className="mx-2">•</span>
+                            <span>{editorial.autor}</span>
                           </>
                         )}
                       </div>
-                      <div className="flex items-center text-guarico-green font-semibold group-hover:text-guarico-gold transition-colors duration-300">
-                        <span className="mr-2">Leer editorial completo</span>
-                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Lista de editoriales */}
-          {editorialesFiltrados.length > 1 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {editorialesFiltrados.slice(1).map((editorial) => (
-                <article key={editorial.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                  <div className="p-6">
-                    <Link 
-                      to={`/opinion/editorial/${editorial.id}`}
-                      className="group block"
-                    >
-                      <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-guarico-green transition-colors duration-300 line-clamp-2">
-                        {editorial.titulo}
-                      </h3>
-                      <p className="text-gray-600 mb-4 line-clamp-4 leading-relaxed">
-                        {truncarTexto(editorial.contenido.replace(/<[^>]*>/g, ''), 150)}
+                      
+                      <p className={`text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors ${
+                        index === 0 ? 'text-lg mb-6' : 'mb-4'
+                      }`}>
+                        {editorial.contenido.substring(0, index === 0 ? 300 : 200)}...
                       </p>
-                      <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-1" />
-                          <span>{formatearFecha(editorial.fecha)}</span>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="inline-flex items-center text-guarico-blue group-hover:text-blue-700 font-medium transition-colors">
+                          <span className="mr-2">Leer editorial completo</span>
+                          <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
                         </div>
-                        {editorial.autor && (
-                          <div className="flex items-center">
-                            <User className="h-4 w-4 mr-1" />
-                            <span>{editorial.autor}</span>
+                        
+                        {index === 0 && (
+                          <div className="flex items-center space-x-2 text-sm text-gray-500">
+                            <MessageSquare className="h-4 w-4" />
+                            <span>Destacado</span>
                           </div>
                         )}
-                      </div>
-                      <div className="flex items-center text-guarico-green font-medium group-hover:text-guarico-gold transition-colors duration-300">
-                        <span className="mr-2">Leer más</span>
-                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                       </div>
                     </Link>
                   </div>
                 </article>
               ))}
             </div>
-          ) : editorialesFiltrados.length === 0 ? (
-            <div className="text-center py-16">
-              <Newspaper className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">No se encontraron editoriales</h3>
-              <p className="text-gray-500">
-                {busqueda ? 'Intenta con otros términos de búsqueda' : 'Aún no hay editoriales publicados'}
-              </p>
-            </div>
-          ) : null}
-        </div>
+          </div>
 
-        {/* Sidebar derecho: minuto a minuto y publicidades */}
-        <aside className="hidden lg:block lg:col-span-1">
-          <BarraLateral />
-        </aside>
+          {/* Sidebar */}
+          <div className="lg:w-80">
+            <div className="bg-white rounded-2xl shadow-lg border p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <MessageSquare className="mr-3 h-6 w-6 text-guarico-blue" />
+                Minuto a Minuto
+              </h3>
+              <div className="space-y-6">
+                {noticias.slice(0, 5).map((noticia, index) => {
+                  const colors = ['border-guarico-blue', 'border-green-500', 'border-purple-500', 'border-orange-500', 'border-red-500'];
+                  return (
+                    <div key={noticia.id} className={`border-l-4 ${colors[index]} pl-4 hover:bg-gray-50 p-3 rounded-r-lg transition-colors`}>
+                      <h4 className="font-semibold text-gray-900 mb-2 hover:text-guarico-blue transition-colors cursor-pointer">
+                        {noticia.titulo}
+                      </h4>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        <span>{new Date(noticia.fecha_publicacion).toLocaleDateString('es-ES')} • {noticia.seccion.nombre}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            
+            {/* Sección adicional de navegación rápida */}
+            <div className="mt-8 bg-white rounded-2xl shadow-lg border p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">
+                Navegación Rápida
+              </h3>
+              <div className="space-y-4">
+                <Link 
+                  to="/opinion" 
+                  className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+                >
+                  <BookOpen className="h-5 w-5 text-guarico-blue mr-3" />
+                  <span className="font-medium text-gray-900 group-hover:text-guarico-blue transition-colors">Opinión Principal</span>
+                </Link>
+                <Link 
+                  to="/opinion/columnistas" 
+                  className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+                >
+                  <User className="h-5 w-5 text-guarico-blue mr-3" />
+                  <span className="font-medium text-gray-900 group-hover:text-guarico-blue transition-colors">Columnistas</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

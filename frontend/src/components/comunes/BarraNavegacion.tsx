@@ -18,6 +18,7 @@ const seccionesMas = [
   { nombre: 'COMUNIDAD', ruta: '/seccion/Comunidad' },
   { nombre: 'SEGURIDAD', ruta: '/seccion/Seguridad' },
   { nombre: 'TURISMO', ruta: '/seccion/Turismo' },
+  { nombre: 'EDUCACIÓN', ruta: '/seccion/Educación' },
 ];
 
 // Todas las secciones para móvil

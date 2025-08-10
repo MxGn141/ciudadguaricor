@@ -18,9 +18,44 @@ const GestionarColumnistas: React.FC = () => {
 
   const fetchColumnistas = async () => {
     setLoading(true);
-    const res = await axios.get('/api/columnistas');
-    setColumnistas(res.data);
-    setLoading(false);
+    try {
+      // Intentar conectarse a diferentes endpoints
+      const API_ENDPOINTS = [
+        'https://ciudadguaricor.onrender.com/api', // Producción
+        'http://localhost:3000/api', // Desarrollo
+        'http://localhost:3001/api', // Desarrollo alternativo
+        '/api' // Fallback
+      ];
+      
+      let columnistasData = [];
+      let apiConnected = false;
+      
+      for (const API_BASE of API_ENDPOINTS) {
+        try {
+          console.log(`🔍 Admin: Conectando a ${API_BASE}/columnistas`);
+          const res = await axios.get(`${API_BASE}/columnistas`);
+          columnistasData = res.data;
+          apiConnected = true;
+          console.log('✅ Admin: Columnistas cargados:', columnistasData.length);
+          break;
+        } catch (apiError: any) {
+          console.log(`❌ Admin: Error en ${API_BASE}:`, apiError.message);
+          continue;
+        }
+      }
+      
+      if (apiConnected) {
+        setColumnistas(columnistasData);
+      } else {
+        console.error('❌ Admin: No se pudo conectar a ningún endpoint');
+        setColumnistas([]);
+      }
+    } catch (error) {
+      console.error('❌ Admin: Error general:', error);
+      setColumnistas([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -40,10 +75,35 @@ const GestionarColumnistas: React.FC = () => {
       fotoUrl: nuevo.fotoUrl || '',
       redes: nuevo.redes ? (typeof nuevo.redes === 'string' ? nuevo.redes : JSON.stringify(nuevo.redes)) : undefined
     };
-    if (editando) {
-      await axios.put(`/api/columnistas/${editando}`, payload);
-    } else {
-      await axios.post('/api/columnistas', payload);
+    // Usar el mismo sistema de endpoints múltiples
+    const API_ENDPOINTS = [
+      'https://ciudadguaricor.onrender.com/api', // Producción
+      'http://localhost:3000/api', // Desarrollo
+      'http://localhost:3001/api', // Desarrollo alternativo
+      '/api' // Fallback
+    ];
+    
+    let success = false;
+    for (const API_BASE of API_ENDPOINTS) {
+      try {
+        if (editando) {
+          await axios.put(`${API_BASE}/columnistas/${editando}`, payload);
+          console.log('✅ Admin: Columnista actualizado');
+        } else {
+          await axios.post(`${API_BASE}/columnistas`, payload);
+          console.log('✅ Admin: Columnista creado');
+        }
+        success = true;
+        break;
+      } catch (apiError: any) {
+        console.log(`❌ Admin: Error en ${API_BASE}:`, apiError.message);
+        continue;
+      }
+    }
+    
+    if (!success) {
+      alert('Error: No se pudo conectar al servidor');
+      return;
     }
     setNuevo({});
     setEditando(null);
@@ -57,8 +117,32 @@ const GestionarColumnistas: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('¿Eliminar columnista?')) return;
-    await axios.delete(`/api/columnistas/${id}`);
-    fetchColumnistas();
+    
+    const API_ENDPOINTS = [
+      'https://ciudadguaricor.onrender.com/api', // Producción
+      'http://localhost:3000/api', // Desarrollo
+      'http://localhost:3001/api', // Desarrollo alternativo
+      '/api' // Fallback
+    ];
+    
+    let success = false;
+    for (const API_BASE of API_ENDPOINTS) {
+      try {
+        await axios.delete(`${API_BASE}/columnistas/${id}`);
+        console.log('✅ Admin: Columnista eliminado');
+        success = true;
+        break;
+      } catch (apiError: any) {
+        console.log(`❌ Admin: Error eliminando en ${API_BASE}:`, apiError.message);
+        continue;
+      }
+    }
+    
+    if (success) {
+      fetchColumnistas();
+    } else {
+      alert('Error: No se pudo eliminar el columnista');
+    }
   };
 
   return (

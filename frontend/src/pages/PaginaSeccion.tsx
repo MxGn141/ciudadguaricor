@@ -3,7 +3,7 @@ import { useParams, Navigate, Link } from 'react-router-dom';
 import { useContextoNoticias, Noticia } from '../contexts/ContextoNoticias';
 import { Calendar, Clock } from 'lucide-react';
 
-const seccionesValidas = ['Gestión', 'Municipales', 'Deportes', 'Salud', 'Cultura', 'Produccion', 'Comunidad', 'Seguridad', 'Turismo'];
+const seccionesValidas = ['Gestión', 'Municipales', 'Deportes', 'Salud', 'Cultura', 'Produccion', 'Comunidad', 'Seguridad', 'Turismo', 'Educación'];
 
 const coloresSeccion = {
   'Gestión': 'from-blue-600 to-blue-800',
@@ -14,7 +14,8 @@ const coloresSeccion = {
   'Produccion': 'from-emerald-600 to-emerald-800',
   'Comunidad': 'from-pink-600 to-pink-800',
   'Seguridad': 'from-red-600 to-red-800',
-  'Turismo': 'from-cyan-600 to-cyan-800'
+  'Turismo': 'from-cyan-600 to-cyan-800',
+  'Educación': 'from-indigo-600 to-indigo-800'
 };
 
 export default function PaginaSeccion() {

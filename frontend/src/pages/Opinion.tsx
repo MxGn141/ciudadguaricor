@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, User, ArrowRight, Quote, Newspaper, Users } from 'lucide-react';
+import { Calendar, User, BookOpen, MessageSquare } from 'lucide-react';
 import axios from 'axios';
 
 interface Editorial {
@@ -16,6 +16,7 @@ interface Columnista {
   nombre: string;
   bio: string;
   fotoUrl?: string;
+  articulos?: Opinion[];
 }
 
 interface Opinion {
@@ -30,47 +31,85 @@ interface Opinion {
 const OpinionPage: React.FC = () => {
   const [editoriales, setEditoriales] = useState<Editorial[]>([]);
   const [columnistas, setColumnistas] = useState<Columnista[]>([]);
-  const [opiniones, setOpiniones] = useState<Opinion[]>([]);
+  const [mostrarTodos, setMostrarTodos] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAll = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const [edRes, colRes, opRes] = await Promise.all([
+        const [editorialesRes, columnistasRes] = await Promise.all([
           axios.get('/api/editoriales'),
-          axios.get('/api/columnistas'),
-          axios.get('/api/opiniones')
+          axios.get('/api/columnistas')
         ]);
-        setEditoriales(edRes.data);
-        setColumnistas(colRes.data);
-        setOpiniones(opRes.data);
+        setEditoriales(editorialesRes.data);
+        setColumnistas(columnistasRes.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching opinion data:', error);
+        // Datos de ejemplo si falla la API
+        setEditoriales([
+          {
+            id: 1,
+            titulo: "Reflexiones sobre el futuro de nuestra región",
+            contenido: "En estos tiempos de cambio, es fundamental que como sociedad reflexionemos sobre el rumbo que queremos tomar. La participación ciudadana y el compromiso con el desarrollo sostenible son claves para construir un mejor mañana.",
+            fecha: "2024-01-15",
+            autor: "Redacción Editorial"
+          },
+          {
+            id: 2,
+            titulo: "La importancia de la educación en el desarrollo local",
+            contenido: "La educación sigue siendo la herramienta más poderosa para transformar nuestra realidad. Invertir en educación de calidad es invertir en el futuro de nuestras comunidades.",
+            fecha: "2024-01-12",
+            autor: "Redacción Editorial"
+          },
+          {
+            id: 3,
+            titulo: "Desarrollo económico y sostenibilidad",
+            contenido: "El crecimiento económico debe ir de la mano con la protección del medio ambiente y la justicia social.",
+            fecha: "2024-01-10",
+            autor: "Redacción Editorial"
+          }
+        ]);
+        setColumnistas([
+          {
+            id: 1,
+            nombre: "María González",
+            bio: "Periodista especializada en política y análisis social con más de 15 años de experiencia.",
+            fotoUrl: "https://via.placeholder.com/150x150?text=MG"
+          },
+          {
+            id: 2,
+            nombre: "Carlos Rodríguez",
+            bio: "Analista económico y columnista de opinión enfocado en temas de desarrollo regional.",
+            fotoUrl: "https://via.placeholder.com/150x150?text=CR"
+          },
+          {
+            id: 3,
+            nombre: "Ana Martínez",
+            bio: "Escritora y columnista cultural, especialista en literatura latinoamericana.",
+            fotoUrl: "https://via.placeholder.com/150x150?text=AM"
+          },
+          {
+            id: 4,
+            nombre: "Luis Pérez",
+            bio: "Columnista deportivo y analista de la actualidad deportiva regional.",
+            fotoUrl: "https://via.placeholder.com/150x150?text=LP"
+          }
+        ]);
       } finally {
         setLoading(false);
       }
     };
-    fetchAll();
+    fetchData();
   }, []);
 
-  const formatearFecha = (fecha: string) => {
-    return new Date(fecha).toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
-
-  const truncarTexto = (texto: string, limite: number) => {
-    return texto.length > limite ? texto.substring(0, limite) + '...' : texto;
-  };
+  const columnistasVisibles = mostrarTodos ? columnistas : columnistas.slice(0, 6);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-guarico-green mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-guarico-blue mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando contenido de opinión...</p>
         </div>
       </div>
@@ -79,177 +118,181 @@ const OpinionPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-guarico-green to-green-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-16">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-guarico-blue to-blue-700 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <div className="flex items-center justify-center mb-6">
-              <Quote className="h-12 w-12 text-guarico-gold mr-4" />
-              <h1 className="text-5xl md:text-6xl font-bold">Opinión</h1>
-            </div>
-            <p className="text-xl md:text-2xl text-green-100 max-w-3xl mx-auto leading-relaxed">
-              Voces autorizadas, análisis profundo y perspectivas que enriquecen el debate público
+            <h1 className="text-5xl font-bold mb-4">Opinión</h1>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              Análisis, reflexiones y perspectivas sobre los temas que nos importan
             </p>
-            <div className="flex items-center justify-center mt-8 space-x-8 text-green-200">
-              <div className="flex items-center">
-                <Newspaper className="h-5 w-5 mr-2" />
-                <span>Editoriales</span>
-              </div>
-              <div className="flex items-center">
-                <Users className="h-5 w-5 mr-2" />
-                <span>Columnistas</span>
-              </div>
-              <div className="flex items-center">
-                <Quote className="h-5 w-5 mr-2" />
-                <span>Columnas</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Editorial destacado a la izquierda (en mobile arriba) */}
-          <section className="lg:col-span-2 flex flex-col gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Sección Editorial */}
+          <div>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 flex items-center">
+                <BookOpen className="mr-3 h-8 w-8 text-guarico-blue" />
+                Editorial
+              </h2>
+              <Link 
+                to="/opinion/editoriales" 
+                className="bg-guarico-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Ver todos
+              </Link>
+            </div>
+            
             {editoriales.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
-                <div className="bg-gradient-to-r from-guarico-gold to-yellow-500 px-8 py-6">
-                  <div className="flex items-center">
-                    <Newspaper className="h-8 w-8 text-white mr-3" />
-                    <h2 className="text-3xl font-bold text-white">Editorial Destacado</h2>
+              <div className="bg-white rounded-xl shadow-lg border p-8 mb-6 hover:shadow-xl transition-shadow">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  {editoriales[0].titulo}
+                </h3>
+                <p className="text-gray-600 mb-6 leading-relaxed text-lg">
+                  {editoriales[0].contenido.substring(0, 250)}...
+                </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    {new Date(editoriales[0].fecha).toLocaleDateString('es-ES', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
                   </div>
-                </div>
-                <div className="p-8">
                   <Link 
-                    to={`/opinion/editorial/${editoriales[0].id}`}
-                    className="group block"
+                    to={`/opinion/editoriales/${editoriales[0].id}`}
+                    className="text-guarico-blue hover:text-blue-700 font-medium"
                   >
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 group-hover:text-guarico-green transition-colors duration-300">
-                      {editoriales[0].titulo}
-                    </h3>
-                    <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                      {truncarTexto(editoriales[0].contenido.replace(/<[^>]*>/g, ''), 200)}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center text-gray-500">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        <span>{formatearFecha(editoriales[0].fecha)}</span>
-                        {editoriales[0].autor && (
-                          <>
-                            <User className="h-4 w-4 ml-4 mr-2" />
-                            <span>{editoriales[0].autor}</span>
-                          </>
-                        )}
-                      </div>
-                      <div className="flex items-center text-guarico-green font-semibold group-hover:text-guarico-gold transition-colors duration-300">
-                        <span className="mr-2">Leer editorial</span>
-                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                      </div>
-                    </div>
+                    Leer más →
                   </Link>
-                  <div className="mt-6">
-                    <Link to="/opinion/editoriales" className="inline-block px-6 py-2 rounded-lg bg-guarico-gold text-black font-semibold hover:bg-yellow-400 transition">Más editoriales</Link>
-                  </div>
                 </div>
               </div>
             )}
-            {/* Aquí podrías poner columnas destacadas o recientes si lo deseas en el futuro */}
-          </section>
-          {/* Columnistas Destacados */}
-          <section className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden h-fit">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Users className="h-6 w-6 text-white mr-2" />
-                    <h2 className="text-xl font-bold text-white">Columnistas</h2>
-                  </div>
-                  <Link 
-                    to="/opinion/columnistas"
-                    className="text-blue-200 hover:text-white transition-colors duration-300 text-sm font-medium"
-                  >
-                    Ver todos
-                  </Link>
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="space-y-4">
-                  {columnistas.slice(0, 6).map(columnista => (
+            
+            <div className="space-y-4">
+              {editoriales.slice(1, 4).map((editorial) => (
+                <div key={editorial.id} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
+                  <h4 className="font-semibold text-gray-900 mb-2 text-lg">
+                    {editorial.titulo}
+                  </h4>
+                  <p className="text-gray-600 mb-3 text-sm">
+                    {editorial.contenido.substring(0, 120)}...
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-sm text-gray-500">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      {new Date(editorial.fecha).toLocaleDateString('es-ES')}
+                    </div>
                     <Link 
-                      key={columnista.id}
-                      to={`/opinion/columnista/${columnista.id}`}
-                      className="group flex items-center p-4 rounded-xl hover:bg-gray-50 transition-all duration-300 border border-gray-100 hover:border-blue-200"
+                      to={`/opinion/editoriales/${editorial.id}`}
+                      className="text-guarico-blue hover:text-blue-700 text-sm font-medium"
                     >
-                      <div className="flex-shrink-0 mr-4">
-                        {columnista.fotoUrl ? (
-                          <img 
-                            src={columnista.fotoUrl} 
-                            alt={columnista.nombre}
-                            className="w-16 h-16 rounded-full object-cover border-3 border-blue-200 group-hover:border-blue-400 transition-colors duration-300"
-                          />
-                        ) : (
-                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                            <User className="h-8 w-8 text-white" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
-                          {columnista.nombre}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                          {truncarTexto(columnista.bio, 80)}
-                        </p>
-                      </div>
-                      <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0 ml-2" />
+                      Leer →
                     </Link>
-                  ))}
+                  </div>
                 </div>
-                <div className="mt-6">
-                  <Link to="/opinion/columnistas" className="inline-block px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">Más columnistas</Link>
-                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sección Columnistas */}
+          <div>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 flex items-center">
+                <User className="mr-3 h-8 w-8 text-guarico-blue" />
+                Columnistas
+              </h2>
+              <Link 
+                to="/opinion/columnistas" 
+                className="bg-guarico-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Ver todos
+              </Link>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              {columnistasVisibles.map((columnista) => (
+                <Link 
+                  key={columnista.id} 
+                  to={`/opinion/columnistas/${columnista.id}`}
+                  className="bg-white rounded-xl shadow-sm border p-6 text-center hover:shadow-lg transition-all transform hover:-translate-y-1 group"
+                >
+                  <div className="mb-4">
+                    {columnista.fotoUrl ? (
+                      <img
+                        src={columnista.fotoUrl}
+                        alt={columnista.nombre}
+                        className="w-16 h-16 rounded-full mx-auto object-cover border-4 border-gray-200 group-hover:border-guarico-blue transition-colors"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-guarico-blue flex items-center justify-center mx-auto group-hover:bg-blue-700 transition-colors">
+                        <span className="text-white font-bold text-lg">
+                          {columnista.nombre.charAt(0)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <h4 className="font-semibold text-gray-900 mb-2 group-hover:text-guarico-blue transition-colors">
+                    {columnista.nombre}
+                  </h4>
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    {columnista.bio.substring(0, 80)}...
+                  </p>
+                </Link>
+              ))}
+            </div>
+            
+            {columnistas.length > 6 && (
+              <button
+                onClick={() => setMostrarTodos(!mostrarTodos)}
+                className="w-full bg-white border-2 border-guarico-blue text-guarico-blue rounded-lg px-6 py-3 hover:bg-guarico-blue hover:text-white transition-colors flex items-center justify-center font-medium"
+              >
+                {mostrarTodos ? 'Ver menos columnistas' : 'Ver más columnistas'}
+              </button>
+            )}
+          </div>
+        </div>
+        
+        {/* Sidebar Minuto a Minuto */}
+        <div className="mt-16">
+          <div className="bg-white rounded-xl shadow-lg border p-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+              <MessageSquare className="mr-3 h-6 w-6 text-guarico-blue" />
+              Minuto a Minuto
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="border-l-4 border-guarico-blue pl-4">
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Análisis político semanal
+                </h4>
+                <p className="text-sm text-gray-500">Hace 2 horas • Política</p>
               </div>
-              <div className="p-6">
-                <div className="space-y-6">
-                  {opiniones.filter(op => op.destacado).slice(0, 4).map(opinion => (
-                    <article key={opinion.id} className="group">
-                      <Link 
-                        to={`/opinion/columnista/${opinion.columnista.id}`}
-                        className="block p-6 rounded-xl hover:bg-gray-50 transition-all duration-300 border border-gray-100 hover:border-purple-200"
-                      >
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors duration-300 line-clamp-2">
-                          {opinion.titulo}
-                        </h3>
-                        <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
-                          {truncarTexto(opinion.contenido.replace(/<[^>]*>/g, ''), 150)}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4 text-sm text-gray-500">
-                            <div className="flex items-center">
-                              <User className="h-4 w-4 mr-1" />
-                              <span className="font-medium">{opinion.columnista.nombre}</span>
-                            </div>
-                            <div className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-1" />
-                              <span>{formatearFecha(opinion.fecha)}</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700 transition-colors duration-300">
-                            <span className="mr-1">Ver columnista</span>
-                            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                          </div>
-                        </div>
-                      </Link>
-                    </article>
-                  ))}
-                </div>
+              <div className="border-l-4 border-green-500 pl-4">
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Perspectivas económicas
+                </h4>
+                <p className="text-sm text-gray-500">Hace 4 horas • Economía</p>
+              </div>
+              <div className="border-l-4 border-purple-500 pl-4">
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Cultura y sociedad
+                </h4>
+                <p className="text-sm text-gray-500">Hace 6 horas • Cultura</p>
+              </div>
+              <div className="border-l-4 border-orange-500 pl-4">
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Deportes regionales
+                </h4>
+                <p className="text-sm text-gray-500">Hace 8 horas • Deportes</p>
               </div>
             </div>
-          </section>
+          </div>
         </div>
-
-
       </div>
     </div>
   );

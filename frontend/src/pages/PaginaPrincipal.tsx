@@ -12,7 +12,8 @@ const secciones = [
   { nombre: 'Produccion', color: 'bg-emerald-600', limite: 3 },
   { nombre: 'Comunidad', color: 'bg-pink-600', limite: 3 },
   { nombre: 'Seguridad', color: 'bg-red-600', limite: 3 },
-  { nombre: 'Turismo', color: 'bg-cyan-600', limite: 3 }
+  { nombre: 'Turismo', color: 'bg-cyan-600', limite: 3 },
+  { nombre: 'Educación', color: 'bg-indigo-600', limite: 3 }
 ];
 
 // Paleta de colores para cada sección (igual que en PaginaSeccion)
@@ -24,14 +25,14 @@ const coloresSeccion = {
   'Produccion': 'bg-emerald-600 text-white',
   'Comunidad': 'bg-pink-600 text-white',
   'Seguridad': 'bg-red-600 text-white',
-  'Turismo': 'bg-cyan-600 text-white'
+  'Turismo': 'bg-cyan-600 text-white',
+  'Educación': 'bg-indigo-600 text-white'
 };
 
 export default function PaginaPrincipal() {
   const [noticiasPorSeccion, setNoticiasPorSeccion] = useState<Record<string, Noticia[]>>({});
-  const [todasLasNoticias, setTodasLasNoticias] = useState<Noticia[]>([]);
-  const [noticiasDestacadas, setNoticiasDestacadas] = useState<Noticia[]>([]);
-  const { obtenerNoticiasPorSeccion, noticias, cargandoBusqueda, publicidades, contenidos } = useContextoNoticias();
+
+  const { obtenerNoticiasPorSeccion, noticias, cargandoBusqueda, contenidos } = useContextoNoticias();
   const [noticiaActual, setNoticiaActual] = useState(0);
 
   // Filtrar contenido destacado por ubicación (coincidiendo con backend)
@@ -52,34 +53,29 @@ export default function PaginaPrincipal() {
   }, []);
 
   useEffect(() => {
-    // Procesar todas las noticias para obtener las más nuevas y destacadas
+    // Reiniciar el índice del carrusel cuando cambien las noticias
     if (noticias.length > 0) {
       console.log('Noticias cargadas:', noticias.length);
-      console.log('Primeras 3 noticias:', noticias.slice(0, 3).map(n => ({ id: n.id, titulo: n.titulo, fecha: n.fecha_publicacion })));
-      
-      // Ordenar por fecha de publicación (más nuevas primero)
-      const noticiasOrdenadas = [...noticias].sort((a, b) => 
-        convertirFecha(b.fecha_publicacion).getTime() - convertirFecha(a.fecha_publicacion).getTime()
-      );
-      
-      setTodasLasNoticias(noticiasOrdenadas);
-      
-      // Obtener noticias destacadas
-      const destacadas = noticiasOrdenadas.filter(noticia => noticia.destacada).slice(0, 3);
-      setNoticiasDestacadas(destacadas);
-      
-      // Reiniciar el índice del carrusel cuando cambien las noticias
       setNoticiaActual(0);
     }
   }, [noticias]);
 
   const cargarNoticiasPorSeccion = async () => {
-    const secciones = ['Gestión', 'Municipales', 'Deportes', 'Cultura', 'Produccion', 'Comunidad', 'Seguridad', 'Turismo'];
+    // Usar las secciones definidas arriba para mantener consistencia
+    const nombresSecciones = secciones.map(s => s.nombre);
     const noticiasTemp: Record<string, Noticia[]> = {};
     
-    for (const seccion of secciones) {
-      const noticias = await obtenerNoticiasPorSeccion(seccion);
-      noticiasTemp[seccion] = noticias;
+    console.log('Cargando noticias para secciones:', nombresSecciones);
+    
+    for (const seccion of nombresSecciones) {
+      try {
+        const noticiasSeccion = await obtenerNoticiasPorSeccion(seccion);
+        console.log(`Noticias cargadas para ${seccion}:`, noticiasSeccion.length);
+        noticiasTemp[seccion] = noticiasSeccion;
+      } catch (error) {
+        console.error(`Error cargando noticias para ${seccion}:`, error);
+        noticiasTemp[seccion] = [];
+      }
     }
     
     setNoticiasPorSeccion(noticiasTemp);
@@ -125,10 +121,28 @@ export default function PaginaPrincipal() {
           <h2 className={`text-xl md:text-2xl font-bold px-4 py-2 rounded-lg shadow-md border-2 border-white ${coloresSeccion[seccion as keyof typeof coloresSeccion] || 'bg-blue-600 text-white'}`}>{seccion}</h2>
           <div className={`flex-1 h-0.5 ml-4 ${coloresSeccion[seccion as keyof typeof coloresSeccion]?.split(' ')[0] || 'bg-blue-600'} opacity-30`} />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {noticiasSeccion.slice(0, 6).map((noticia) => (
-            <TarjetaNoticia key={noticia.id} noticia={noticia} />
-          ))}
+        {/* Grid responsivo con CSS que controla la visualización */}
+        <div className="grid gap-4 md:gap-6">
+          {/* Móvil: 2x2 = 4 noticias */}
+          <div className="grid grid-cols-2 gap-4 md:hidden">
+            {noticiasSeccion.slice(0, 4).map((noticia) => (
+              <TarjetaNoticia key={noticia.id} noticia={noticia} />
+            ))}
+          </div>
+          
+          {/* Tablet: 2 noticias lado a lado */}
+          <div className="hidden md:grid lg:hidden grid-cols-2 gap-6">
+            {noticiasSeccion.slice(0, 2).map((noticia) => (
+              <TarjetaNoticia key={noticia.id} noticia={noticia} />
+            ))}
+          </div>
+          
+          {/* Desktop: 3 noticias */}
+          <div className="hidden lg:grid grid-cols-3 gap-6">
+            {noticiasSeccion.slice(0, 3).map((noticia) => (
+              <TarjetaNoticia key={noticia.id} noticia={noticia} />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -306,23 +320,23 @@ export default function PaginaPrincipal() {
 
             {/* Contenido Destacado */}
             {contenidoMain1 && (
-              <article className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="w-full mb-8">
                 {contenidoMain1.url ? (
-                  <a href={contenidoMain1.url} target="_blank" rel="noopener noreferrer">
+                  <a href={contenidoMain1.url} target="_blank" rel="noopener noreferrer" className="block">
                     <img 
                       src={contenidoMain1.media}
                       alt={contenidoMain1.titulo || 'Contenido destacado'}
-                      className="w-full h-60 object-cover"
+                      className="w-full h-auto hover:opacity-90 transition-opacity duration-300"
                     />
                   </a>
                 ) : (
                   <img 
                     src={contenidoMain1.media}
                     alt={contenidoMain1.titulo || 'Contenido destacado'}
-                    className="w-full h-60 object-cover"
+                    className="w-full h-auto"
                   />
                 )}
-              </article>
+              </div>
             )}
 
             {/* Secciones con contenido adicional */}
@@ -333,51 +347,62 @@ export default function PaginaPrincipal() {
                   <React.Fragment key={seccion.nombre}>
                     {/* Contenido Relacionado */}
                     {contenidoMain2 && (
-                      <article className="w-full mb-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                      <div className="w-full mb-8">
                         {contenidoMain2.url ? (
-                          <a href={contenidoMain2.url} target="_blank" rel="noopener noreferrer">
+                          <a href={contenidoMain2.url} target="_blank" rel="noopener noreferrer" className="block">
                             <img 
                               src={contenidoMain2.media}
                               alt={contenidoMain2.titulo || 'Contenido destacado'}
-                              className="w-full h-60 object-cover"
+                              className="w-full h-auto hover:opacity-90 transition-opacity duration-300"
                             />
                           </a>
                         ) : (
                           <img 
                             src={contenidoMain2.media}
                             alt={contenidoMain2.titulo || 'Contenido destacado'}
-                            className="w-full h-60 object-cover"
+                            className="w-full h-auto"
                           />
                         )}
-                      </article>
+                      </div>
                     )}
                     {renderSeccion(seccion.nombre)}
                   </React.Fragment>
                 );
               }
+              
+              // Antes de la sección de Educación, mostrar el banner final
+              if (seccion.nombre === 'Educación') {
+                return (
+                  <React.Fragment key={seccion.nombre}>
+                    {/* Banner publicitario antes de Educación */}
+                    {contenidoMainBg && (
+                      <div className="w-full mb-8">
+                        {contenidoMainBg.url ? (
+                          <a href={contenidoMainBg.url} target="_blank" rel="noopener noreferrer" className="block">
+                            <img 
+                              src={contenidoMainBg.media}
+                              alt={contenidoMainBg.titulo || 'Contenido destacado'}
+                              className="w-full h-auto hover:opacity-90 transition-opacity duration-300"
+                            />
+                          </a>
+                        ) : (
+                          <img 
+                            src={contenidoMainBg.media}
+                            alt={contenidoMainBg.titulo || 'Contenido destacado'}
+                            className="w-full h-auto"
+                          />
+                        )}
+                      </div>
+                    )}
+                    {renderSeccion(seccion.nombre)}
+                  </React.Fragment>
+                );
+              }
+              
               return renderSeccion(seccion.nombre);
             })}
 
-            {/* Banner publicitario final */}
-            {contenidoMainBg && (
-              <div className="w-full mt-8 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                {contenidoMainBg.url ? (
-                  <a href={contenidoMainBg.url} target="_blank" rel="noopener noreferrer">
-                    <img 
-                      src={contenidoMainBg.media}
-                      alt={contenidoMainBg.titulo || 'Contenido destacado'}
-                      className="w-full h-60 object-cover"
-                    />
-                  </a>
-                ) : (
-                  <img 
-                    src={contenidoMainBg.media}
-                    alt={contenidoMainBg.titulo || 'Contenido destacado'}
-                    className="w-full h-60 object-cover"
-                  />
-                )}
-              </div>
-            )}
+
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">

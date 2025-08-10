@@ -60,7 +60,7 @@ export default function EncabezadoPrincipal() {
           style={{
             height: 'clamp(120px, 25vw, 256px)',
             backgroundImage: `url(${bannerHeader?.media || '/media/contenido/header-bg.png'})`,
-            backgroundSize: '100% 100%',
+            backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
           }}

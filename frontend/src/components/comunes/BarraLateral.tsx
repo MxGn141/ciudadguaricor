@@ -1,4 +1,3 @@
-import React from 'react';
 import { useContextoNoticias } from '../../contexts/ContextoNoticias';
 
 export default function BarraLateral() {
@@ -69,7 +68,7 @@ export default function BarraLateral() {
       {/* Contenido Relacionado (contenidos side) */}
       <section className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="bg-guarico-blue text-white px-4 py-3">
-          <h3 className="font-bold">CONTENIDO RELACIONADO</h3>
+          <h3 className="font-bold">Promociones</h3>
         </div>
         <div className="p-4 space-y-4">
           {contenidosSide.length === 0 ? (
@@ -90,9 +89,6 @@ export default function BarraLateral() {
                   alt={contenido.titulo || 'Banner lateral'}
                   className="w-full h-auto object-contain rounded-lg shadow"
                 />
-                {contenido.titulo && (
-                  <div className="mt-2 text-xs text-gray-600 text-center">{contenido.titulo}</div>
-                )}
               </a>
             ))
           )}
