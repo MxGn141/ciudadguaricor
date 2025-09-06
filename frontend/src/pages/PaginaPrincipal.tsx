@@ -123,8 +123,8 @@ export default function PaginaPrincipal() {
         </div>
         {/* Grid responsivo con CSS que controla la visualización */}
         <div className="grid gap-4 md:gap-6">
-          {/* Móvil: 2x2 = 4 noticias */}
-          <div className="grid grid-cols-2 gap-4 md:hidden">
+          {/* Móvil: 1 por fila (apiladas) */}
+          <div className="grid grid-cols-1 gap-4 md:hidden">
             {noticiasSeccion.slice(0, 4).map((noticia) => (
               <TarjetaNoticia key={noticia.id} noticia={noticia} />
             ))}

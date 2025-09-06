@@ -215,7 +215,7 @@ const OpinionPage: React.FC = () => {
               </Link>
             </div>
             
-            <div className="grid grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
               {columnistasVisibles.map((columnista) => (
                 <Link 
                   key={columnista.id} 
